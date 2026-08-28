@@ -1,0 +1,179 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------- */
+/* StudyLab — Design tokens                                               */
+/* Dark es el tema por defecto (uso nocturno / sesiones largas).          */
+/* El tema claro sobreescribe las mismas variables via [data-theme="light"]. */
+/* ---------------------------------------------------------------------- */
+
+:root {
+  color-scheme: dark;
+
+  /* Fondo */
+  --color-bg-base: #0b0e14;
+  --color-bg-base-alt: #12151c;
+  --color-bg-surface: #151a23;
+  --color-bg-surface-2: #1b212c;
+  --color-bg-surface-hover: #212836;
+
+  /* Bordes — separación por contraste sutil, nunca líneas duras */
+  --color-border-subtle: #1f2530;
+  --color-border: #2b3342;
+
+  /* Texto */
+  --color-text-primary: #e7ebf3;
+  --color-text-secondary: #9aa5b8;
+  --color-text-tertiary: #626d82;
+
+  /* Acento — cian apagado, baja saturación, no estimula */
+  --color-accent: #5ec9c0;
+  --color-accent-hover: #79d6ce;
+  --color-accent-active: #4bb0a8;
+  --color-accent-muted: #1c3634;
+  --color-accent-contrast: #06120f;
+
+  /* Estados — reservados a alertas reales, nunca decorativos */
+  --color-danger: #e5484d;
+  --color-danger-muted: #3a1c1e;
+  --color-warning: #f5a623;
+  --color-warning-muted: #3a2c10;
+  --color-success: #4fcb8d;
+  --color-success-muted: #163527;
+
+  /* Sombra — muy sutil, refuerza elevación sin ruido */
+  --shadow-surface: 0 1px 0 0 rgb(255 255 255 / 0.02) inset, 0 8px 24px -12px rgb(0 0 0 / 0.5);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --color-bg-base: #f4f6f9;
+  --color-bg-base-alt: #eceff4;
+  --color-bg-surface: #ffffff;
+  --color-bg-surface-2: #f0f2f6;
+  --color-bg-surface-hover: #e7ebf1;
+
+  --color-border-subtle: #e9ecf2;
+  --color-border: #d7dce5;
+
+  --color-text-primary: #10131a;
+  --color-text-secondary: #4a5468;
+  --color-text-tertiary: #8891a1;
+
+  --color-accent: #2f8f87;
+  --color-accent-hover: #267870;
+  --color-accent-active: #1f645d;
+  --color-accent-muted: #dcefed;
+  --color-accent-contrast: #ffffff;
+
+  --color-danger: #d8383e;
+  --color-danger-muted: #fbe4e4;
+  --color-warning: #b8740c;
+  --color-warning-muted: #fbedd4;
+  --color-success: #218a5b;
+  --color-success-muted: #dcf3e7;
+
+  --shadow-surface: 0 1px 0 0 rgb(255 255 255 / 0.6) inset, 0 8px 24px -14px rgb(16 19 26 / 0.16);
+}
+
+@theme {
+  /* Tipografía */
+  --font-display: "Space Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, "SF Mono", monospace;
+
+  /* Radios — geométricos, discretos */
+  --radius-sm: 0.375rem;   /* 6px  — chips, inputs pequeños */
+  --radius-md: 0.625rem;   /* 10px — botones, inputs */
+  --radius-lg: 0.875rem;   /* 14px — cards, paneles */
+  --radius-xl: 1.25rem;    /* 20px — superficies grandes, modales */
+
+  /* Colores expuestos como utilidades Tailwind (bg-base, text-primary, etc.) */
+  --color-bg-base: var(--color-bg-base);
+  --color-bg-base-alt: var(--color-bg-base-alt);
+  --color-bg-surface: var(--color-bg-surface);
+  --color-bg-surface-2: var(--color-bg-surface-2);
+  --color-bg-surface-hover: var(--color-bg-surface-hover);
+
+  --color-border-subtle: var(--color-border-subtle);
+  --color-border: var(--color-border);
+
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-tertiary: var(--color-text-tertiary);
+
+  --color-accent: var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-accent-active: var(--color-accent-active);
+  --color-accent-muted: var(--color-accent-muted);
+  --color-accent-contrast: var(--color-accent-contrast);
+
+  --color-danger: var(--color-danger);
+  --color-danger-muted: var(--color-danger-muted);
+  --color-warning: var(--color-warning);
+  --color-warning-muted: var(--color-warning-muted);
+  --color-success: var(--color-success);
+  --color-success-muted: var(--color-success-muted);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Base                                                                    */
+/* ---------------------------------------------------------------------- */
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+
+::selection {
+  background-color: var(--color-accent-muted);
+  color: var(--color-text-primary);
+}
+
+/* Foco de teclado siempre visible — accesibilidad, no decorativo */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Fondo ambiental — degradé estático + "respiración" extremadamente lenta */
+/* Nunca compite por atención. Se puede desactivar (.ambient-off) y        */
+/* respeta prefers-reduced-motion.                                        */
+/* ---------------------------------------------------------------------- */
+
+.ambient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% -10%, color-mix(in srgb, var(--color-accent) 7%, transparent), transparent),
+    radial-gradient(ellipse 60% 50% at 100% 100%, color-mix(in srgb, var(--color-accent) 5%, transparent), transparent),
+    linear-gradient(180deg, var(--color-bg-base-alt) 0%, var(--color-bg-base) 55%);
+  animation: ambient-breathe 18s ease-in-out infinite;
+}
+
+@keyframes ambient-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+.ambient-off .ambient-bg {
+  animation: none;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-bg {
+    animation: none;
+  }
+}
