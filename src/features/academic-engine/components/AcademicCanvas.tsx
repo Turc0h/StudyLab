@@ -14,6 +14,7 @@ import {
 } from "../../../db/db";
 import { searchAcademicKnowledge } from "../vectorIndex";
 import { evaluateStudentExplanation, type SocraticEvaluationResult } from "../socraticEvaluator";
+import { generateSocraticProfessorResponse } from "../socraticProfessorEngine";
 import { CitationPill } from "./CitationPill";
 import { PdfViewer } from "../../document-viewer/PdfViewer";
 import {
@@ -26,6 +27,14 @@ import {
   Zap,
   CheckCircle2,
   Share2,
+  Maximize2,
+  Minimize2,
+  ArrowLeftRight,
+  Eye,
+  EyeOff,
+  AlertCircle,
+  XCircle,
+  RotateCcw,
 } from "lucide-react";
 
 interface AcademicCanvasProps {
@@ -33,6 +42,10 @@ interface AcademicCanvasProps {
   chunks: AcademicChunkRecord[];
   onGenerateCardsForChunk?: (chunk: AcademicChunkRecord) => void;
   navigationTarget?: { page: number; bbox?: AcademicBoundingBox; timestamp: number } | null;
+  isRagSwapped?: boolean;
+  onToggleSwapRag?: () => void;
+  isCognitivePanelVisible?: boolean;
+  onToggleCognitivePanel?: () => void;
 }
 
 interface ChatMessage {
@@ -60,21 +73,82 @@ export function AcademicCanvas({
   chunks,
   onGenerateCardsForChunk,
   navigationTarget,
+  isRagSwapped = false,
+  onToggleSwapRag,
+  isCognitivePanelVisible = true,
+  onToggleCognitivePanel,
 }: AcademicCanvasProps) {
   const [activeTab, setActiveTab] = useState<"notes" | "source" | "split">("split");
+  const [chatHeight, setChatHeight] = useState<"compact" | "expanded" | "maximized">("expanded");
   const [notesContent, setNotesContent] = useState<string>(
-    `# Apuntes de Estudio: Electrodinámica y Mecánica Cuántica\n\n## Ley de Faraday-Lenz\nLa variación temporal del flujo magnético induce una fem:\n$$\\mathcal{E} = -\\frac{d\\Phi_B}{dt}$$\nEl signo negativo representa la oposición de Lenz para preservar la energía.\n\n## Operadores Hermíticos\nUn observable cuántico $\\hat{A}$ cumple $\\hat{A} = \\hat{A}^\\dagger$, garantizando que sus autovalores sean estrictamente reales: $a_n \\in \\mathbb{R}$.`,
+    activeSource
+      ? `# Cuaderno de Cátedra: ${activeSource.title}\n\n*Profesor/a:* ${activeSource.professorId || "Cátedra Universitaria"}\n*Carrera:* ${activeSource.career || "Universidad"}\n\n## Síntesis Conceptual y Demostraciones\nEscriba aquí sus deducciones formales, teoremas y fórmulas en LaTeX ($...$) para contrastarlas contra la bibliografía oficial.`
+      : `# Cuaderno de Estudio Universitario\n\nSeleccione o suba un documento en el Gestor de Fuentes para activar la sincronización con el visor y el Catedrático Socrático.`
   );
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
       id: "msg-welcome",
       sender: "assistant",
-      text: "Motor Académico inicializado. Todas las respuestas están estrictamente fundamentadas en tus documentos indexados con citas obligatorias auditables.",
+      text: "Cátedra Universitaria conectada.\n\nEstimado/a estudiante: este claustro opera bajo el principio inquebrantable de Citation-First RAG. Toda afirmación, objeción y pregunta socrática proviene estrictamente de las fuentes que usted provea. No resolveré ejercicios mecánicos por usted; mi labor es auditar su rigor deductivo e interrogar las hipótesis que sustentan sus razonamientos. Formule su hipótesis o exponga su planteo inicial.",
       citations: [],
     },
   ]);
   const [isSearching, setIsSearching] = useState(false);
+
+  const storageKey = `studylab_academic_chat_${activeSource?.id || "global"}`;
+
+  // Restore chat messages per activeSource from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setChatMessages(parsed);
+          return;
+        }
+      }
+    } catch {
+      // ignore
+    }
+    setChatMessages([
+      {
+        id: "msg-welcome",
+        sender: "assistant",
+        text: "Cátedra Universitaria conectada.\n\nEstimado/a estudiante: este claustro opera bajo el principio inquebrantable de Citation-First RAG. Toda afirmación, objeción y pregunta socrática proviene estrictamente de las fuentes que usted provea. No resolveré ejercicios mecánicos por usted; mi labor es auditar su rigor deductivo e interrogar las hipótesis que sustentan sus razonamientos. Formule su hipótesis o exponga su planteo inicial.",
+        citations: [],
+      },
+    ]);
+  }, [storageKey]);
+
+  // Persist chat messages whenever they change
+  useEffect(() => {
+    if (chatMessages.length > 0) {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(chatMessages));
+      } catch {
+        // quota limit
+      }
+    }
+  }, [chatMessages, storageKey]);
+
+  const handleClearChat = () => {
+    const welcomeMsg: ChatMessage = {
+      id: `msg-${Date.now()}`,
+      sender: "assistant",
+      text: "Historial de diálogo reiniciado.\n\nIndique qué concepto, axioma o demostración de las fuentes adjuntas desea examinar rigurosamente.",
+      citations: [],
+    };
+    setChatMessages([welcomeMsg]);
+    try {
+      localStorage.setItem(storageKey, JSON.stringify([welcomeMsg]));
+    } catch {
+      // ignore
+    }
+    setFeedbackToast("Diálogo socrático reiniciado");
+    setTimeout(() => setFeedbackToast(null), 2500);
+  };
 
   // PDF blob from IndexedDB if activeSource has a real uploaded file
   const [fileBlob, setFileBlob] = useState<Blob | null>(null);
@@ -270,54 +344,39 @@ export function AcademicCanvas({
       topK: 3,
     });
 
+    let evaluationResult: SocraticEvaluationResult | undefined;
     if (searchResults.length > 0) {
       const topMatch = searchResults[0];
-      const matchedChunk = topMatch.chunk;
-
-      let responseText = "";
-      if (query.toLowerCase().includes("faraday") || query.toLowerCase().includes("flujo")) {
-        responseText = `De acuerdo con la Ley de Faraday-Lenz, la fuerza electromotriz inducida en un circuito es proporcional a la variación temporal del flujo magnético total. El signo negativo impuesto por Heinrich Lenz obedece estrictamente al principio de conservación de energía, impidiendo que la corriente inducida amplifique la perturbación inicial.`;
-      } else if (query.toLowerCase().includes("hermítico") || query.toLowerCase().includes("autovalor")) {
-        responseText = `En el formalismo cuántico en espacios de Hilbert, los observables medibles físicamente corresponden a operadores autoadjuntos o Hermíticos ($\\hat{A} = \\hat{A}^\\dagger$). Su teorema fundamental demuestra que todos sus autovalores son números estrictamente reales ($a_n \\in \\mathbb{R}$) y sus autoestados asociados son ortogonales, permitiendo probabilidades reales no negativas.`;
-      } else {
-        responseText = `Con base en el análisis del documento "${topMatch.sourceTitle}": ${matchedChunk.rawContent.split("\n")[1] || matchedChunk.rawContent.slice(0, 160)}. La demostración rigurosa preserva la estructura integral en la página ${matchedChunk.pageNumber}.`;
-      }
-
-      let evaluationResult: SocraticEvaluationResult | undefined;
-      if (query.toLowerCase().includes("porque") || query.toLowerCase().includes("es cuando") || query.split(/\s+/).length > 12) {
+      // Run deep socratic evaluation if the query is an explanation or synthesis attempt
+      if (
+        query.toLowerCase().includes("porque") ||
+        query.toLowerCase().includes("es cuando") ||
+        query.toLowerCase().includes("significa") ||
+        query.toLowerCase().includes("sucede que") ||
+        query.split(/\s+/).length >= 8
+      ) {
         evaluationResult = await evaluateStudentExplanation({
-          chunk: matchedChunk,
+          chunk: topMatch.chunk,
           studentExplanation: query,
         });
       }
-
-      const assistantMsg: ChatMessage = {
-        id: `asst-${Date.now()}`,
-        sender: "assistant",
-        text: responseText,
-        citations: searchResults.map((r) => ({
-          sourceTitle: r.sourceTitle,
-          page: r.chunk.pageNumber,
-          paragraph: r.chunk.paragraphIndex,
-          snippet: r.chunk.rawContent.split("\n")[1] || r.chunk.rawContent.slice(0, 100),
-          bbox: r.chunk.boundingBox,
-        })),
-        evaluation: evaluationResult,
-      };
-
-      setChatMessages((prev) => [...prev, assistantMsg]);
-    } else {
-      setChatMessages((prev) => [
-        ...prev,
-        {
-          id: `asst-${Date.now()}`,
-          sender: "assistant",
-          text: `No se encontraron fragmentos con suficiente confianza semántica en la fuente activa. Intentá con términos técnicos específicos como "Ley de Faraday", "Operador Hermítico" o "Autovalores".`,
-          citations: [],
-        },
-      ]);
     }
 
+    const professorResponse = await generateSocraticProfessorResponse({
+      query,
+      searchResults,
+      evaluationResult,
+    });
+
+    const assistantMsg: ChatMessage = {
+      id: `asst-${Date.now()}`,
+      sender: "assistant",
+      text: professorResponse.messageText,
+      citations: professorResponse.citations,
+      evaluation: professorResponse.evaluation,
+    };
+
+    setChatMessages((prev) => [...prev, assistantMsg]);
     setIsSearching(false);
   };
 
@@ -603,13 +662,113 @@ export function AcademicCanvas({
       </div>
 
       {/* Bottom Socratic RAG Chat Terminal */}
-      <div className="h-64 border-t border-border-subtle bg-bg-surface-2/90 flex flex-col">
-        <div className="flex items-center justify-between px-4 py-1.5 border-b border-border-subtle/50 bg-bg-surface-1 text-[11px] font-mono text-text-tertiary">
-          <span className="flex items-center gap-1.5">
+      <div
+        className={`border-t border-border-subtle bg-bg-surface-2/90 flex flex-col transition-all duration-300 ${
+          chatHeight === "compact"
+            ? "h-44"
+            : chatHeight === "expanded"
+            ? "h-96"
+            : "h-[36rem]"
+        }`}
+      >
+        <div className="flex items-center justify-between px-4 py-2 border-b border-border-subtle/50 bg-bg-surface-1 text-[11px] font-mono text-text-tertiary">
+          <div className="flex items-center gap-2">
             <BrainCircuit className="h-3.5 w-3.5 text-accent-primary animate-pulse" />
-            Chat Socrático con Citas Obligatorias (Citation-First RAG)
-          </span>
-          <span className="text-[10px]">Selecciona texto en el visor o escribe una duda para auditarla</span>
+            <span className="font-semibold text-text-primary">
+              Cátedra Socrática · Citation-First RAG
+            </span>
+            <span className="hidden md:inline text-[10px] text-text-tertiary">
+              (El Catedrático audita y explica con citas obligatorias)
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Cognitive Hub Visibility Toggle */}
+            {onToggleCognitivePanel && (
+              <button
+                type="button"
+                onClick={onToggleCognitivePanel}
+                className={`flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono border transition-all cursor-pointer ${
+                  isCognitivePanelVisible
+                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                    : "border-border-subtle bg-bg-surface-2 text-text-tertiary hover:text-text-primary"
+                }`}
+                title="Mostrar u ocultar el Cognitive Hub (FSRS, Simulacro, Grafo)"
+              >
+                {isCognitivePanelVisible ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+                <span>Cognitive Hub: {isCognitivePanelVisible ? "ON" : "OFF"}</span>
+              </button>
+            )}
+
+            {/* Swap Position with Cognitive Hub */}
+            {onToggleSwapRag && (
+              <button
+                type="button"
+                onClick={onToggleSwapRag}
+                className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono border border-accent-primary/30 bg-accent-primary/10 text-accent-primary hover:bg-accent-primary/20 transition-all cursor-pointer"
+                title="Intercambiar ubicación entre el Chat RAG y el Cognitive Hub"
+              >
+                <ArrowLeftRight className="h-3 w-3" />
+                <span>{isRagSwapped ? "RAG en Centro" : "RAG en Lateral"}</span>
+              </button>
+            )}
+
+            {/* Clear Chat Dialogue */}
+            <button
+              type="button"
+              onClick={handleClearChat}
+              className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono text-text-tertiary hover:text-red-400 hover:bg-red-500/10 transition-all cursor-pointer"
+              title="Reiniciar diálogo socrático"
+            >
+              <RotateCcw className="h-3 w-3" />
+              <span>Limpiar</span>
+            </button>
+
+            {/* Sizing Toggles */}
+            <div className="flex items-center gap-1 border-l border-border-subtle/60 pl-2">
+              <button
+                type="button"
+                onClick={() => setChatHeight("compact")}
+                className={`px-1.5 py-0.5 rounded text-[10px] font-mono transition-all cursor-pointer ${
+                  chatHeight === "compact"
+                    ? "bg-accent-primary/20 text-accent-primary font-bold"
+                    : "text-text-tertiary hover:text-text-primary"
+                }`}
+                title="Altura compacta (176px)"
+              >
+                S
+              </button>
+              <button
+                type="button"
+                onClick={() => setChatHeight("expanded")}
+                className={`px-1.5 py-0.5 rounded text-[10px] font-mono transition-all cursor-pointer ${
+                  chatHeight === "expanded"
+                    ? "bg-accent-primary/20 text-accent-primary font-bold"
+                    : "text-text-tertiary hover:text-text-primary"
+                }`}
+                title="Altura ampliada (384px)"
+              >
+                M
+              </button>
+              <button
+                type="button"
+                onClick={() => setChatHeight("maximized")}
+                className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono transition-all cursor-pointer ${
+                  chatHeight === "maximized"
+                    ? "bg-accent-primary/20 text-accent-primary font-bold"
+                    : "text-text-tertiary hover:text-text-primary"
+                }`}
+                title="Maximizar espacio de lectura socrática (576px)"
+              >
+                {chatHeight === "maximized" ? (
+                  <Minimize2 className="h-3 w-3" />
+                ) : (
+                  <Maximize2 className="h-3 w-3" />
+                )}
+                <span>L</span>
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Message Log */}
@@ -623,12 +782,41 @@ export function AcademicCanvas({
                   : "self-start bg-bg-surface-1 border border-border-subtle text-text-primary shadow-sm"
               }`}
             >
-              <p className="whitespace-pre-line">{msg.text}</p>
+              {/* Render Message Text with Inline Citations */}
+              <div className="whitespace-pre-line leading-relaxed">
+                {(() => {
+                  const parts = msg.text.split(/(\[\[cite:[^\]]+\]\])/g);
+                  return parts.map((part, pIdx) => {
+                    const citeMatch = part.match(/\[\[cite:([^:]+):(\d+):(\d+)\]\]/);
+                    if (citeMatch) {
+                      const [, sourceTitle, pageStr, paraStr] = citeMatch;
+                      const pageNum = parseInt(pageStr, 10);
+                      const paraNum = parseInt(paraStr, 10);
+                      const matchingCitation = msg.citations.find(
+                        (c) => c.page === pageNum && c.paragraph === paraNum
+                      );
 
-              {/* Citations List */}
+                      return (
+                        <CitationPill
+                          key={pIdx}
+                          sourceTitle={sourceTitle}
+                          pageNumber={pageNum}
+                          paragraphIndex={paraNum}
+                          snippet={matchingCitation?.snippet}
+                          boundingBox={matchingCitation?.bbox}
+                          onClickCitation={handleCitationClick}
+                        />
+                      );
+                    }
+                    return <span key={pIdx}>{part}</span>;
+                  });
+                })()}
+              </div>
+
+              {/* Citations Summary Footer */}
               {msg.citations.length > 0 && (
                 <div className="mt-2.5 pt-2 border-t border-border-subtle/50 flex flex-wrap items-center gap-1.5">
-                  <span className="text-[10px] font-mono text-text-tertiary">Fuentes auditadas:</span>
+                  <span className="text-[10px] font-mono text-text-tertiary">Corpus auditado:</span>
                   {msg.citations.map((c, idx) => (
                     <CitationPill
                       key={idx}
@@ -660,6 +848,45 @@ export function AcademicCanvas({
                     <div className="text-[11px] text-text-secondary">
                       <strong className="text-warning">Omisión Crítica: </strong>
                       {msg.evaluation.omissions[0].missingPoint} ({msg.evaluation.omissions[0].impact})
+                    </div>
+                  )}
+
+                  {/* Contradiction Diff Canvas (Visual Comparison Widget) */}
+                  {msg.evaluation.contradictions && msg.evaluation.contradictions.length > 0 && (
+                    <div className="mt-1 flex flex-col gap-2">
+                      <div className="text-[11px] font-mono font-bold text-red-400 flex items-center gap-1">
+                        <XCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                        <span>Discrepancia Conceptual Identificada (Diff Dialéctico):</span>
+                      </div>
+                      {msg.evaluation.contradictions.map((contra, cIdx) => (
+                        <div key={cIdx} className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px]">
+                          {/* Student mistaken claim */}
+                          <div className="p-2.5 rounded-lg bg-red-950/30 border border-red-500/30 text-red-200">
+                            <div className="text-[10px] font-mono uppercase tracking-wider text-red-400 font-bold mb-1 flex items-center gap-1">
+                              <AlertCircle className="w-3 h-3" />
+                              Aseveración del Alumno
+                            </div>
+                            <p className="italic">"{contra.claim}"</p>
+                          </div>
+                          {/* Textbook correction */}
+                          <div className="p-2.5 rounded-lg bg-emerald-950/30 border border-emerald-500/30 text-emerald-200">
+                            <div className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 font-bold mb-1 flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3" />
+                              Fundamento de Cátedra
+                            </div>
+                            <p>{contra.correction}</p>
+                            {msg.evaluation?.citationProof && (
+                              <button
+                                type="button"
+                                onClick={() => handleCitationClick(msg.evaluation!.citationProof.page, { x: 0, y: 0, width: 100, height: 100 })}
+                                className="mt-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-900/60 hover:bg-emerald-800/80 text-emerald-300 font-mono text-[9px] border border-emerald-500/30 transition-colors cursor-pointer"
+                              >
+                                <span>Ver Pág. {msg.evaluation.citationProof.page}</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   )}
 
@@ -768,6 +995,58 @@ export function AcademicCanvas({
             )}
           </div>
         </Modal>
+      )}
+
+      {/* Floating Contextual Selection Popover Menu */}
+      {selectionMenu && (
+        <div
+          style={{ left: `${selectionMenu.x}px`, top: `${selectionMenu.y}px` }}
+          className="fixed z-50 flex items-center gap-1.5 p-1.5 rounded-xl border border-accent-primary/40 bg-bg-surface-2/95 shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95"
+        >
+          <button
+            type="button"
+            onClick={() => {
+              setChatInput(`Estimado profesor: ¿podría auditar y explicar rigurosamente este pasaje: "${selectionMenu.text}"?`);
+              setSelectionMenu(null);
+              window.getSelection()?.removeAllRanges();
+            }}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-accent-primary text-text-inverted text-[11px] font-mono hover:bg-accent-hover transition-all cursor-pointer shadow-xs"
+          >
+            <BrainCircuit className="h-3 w-3" />
+            <span>Auditar con Catedrático</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setChatInput(`Plantéeme una pregunta socrática o caso límite sobre esta proposición: "${selectionMenu.text}"`);
+              setSelectionMenu(null);
+              window.getSelection()?.removeAllRanges();
+            }}
+            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-mono hover:bg-amber-500/25 transition-all cursor-pointer"
+          >
+            <Zap className="h-3 w-3 text-amber-400" />
+            <span>Caso Límite</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => void handleCreateFlashcardFromSelection()}
+            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-bg-surface-1 text-text-secondary hover:text-text-primary text-[11px] font-mono border border-border-subtle transition-all cursor-pointer"
+          >
+            <Sparkles className="h-3 w-3 text-accent-primary" />
+            <span>+ FSRS</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => void handleConnectToGraphFromSelection()}
+            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-bg-surface-1 text-text-secondary hover:text-text-primary text-[11px] font-mono border border-border-subtle transition-all cursor-pointer"
+          >
+            <Share2 className="h-3 w-3 text-accent-secondary" />
+            <span>+ Grafo</span>
+          </button>
+        </div>
       )}
     </div>
   );
