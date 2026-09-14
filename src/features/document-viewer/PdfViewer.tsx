@@ -141,7 +141,13 @@ function PdfPage({
   }
 
   return (
-    <div className="flex flex-col items-center gap-1.5">
+    <div
+      className="flex flex-col items-center gap-1.5"
+      style={{
+        contentVisibility: "auto",
+        containIntrinsicSize: "auto 600px auto 900px",
+      }}
+    >
       <div
         ref={(el) => registerContainer(pageNumber, el)}
         className={postItArmed ? "relative cursor-crosshair" : "relative"}
@@ -194,11 +200,19 @@ export function PdfViewer({
 
   useEffect(() => {
     let cancelled = false;
+    let loadingTask: ReturnType<typeof pdfjsLib.getDocument> | null = null;
+    let currentDoc: PDFDocumentProxy | null = null;
     setPdfDoc(null);
     (async () => {
       const arrayBuffer = await blob.arrayBuffer();
-      const doc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-      if (cancelled) return;
+      loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+      const doc = await loadingTask.promise;
+      if (cancelled) {
+        void doc.cleanup();
+        void loadingTask.destroy();
+        return;
+      }
+      currentDoc = doc;
       setPdfDoc(doc);
       setNumPages(doc.numPages);
       const firstPage = await doc.getPage(1);
@@ -210,6 +224,8 @@ export function PdfViewer({
     })();
     return () => {
       cancelled = true;
+      if (currentDoc) void currentDoc.cleanup();
+      if (loadingTask) void loadingTask.destroy();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blob]);

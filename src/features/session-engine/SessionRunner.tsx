@@ -1,11 +1,13 @@
 import type { StudyMethod } from "./methods";
 import { CornellRunner } from "./runners/CornellRunner";
-import { FeynmanRunner } from "./runners/FeynmanRunner";
-import { InterleavingRunner } from "./runners/InterleavingRunner";
+import { DynamicInterleavingRunner } from "./runners/DynamicInterleavingRunner";
 import { LeitnerRunner } from "./runners/LeitnerRunner";
 import { PomodoroRunner } from "./runners/PomodoroRunner";
+import { QuantitativeBlurtingRunner } from "./runners/QuantitativeBlurtingRunner";
 import { RecallRunner } from "./runners/RecallRunner";
+import { SocraticFeynmanRunner } from "./runners/SocraticFeynmanRunner";
 import { SpacedRunner } from "./runners/SpacedRunner";
+import { SpatialPalaceRunner } from "./runners/SpatialPalaceRunner";
 import { Sq3rRunner } from "./runners/Sq3rRunner";
 
 interface SessionRunnerProps {
@@ -28,9 +30,13 @@ export function SessionRunner({ method, subjectFolderId, onHideDocument }: Sessi
         />
       );
     case "interleaving":
-      return <InterleavingRunner methodId={method.id} subjectFolderId={subjectFolderId} />;
+      return <DynamicInterleavingRunner methodId={method.id} subjectFolderId={subjectFolderId} />;
     case "feynman":
-      return <FeynmanRunner methodId={method.id} subjectFolderId={subjectFolderId} />;
+      return <SocraticFeynmanRunner methodId={method.id} subjectFolderId={subjectFolderId} />;
+    case "blurting":
+      return <QuantitativeBlurtingRunner methodId={method.id} subjectFolderId={subjectFolderId} />;
+    case "palace":
+      return <SpatialPalaceRunner methodId={method.id} subjectFolderId={subjectFolderId} />;
     case "cornell":
       return <CornellRunner methodId={method.id} subjectFolderId={subjectFolderId} />;
     case "sq3r":

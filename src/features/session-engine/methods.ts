@@ -6,7 +6,9 @@ export type StructureType =
   | "interleaving"
   | "cornell"
   | "sq3r"
-  | "leitner";
+  | "leitner"
+  | "blurting"
+  | "palace";
 
 export interface StudyMethod {
   id: string;
@@ -139,6 +141,36 @@ export const studyMethods: StudyMethod[] = [
       "Mostramos las flashcards con repaso pendiente hoy. Marcás 'Fallé' o 'Acerté' después de cada una y el sistema las mueve de caja automáticamente.",
     combinesWith: ["spaced-repetition", "interleaving"],
     structureType: "leitner",
+    hasTimer: false,
+    cyclic: false,
+  },
+  {
+    id: "blurting",
+    name: "Quantitative Blurting",
+    shortDescription: "Volcado mental libre con categorización cromática (Verde/Amarillo/Rojo/Gris).",
+    whatItIs:
+      "Protocolo de recuerdo activo radical: volcar todo lo que recuerdes sobre un tema durante un bloque de tiempo estricto, sin mirar apuntes.",
+    whyItWorks:
+      "Expone de forma cruda las lagunas de evocación no asistida, diferenciando recuerdo real de mera familiaridad pasiva.",
+    howItWorksHere:
+      "Escribís sin pausas durante 5 minutos en el lienzo. Al terminar, el sistema audita cromáticamente tus aserciones y genera tarjetas FSRS de las omisiones.",
+    combinesWith: ["feynman", "spaced-repetition"],
+    structureType: "blurting",
+    hasTimer: true,
+    cyclic: false,
+  },
+  {
+    id: "palace",
+    name: "Palacio de la Memoria 2.5D",
+    shortDescription: "Navegación espacial por loci mnemónicos con compuertas de recuerdo activo.",
+    whatItIs:
+      "Método de Loci clásico adaptado a un entorno isométrico 2.5D: vincula conceptos abstractos a coordenadas espaciales concretas.",
+    whyItWorks:
+      "Aprovecha el mapa cognitivo visoespacial del hipocampo (células de lugar y de red) para anclar recuerdos a largo plazo con altísima estabilidad.",
+    howItWorksHere:
+      "Navegás por cámaras arquitectónicas con WASD o clics. Cada cristal contiene un desafío mnemónico; las puertas a nuevas cámaras solo se abren al consolidar retención (R ≥ 85%).",
+    combinesWith: ["leitner", "active-recall"],
+    structureType: "palace",
     hasTimer: false,
     cyclic: false,
   },

@@ -512,6 +512,196 @@ sola vez si Dexie no migra sola — es la misma función que se acaba de agregar
 
 ---
 
+## Ajustes post-entrega #3 — Rediseño futurista HUD, corrección de bugs, optimización y gestión de archivos
+
+Tercera ronda de mejoras integrales enfocada en estética de vanguardia, estabilidad funcional y rendimiento de estudio prolongado.
+
+**Qué se construyó y mejoró**
+
+1. **Estética gráfica futurista / HUD de alta tecnología**:
+   - Nuevos tokens y sombras de resplandor neón (`--shadow-glow`, `--shadow-glow-sm`) en `index.css`.
+   - Efectos de *glassmorphism* de alto contraste (`.glass-panel`, `.glass-panel-interactive`) con bordes translúcidos y desenfoque de fondo en `Surface.tsx`.
+   - Cuadrícula cibernética sutil con máscara orbital (`.cyber-grid`) en `AmbientBackground.tsx` que acompaña el fondo ambiental sin saturar la vista.
+   - Barra lateral `Sidebar.tsx` transformada en consola HUD con indicador de telemetría de base de datos local activa (`// LOCAL DB INDEXED_OK`) y puntos de pulso LED (`.hud-pulse-dot`).
+   - `Badge.tsx` y `Button.tsx` actualizados con tipografía técnica `JetBrains Mono` y micro-bordes luminosos.
+   - Fichas de métodos `MethodCard.tsx` rediseñadas como paneles HUD interactivos con identificadores técnicos.
+
+2. **Corrección de errores críticos (Bugs funcionales)**:
+   - **Desfase de zona horaria en vencimientos (`Dashboard.tsx`)**: se reemplazó la interpretación automática en UTC por el desglose numérico de año, mes y día en hora local fijada a las 23:59:59.
+   - **Cálculo erróneo de `formatDueDate` (`stats.ts`)**: se corrigió la fórmula que marcaba como "Mañana" las entregas del día de hoy, calculando la diferencia real entre días calendario a medianoche.
+   - **Efectos colaterales en `useLiveQuery` (`LeitnerRunner.tsx`)**: se extrajo la creación del mazo por defecto a un `useEffect` para evitar bucles reactivos y condiciones de carrera en React 19.
+   - **Bloqueo permanente en fallo de OCR (`DocumentAnnotator.tsx`)**: se implementó un bloque `catch` que devuelve `ocrStatus` a `"pending"` e informa el error al usuario si falla la conexión al descargar el modelo de Tesseract.
+   - **Detección robusta de PDFs (`fileHelpers.ts`)**: soporte para extensión de archivo `.pdf` y variantes `application/x-pdf`, previniendo fallos al arrastrar archivos en Windows.
+
+3. **Optimizaciones de rendimiento y timers**:
+   - **Temporizador resiliente a segundo plano (`BlockSessionRunner.tsx`)**: el timer ahora calcula el tiempo transcurrido contra marcas de tiempo reales (`Date.now() + remaining * 1000`), impidiendo que el navegador congele o ralentice el Pomodoro al cambiar de pestaña o minimizar la ventana.
+   - **Anillo de progreso circular futurista (*Progress Ring*)**: reemplazo de la barra estática por un indicador radial SVG animado con resplandor neón cian.
+   - **Renderizado diferido en PDFs extensos (`PdfViewer.tsx`)**: incorporación de `content-visibility: auto` y `contain-intrinsic-size` en cada página, más liberación de memoria mediante `doc.cleanup()` y `loadingTask.destroy()`.
+
+4. **Gestión de archivos y carpetas**:
+   - Posibilidad de eliminar archivos y carpetas directamente desde `FileGrid.tsx` y `FolderTree.tsx`.
+   - Borrado en cascada (`deleteFileCascade` y `deleteFolderCascade` en `fileHelpers.ts`): limpia de forma atómica los subrayados, post-its y páginas OCR asociadas en IndexedDB, impidiendo que queden registros huérfanos.
+
+5. **Persistencia y exportación de notas de estudio**:
+   - `CornellRunner.tsx`, `FeynmanRunner.tsx` y `Sq3rRunner.tsx` ahora guardan automáticamente borradores en almacenamiento local para no perder apuntes ante recargas accidentales, e incluyen botones para **"Copiar texto"** y **"Descargar .txt"**.
+
+6. **Diseño responsive en Sesión (`Session.tsx`)**:
+   - En pantallas móviles (`< md`), se incorpora un selector HUD entre "MÉTODO // TIMER" y "DOCUMENTO", evitando que el visor de PDF quede comprimido.
+
+---
+
+## StudyLab v3.0 — Cognitive Operating System
+
+Transformación de la aplicación en un Sistema Operativo Cognitivo de alto rendimiento, implementado sin restricciones ni simplificaciones.
+
+### Módulo 1: Motor de Memoria & Algoritmos Predictivos
+- **FSRS v4.5 / v5 (Free Spaced Repetition Scheduler)**:
+  - Implementación matemática canónica de Retrievability $R(t, S) = (1 + 19 \cdot t / S)^{-0.5}$.
+  - Vida media del conocimiento: $t_{1/2} = \frac{3}{19} \cdot S \approx 0.1579 \cdot S$.
+  - Vector canónico de 17 parámetros de Jarrett Ye con mean-reversion de Dificultad $D$ y actualización de Estabilidad $S$ en recuerdo y olvido.
+  - Esquema Dexie v3 con tablas `cardsFsrs` y `reviewLogs` (telemetría con latencia en milisegundos y estados previos/posteriores).
+  - Migración y sincronización automática transparente de mazos Leitner existentes hacia FSRS.
+  - Actualización de `LeitnerRunner.tsx` con soporte dual (FSRS predictivo / Leitner clásico) y preview de intervalos en tiempo real.
+- **Grafo de Conocimiento & Árboles Causales (`/graph`)**:
+  - Motor topológico DAG (`graphEngine.ts`) con detección de ciclos causales.
+  - Bloqueo dinámico de nodos: los conceptos hijos se bloquean si cualquier prerrequisito tiene $R < 0.70$ o maestría $< 70\%$.
+  - Detección de Cuellos de Botella Cognitivos (`identifyBottlenecks`): identifica conceptos de alta centralidad con alta tasa de fallas recurrentes.
+  - Lienzo interactivo `GraphCanvas.tsx` con estética Cyber-HUD, arrastre, zoom, anillos de progreso de retención y panel inspector.
+
+### Módulo 2: Modos Avanzados de Estudio Cognitivo
+- **Técnica Feynman & Validación Socrática (`SocraticFeynmanRunner.tsx`)**:
+  - Detector en tiempo real de razonamiento circular / tautologías ("X ocurre porque X...").
+  - Detector de jerga técnica compleja con incentivo a la sustitución por analogías cotidianas.
+  - Generador dinámico de desafíos socráticos y contraejemplos en condiciones de borde.
+- **Quantitative Blurting con Categorización Cromática (`QuantitativeBlurtingRunner.tsx`)**:
+  - Volcado mental libre contra cronómetro estricto.
+  - Auditoría cromática automática de aserciones: 🟢 Verde (preciso), 🟡 Amarillo (impreciso), 🔴 Rojo (distorsión/error), ⚪ Gris (omisiones fundamentales).
+  - Métricas cuantitativas de exhaustividad y precisión, más generación en 1 clic de tarjetas FSRS a partir de las omisiones.
+- **Dynamic Adaptive Interleaving (`DynamicInterleavingRunner.tsx`)**:
+  - Práctica entrelazada de alta interferencia contextual entre múltiples dominios.
+  - Inyección de preguntas trampa discriminativas diseñadas para evitar sesgos de transferencia superficial.
+  - Medidor en tiempo real del Ratio de Discriminación.
+- **Palacio de la Memoria Espacial 2.5D (`SpatialPalaceRunner.tsx`)**:
+  - Entorno isométrico en Canvas 2.5D con navegación por coordenadas espaciales (WASD / teclado / ratón).
+  - Cámaras progresivas ("Atrio de Fundamentos", "Cámara de Dinámica Sináptica", "Bóveda de Síntesis").
+  - Compuertas de Recuerdo Activo: las puertas permanecen selladas hasta alcanzar retención consolidada ($R \ge 85\%$) en los loci del recinto.
+
+### Módulo 3: Workspace OS Modular & Micro-Widgets (`/workspace`)
+- **Perfiles Neuro-Cognitivos Sintonizados**:
+  - `Deep Problem Solving`: KaTeX REPL + Síntesis Gamma 40 Hz + Medidor de Fatiga.
+  - `Memory Fortress`: Bloc Efímero 60s + Síntesis Alfa 10 Hz + Medidor de Fatiga.
+  - `Research Synthesis`: KaTeX REPL + Bloc Efímero + Síntesis Theta 6 Hz.
+  - `Personalizado`: selección modular de micro-widgets activos.
+- **Micro-Widgets**:
+  - `CognitiveFatigueMeter.tsx`: Telemetría en vivo de dinámica de tecleo, ráfagas de corrección y pausas para calcular el Índice de Fatiga (0–100%).
+  - `EphemeralScratchpad.tsx`: Desvanecimiento visual de opacidad en 60 segundos y purga automática de buffer para forzar síntesis y desahogar la memoria de trabajo.
+  - `BinauralSynthesizer.tsx`: Generador Web Audio API nativo con osciladores estéreo desacoplados (Gamma 40Hz, Alfa 10Hz, Theta 6Hz) y ruido marrón/rosa para enmascaramiento ambiental. Sin dependencias externas de audio.
+  - `LatexTerminal.tsx`: Terminal de evaluación interactiva con KaTeX en vivo, paleta de símbolos científicos y snippets de fórmulas.
+- **Motor Autonómico de Reglas IFTTT (`automationEngine.ts`)**:
+  - Detección de picos de neuro-fatiga (>75%) con sugerencia de micro-descanso y sintonización de ondas Alfa.
+  - Aislamiento de lapsos consecutivos con recomendación en el Grafo de Conocimiento.
+  - Alertas circadianas nocturnas para optimización del sueño de ondas lentas.
+
+### Módulo 4: Telemetría & Métricas en Dashboard
+- Indicador de Vida Media del Conocimiento ($t_{1/2}$) agregado.
+- Monitor del Índice de Ilusión de Competencia (ICI) comparando velocidad de respuesta vs estabilidad de retención real.
+- Lanzador de acceso directo hacia el Grafo Causal y el Workspace OS.
+
+---
+
+## Fase 8 — Personal Academic Knowledge Engine (v4.0)
+
+Transformación de StudyLab en un motor de conocimiento universitario de alta precisión académica superior a NotebookLM, con arquitectura Citation-First, RAG híbrido y evaluación socrática.
+
+### 1. Pipeline de Ingesta & Semantic Chunking Jerárquico
+- **AST Parsing Semántico (`academicChunker.ts`)**:
+  - Segmentación jerárquica de textos académicos basada en la estructura formal: Partes, Capítulos, Secciones y Subsecciones.
+  - Bloques Atómicos Indivisibles: Garantía de no fragmentación de axiomas, lemas, teoremas y sus demostraciones integradas.
+  - Extracción matemática LaTeX: Detección y normalización de fórmulas en modo bloque (`$$...$$`, `\[...\]`) y en línea (`$...$`, `\(...\)`).
+  - Bounding Boxes Normalizadas: Coordenadas espaciales relativas (0.0 a 1.0) para trazabilidad e iluminación en visores de documentos.
+- **Indexación Híbrida & GraphRAG (`vectorIndex.ts`)**:
+  - Búsqueda híbrida combinando similitud densa de cosenos con scoring léxico BM25 vía Reciprocal Rank Fusion (RRF).
+  - Impulso semántico topológico mediante los conceptos del Grafo Causal y prerrequisitos directos.
+  - Sembrado de textos universitarios de referencia: *Física III: Electromagnetismo & Campos* y *Álgebra Lineal: Estructuras Algebraicas y Espacios Vectoriales*.
+
+### 2. Generación Activa FSRS & Evaluación Socrática
+- **Auto-generador FSRS (`flashcardGenerator.ts`)**:
+  - Generación automática de tarjetas atómicas cumpliendo las 20 Reglas de Formulación de SuperMemo.
+  - Estimación inicial de Estabilidad ($S_0$) y Dificultad ($D_0$) modulada por la densidad matemática del chunk.
+- **Evaluador Socrático NLI (`socraticEvaluator.ts`)**:
+  - Comparación analítica de explicaciones del alumno contra el texto fuente.
+  - Diagnóstico categórico: Dominio Completo, Comprensión Sólida, Comprensión Parcial y Lagunas Críticas.
+  - Detección de aciertos conceptuales, omisiones de hipótesis necesarias y contradicciones/alucinaciones.
+  - Generación de preguntas socráticas adaptativas para cerrar brechas conceptuales.
+
+### 3. The Academic Workspace Tri-Panel (`/academic`)
+- **Panel 1: Gestor de Fuentes Universitarias (`AcademicSourceManager.tsx`)**:
+  - Organización jerárquica por carrera, año de cursada, cátedra y tipo de documento.
+  - Badges de auditoría técnica: OCR Status, AST Tree Parsed, GraphRAG Indexed.
+- **Panel 2: Lienzo Híbrido Split & Citation-First UI (`AcademicCanvas.tsx`)**:
+  - Split view interactivo: Editor de notas con soporte KaTeX + Visor de documento con bounding boxes resaltadas en neón cian.
+  - Diálogo Socrático RAG: Terminal de chat con citaciones auditables obligatorias en cada afirmación.
+  - Píldoras de Cita (`CitationPill.tsx`): Al hacer clic o hover, muestran el fragmento original y desplazan el visor a la página y coordenada exacta.
+- **Panel 3: Widgets de Ejecución Cognitiva (`AcademicCognitiveWidgets.tsx`)**:
+  - Lector y entrenador FSRS con ratings Again (1), Hard (2), Good (3), Easy (4) y telemetría de intervalos.
+  - Simulador de preguntas trampa de examen: Desafíos conceptuales con justificación rigurosa fundamentada en el texto.
+  - Grafo topológico de conceptos clave y dependencias de prerrequisitos.
+
+### 4. Endpoints Backend & Modelo de Datos Dexie v4
+- **Migración Dexie v4 (`db.ts`)**: Tablas `academicSources`, `academicChunks`, `academicEvaluations` y `workspaceState`.
+- **Rutas Express (`server/src/routes/academic.ts`)**:
+  - `/api/academic/sources/ingest`: Ingesta y parseo AST jerárquico.
+  - `/api/academic/cognitive/feynman-eval`: Evaluación socrática de explicaciones.
+  - `/api/academic/cognitive/generate-flashcards`: Síntesis de tarjetas FSRS.
+  - `/api/academic/fsrs/next-review`: Predicción y cálculo de estabilidad e intervalos.
+  - `/api/academic/health`: Estado de los módulos cognitivos.
+
+---
+
+## Fase 9 — Academic Hub UX Overhaul & Visor Ejecutable (v4.1)
+
+### 1. Ingesta Real de Archivos (Drag-and-Drop & PDF.js Local)
+- **`AcademicFileUploader.tsx`**:
+  - Zona nativa de arrastrar y soltar (drag-and-drop) y selector de archivos (`.pdf`, `.md`, `.txt`).
+  - Extracción de texto y coordenadas de página en el navegador mediante `pdfjsLib.getDocument()`.
+  - Persistencia del Blob original en `db.files` vinculado mediante `fileId` con `AcademicSourceRecord`.
+  - Barra de progreso multietapa en tiempo real: *Lectura del archivo (15%)* → *Extracción de texto (50%)* → *Indexación AST y chunks (80%)* → *Éxito (100%)*.
+  - Sincronización multipart opcional con el backend mediante `multer`.
+
+### 2. Visor PDF Interactivo Ejecutable & Menú Flotante (`AcademicCanvas.tsx`)
+- **Renderizado Nativo PDF.js**:
+  - Carga el Blob binario almacenado en `db.files` mediante el componente `PdfViewer` con zoom, cambio de página y renderizado de texto.
+- **Menú Contextual Flotante de Selección**:
+  - Al seleccionar texto en el documento aparece un popover flotante en las coordenadas exactas de la selección con tres acciones:
+    - `[✨ Flashcard FSRS]`: Genera una tarjeta de repetición espaciada en `db.cardsFsrs`.
+    - `[🧠 Evaluar Feynman]`: Carga el fragmento en la terminal socrática para someterlo a auditoría NLI.
+    - `[🔗 Grafo Causal]`: Vincula el fragmento como un concepto dentro del árbol de conocimiento.
+- **Modo Ejecutable por Bloques (`[⚡ Ejecutar Simulacro]`)**:
+  - Cada fragmento de texto o teorema incluye un botón para ejecutar un test rápido e instantáneo de opción múltiple basado exclusivamente en ese párrafo.
+- **Sincronización Bidireccional de Citas**:
+  - Al pulsar un `CitationPill` en el chat o en el simulador, el visor salta a la página indicada y resalta el párrafo con un bounding box animado en neón cian.
+
+### 3. Grafo Causal RPG & Ruta Crítica (`AcademicKnowledgeGraphPanel.tsx`)
+- **Propósito Explícito**: "Mapa de Prerrequisitos Académicos (Tu ruta crítica de estudio)".
+- **Mecánica RPG de Bloqueo/Desbloqueo**:
+  - 🟢 **Verde (R ≥ 80%)**: Dominado.
+  - 🔵 **Cian (50% ≤ R < 80%)**: En progreso / Disponible.
+  - 🔴 **Rojo (R < 50%)**: Crítico / Bloqueado. Los conceptos descendientes que dependen de una base en rojo quedan atenuados y con icono de candado.
+- **Acción Directa de Estudio**:
+  - Al hacer clic en cualquier nodo se abre un modal con el desglose de retención y el botón directo: *"Estudiar este nodo ahora (Sesión FSRS Exprés)"*, que activa el mazo FSRS de inmediato.
+
+### 4. Sistema de Tutoriales On-Demand (`AcademicTutorialOverlay.tsx`)
+- **Botón Global de Ayuda (`?`)**:
+  - Ubicado en el header superior derecho, accesible en cualquier momento.
+- **Tour Guiado de 4 Pasos**:
+  1. *Paso 1 (Gestor de Fuentes):* Ingesta de PDFs y notas.
+  2. *Paso 2 (Visor y Selección Ejecutable):* Menú flotante y simulacros de bloque.
+  3. *Paso 3 (Widgets FSRS):* Algoritmo de memoria y botones Again/Hard/Good/Easy.
+  4. *Paso 4 (Grafo Causal RPG):* Interpretación de colores y desbloqueo de prerrequisitos.
+- Soporte para navegación con teclado (`Esc`, flechas `←` y `→`) y persistencia en `localStorage`.
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

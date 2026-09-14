@@ -11,14 +11,16 @@ export function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function iconForMime(mimeType: string): LucideIcon {
-  if (mimeType === "application/pdf") return FileText;
-  if (mimeType.startsWith("image/")) return FileImage;
-  return File;
+export function isPdf(mimeType: string, filename?: string): boolean {
+  if (mimeType === "application/pdf" || mimeType === "application/x-pdf") return true;
+  if (filename && filename.toLowerCase().endsWith(".pdf")) return true;
+  return false;
 }
 
-export function isPdf(mimeType: string): boolean {
-  return mimeType === "application/pdf";
+export function iconForMime(mimeType: string, filename?: string): LucideIcon {
+  if (isPdf(mimeType, filename)) return FileText;
+  if (mimeType.startsWith("image/")) return FileImage;
+  return File;
 }
 
 export function formatDate(timestamp: number): string {
@@ -27,4 +29,42 @@ export function formatDate(timestamp: number): string {
     month: "short",
     year: "numeric",
   });
+}
+
+/** Elimina un archivo y en cascada todos sus subrayados, post-its, OCR y repasos asociados. */
+export async function deleteFileCascade(fileId: string) {
+  const { db } = await import("../../db/db");
+  await db.highlights.where({ fileId }).delete();
+  await db.postits.where({ fileId }).delete();
+  await db.ocrPages.where({ fileId }).delete();
+  await db.reviewSchedule.where({ fileId }).delete();
+  await db.files.delete(fileId);
+}
+
+/** Elimina una carpeta, sus subcarpetas y todos sus archivos asociados recursivamente. */
+export async function deleteFolderCascade(folderId: string) {
+  const { db } = await import("../../db/db");
+  const allFolders = await db.folders.toArray();
+  const folderIdsToDelete = new Set<string>([folderId]);
+
+  let added = true;
+  while (added) {
+    added = false;
+    for (const f of allFolders) {
+      if (f.parentId && folderIdsToDelete.has(f.parentId) && !folderIdsToDelete.has(f.id)) {
+        folderIdsToDelete.add(f.id);
+        added = true;
+      }
+    }
+  }
+
+  const allFiles = await db.files.toArray();
+  const filesToDelete = allFiles.filter((file) => folderIdsToDelete.has(file.folderId));
+  for (const file of filesToDelete) {
+    await deleteFileCascade(file.id);
+  }
+
+  for (const id of folderIdsToDelete) {
+    await db.folders.delete(id);
+  }
 }

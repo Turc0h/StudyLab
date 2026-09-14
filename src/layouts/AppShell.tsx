@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import { AmbientBackground } from "../components/AmbientBackground";
 import { MobileNav } from "../components/nav/MobileNav";
 import { Sidebar } from "../components/nav/Sidebar";
+import { GlobalTutorialModal } from "../components/tutorial/GlobalTutorialModal";
 import { AmbientPlayer } from "../features/ambient-sound/AmbientPlayer";
 import { useSyncTheme } from "../hooks/useSyncTheme";
 
@@ -19,6 +20,7 @@ export function AppShell() {
       </div>
       <MobileNav />
       <AmbientPlayer />
+      <GlobalTutorialModal />
     </>
   );
 }

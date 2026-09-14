@@ -38,6 +38,8 @@ export function DocumentAnnotator({ fileId, onClose, hideNotesPanel }: DocumentA
   const [ocrRunning, setOcrRunning] = useState(false);
   const [ocrProgress, setOcrProgress] = useState(0);
 
+  const [ocrError, setOcrError] = useState<string | null>(null);
+
   if (!file) return null;
 
   const ready = hasTextLayer === true || file.ocrStatus === "done";
@@ -46,14 +48,25 @@ export function DocumentAnnotator({ fileId, onClose, hideNotesPanel }: DocumentA
   async function handleRunOcr() {
     setOcrRunning(true);
     setOcrProgress(0);
+    setOcrError(null);
     await db.files.update(fileId, { ocrStatus: "processing" });
     try {
       const results = await runOcrOnFile(file!.blob, setOcrProgress);
       await db.ocrPages.where({ fileId }).delete();
-      for (const r of results) {
-        await db.ocrPages.add({ id: generateId(), fileId, page: r.page, lines: r.lines });
+      const records = results.map((r) => ({
+        id: generateId(),
+        fileId,
+        page: r.page,
+        lines: r.lines,
+      }));
+      if (records.length > 0) {
+        await db.ocrPages.bulkAdd(records);
       }
       await db.files.update(fileId, { ocrStatus: "done" });
+    } catch (err) {
+      console.error("Error al procesar OCR:", err);
+      await db.files.update(fileId, { ocrStatus: "pending" });
+      setOcrError("No se pudo completar el reconocimiento. Verificá tu conexión para descargar el modelo de lenguaje.");
     } finally {
       setOcrRunning(false);
     }
@@ -135,6 +148,15 @@ export function DocumentAnnotator({ fileId, onClose, hideNotesPanel }: DocumentA
           )}
         </div>
       </header>
+
+      {ocrError && (
+        <div className="flex items-center justify-between border-b border-danger/30 bg-danger-muted/50 px-4 py-2 text-xs text-danger">
+          <span>{ocrError}</span>
+          <button type="button" onClick={() => setOcrError(null)} className="font-medium hover:underline">
+            Descartar
+          </button>
+        </div>
+      )}
 
       <div className="flex min-h-0 flex-1">
         <div className="min-w-0 flex-1">

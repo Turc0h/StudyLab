@@ -1,49 +1,128 @@
 import { clsx } from "clsx";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Folder, Upload } from "lucide-react";
+import { Folder, Trash2, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import type { FileRecord, FolderRecord } from "../../db/db";
 import { db } from "../../db/db";
-import { formatBytes, formatDate, generateId, iconForMime, isPdf } from "./fileHelpers";
+import {
+  deleteFileCascade,
+  deleteFolderCascade,
+  formatBytes,
+  formatDate,
+  generateId,
+  iconForMime,
+  isPdf,
+} from "./fileHelpers";
 
-function FolderCard({ folder, onClick }: { folder: FolderRecord; onClick: () => void }) {
+function FolderCard({
+  folder,
+  onClick,
+  onDelete,
+}: {
+  folder: FolderRecord;
+  onClick: () => void;
+  onDelete: () => void;
+}) {
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
-      className="flex flex-col items-start gap-2 rounded-md border border-border-subtle bg-bg-surface-2 p-4 text-left transition-colors duration-150 hover:bg-bg-surface-hover"
+      onKeyDown={(e) => e.key === "Enter" && onClick()}
+      className="group relative flex cursor-pointer flex-col items-start justify-between gap-3 rounded-lg glass-panel p-4 text-left transition-all duration-200 hover:border-accent/40 hover:shadow-[0_0_20px_-5px_color-mix(in_srgb,var(--color-accent)_25%,transparent)] hover:-translate-y-0.5"
     >
-      <Folder size={20} strokeWidth={1.75} className="text-accent" />
-      <span className="w-full truncate text-sm font-medium text-text-primary">{folder.name}</span>
-      <span className="text-xs text-text-tertiary capitalize">{folder.type}</span>
-    </button>
+      <div className="flex w-full items-start justify-between">
+        <div className="flex h-8 w-8 items-center justify-center rounded-md border border-accent/30 bg-accent-muted/40 text-accent">
+          <Folder size={18} strokeWidth={1.75} />
+        </div>
+        <button
+          type="button"
+          title="Eliminar carpeta"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          className="rounded p-1 text-text-tertiary opacity-0 transition-opacity duration-150 group-hover:opacity-100 hover:bg-danger-muted hover:text-danger"
+        >
+          <Trash2 size={14} strokeWidth={1.75} />
+        </button>
+      </div>
+      <div className="w-full">
+        <span className="block truncate font-display text-sm font-semibold text-text-primary">
+          {folder.name}
+        </span>
+        <span className="font-mono text-[10px] tracking-wider text-text-tertiary uppercase">
+          {folder.type}
+        </span>
+      </div>
+    </div>
   );
 }
 
-function FileCard({ file, onClick }: { file: FileRecord; onClick: () => void }) {
-  const Icon = iconForMime(file.mimeType);
+function FileCard({
+  file,
+  onClick,
+  onDelete,
+}: {
+  file: FileRecord;
+  onClick: () => void;
+  onDelete: () => void;
+}) {
+  const Icon = iconForMime(file.mimeType, file.name);
+  const isDocPdf = isPdf(file.mimeType, file.name);
+
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
-      className="flex flex-col items-start gap-2 rounded-md border border-border-subtle bg-bg-surface-2 p-4 text-left transition-colors duration-150 hover:bg-bg-surface-hover"
+      onKeyDown={(e) => e.key === "Enter" && onClick()}
+      className="group relative flex cursor-pointer flex-col items-start justify-between gap-3 rounded-lg glass-panel p-4 text-left transition-all duration-200 hover:border-accent/40 hover:shadow-[0_0_20px_-5px_color-mix(in_srgb,var(--color-accent)_25%,transparent)] hover:-translate-y-0.5"
     >
-      <Icon size={20} strokeWidth={1.75} className="text-text-secondary" />
-      <span className="w-full truncate text-sm font-medium text-text-primary">{file.name}</span>
-      <span className="text-xs text-text-tertiary">
-        {formatBytes(file.size)} · {formatDate(file.createdAt)}
-      </span>
-      {isPdf(file.mimeType) && (
-        <span
-          className={clsx(
-            "text-[10px] font-medium tracking-wide uppercase",
-            file.ocrStatus === "done" ? "text-success" : "text-warning",
-          )}
+      <div className="flex w-full items-start justify-between">
+        <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-bg-surface-2 text-text-secondary group-hover:border-accent/40 group-hover:text-accent">
+          <Icon size={18} strokeWidth={1.75} />
+        </div>
+        <button
+          type="button"
+          title="Eliminar archivo"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          className="rounded p-1 text-text-tertiary opacity-0 transition-opacity duration-150 group-hover:opacity-100 hover:bg-danger-muted hover:text-danger"
         >
-          {file.ocrStatus === "done" ? "Listo para subrayar" : "OCR pendiente"}
+          <Trash2 size={14} strokeWidth={1.75} />
+        </button>
+      </div>
+
+      <div className="w-full">
+        <span className="block truncate font-display text-sm font-semibold text-text-primary" title={file.name}>
+          {file.name}
         </span>
-      )}
-    </button>
+        <span className="font-mono text-[11px] text-text-tertiary">
+          {formatBytes(file.size)} · {formatDate(file.createdAt)}
+        </span>
+        {isDocPdf && (
+          <div className="mt-2">
+            <span
+              className={clsx(
+                "inline-flex items-center gap-1 font-mono text-[10px] font-medium tracking-wide uppercase",
+                file.ocrStatus === "done" ? "text-success" : "text-warning",
+              )}
+            >
+              <span
+                className={clsx(
+                  "h-1.5 w-1.5 rounded-full",
+                  file.ocrStatus === "done" ? "bg-success" : "bg-warning",
+                )}
+              />
+              {file.ocrStatus === "done" ? "Listo" : "OCR pend."}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -78,14 +157,16 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
     if (!fileList || fileList.length === 0 || folderId === null) return;
     const now = Date.now();
     for (const file of Array.from(fileList)) {
+      const mimeType =
+        file.type || (file.name.toLowerCase().endsWith(".pdf") ? "application/pdf" : "application/octet-stream");
       await db.files.add({
         id: generateId(),
         folderId,
         name: file.name,
-        mimeType: file.type || "application/octet-stream",
+        mimeType,
         size: file.size,
         blob: file,
-        ocrStatus: isPdf(file.type) ? "pending" : "not_applicable",
+        ocrStatus: isPdf(mimeType, file.name) ? "pending" : "not_applicable",
         createdAt: now,
       });
     }
@@ -109,7 +190,7 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
       }}
       className={clsx(
         "flex flex-col gap-6 rounded-lg border border-dashed p-6 transition-colors duration-150",
-        dragOver ? "bg-accent-muted/30 border-accent" : "border-border-subtle",
+        dragOver ? "bg-accent-muted/30 border-accent shadow-[0_0_20px_-4px_color-mix(in_srgb,var(--color-accent)_30%,transparent)]" : "border-border-subtle",
       )}
     >
       {childFolders.length === 0 && files.length === 0 ? (
@@ -135,10 +216,28 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
           {childFolders.map((folder) => (
-            <FolderCard key={folder.id} folder={folder} onClick={() => onOpenFolder(folder.id)} />
+            <FolderCard
+              key={folder.id}
+              folder={folder}
+              onClick={() => onOpenFolder(folder.id)}
+              onDelete={() => {
+                if (window.confirm(`¿Eliminar la carpeta "${folder.name}" y todo su contenido?`)) {
+                  void deleteFolderCascade(folder.id);
+                }
+              }}
+            />
           ))}
           {files.map((file) => (
-            <FileCard key={file.id} file={file} onClick={() => onOpenFile(file.id)} />
+            <FileCard
+              key={file.id}
+              file={file}
+              onClick={() => onOpenFile(file.id)}
+              onDelete={() => {
+                if (window.confirm(`¿Eliminar el archivo "${file.name}" y sus notas?`)) {
+                  void deleteFileCascade(file.id);
+                }
+              }}
+            />
           ))}
         </div>
       )}

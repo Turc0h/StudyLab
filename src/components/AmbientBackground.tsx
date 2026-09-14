@@ -10,6 +10,7 @@ export function AmbientBackground() {
   return (
     <div className={ambientEnabled ? "" : "ambient-off"}>
       <div className="ambient-bg" aria-hidden="true" />
+      <div className="cyber-grid" aria-hidden="true" />
     </div>
   );
 }

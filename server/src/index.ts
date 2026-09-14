@@ -4,6 +4,7 @@ import express from "express";
 import { isGoogleConfigured } from "./googleClient.js";
 import { authRouter } from "./routes/auth.js";
 import { calendarRouter } from "./routes/calendar.js";
+import { academicRouter } from "./routes/academic.js";
 
 const app = express();
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3001;
@@ -18,6 +19,7 @@ app.get("/health", (_req, res) => {
 
 app.use("/auth/google", authRouter);
 app.use("/api/calendar", calendarRouter);
+app.use("/api/academic", academicRouter);
 
 app.listen(PORT, () => {
   console.log(`StudyLab backend escuchando en http://localhost:${PORT}`);

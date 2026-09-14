@@ -106,6 +106,161 @@ export interface FlashcardDeckRecord {
   createdAt: number;
 }
 
+export type FsrsState = "new" | "learning" | "review" | "relearning";
+
+export interface CardFsrsRecord {
+  id: string;
+  deckId: string;
+  conceptId: string | null;
+  front: string;
+  back: string;
+  state: FsrsState;
+  stability: number;
+  difficulty: number;
+  reps: number;
+  lapses: number;
+  lastReview: number | null;
+  dueDate: number;
+  halfLife: number;
+  createdAt: number;
+}
+
+export interface ReviewLogRecord {
+  id: string;
+  cardId: string;
+  rating: 1 | 2 | 3 | 4;
+  reviewTimestamp: number;
+  latencyMs: number;
+  stateBefore: FsrsState;
+  stateAfter: FsrsState;
+  stabilityBefore: number;
+  stabilityAfter: number;
+  difficultyBefore: number;
+  difficultyAfter: number;
+  scheduledDays: number;
+}
+
+export type ConceptStatus = "locked" | "available" | "in_progress" | "mastered";
+
+export interface ConceptRecord {
+  id: string;
+  domainId: string;
+  name: string;
+  description: string;
+  masteryScore: number;
+  currentRetrievability: number;
+  status: ConceptStatus;
+  prerequisites: string[];
+  tags: string[];
+  createdAt: number;
+}
+
+export interface ConceptEdgeRecord {
+  id: string;
+  sourceConceptId: string;
+  targetConceptId: string;
+  type: "prerequisite" | "related" | "component";
+  strength: number;
+}
+
+export interface WorkspaceConfigRecord {
+  id: string;
+  profileType: "deep-problem-solving" | "memory-fortress" | "research-synthesis" | "custom";
+  activeWidgets: string[];
+  automationEnabled: boolean;
+  updatedAt: number;
+}
+
+export interface FatigueTelemetryRecord {
+  id: string;
+  timestamp: number;
+  fatigueScore: number;
+  keystrokeVariance: number;
+  pauseRate: number;
+  sessionDurationSec: number;
+}
+
+export interface AcademicBoundingBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export type AcademicChunkType =
+  | "theorem"
+  | "proof"
+  | "definition"
+  | "concept"
+  | "formula"
+  | "example"
+  | "paragraph";
+
+export interface AcademicSourceRecord {
+  id: string;
+  subjectId: string;
+  professorId?: string;
+  career?: string;
+  year?: number;
+  semester?: string;
+  title: string;
+  documentType: "textbook" | "lecture_notes" | "exam" | "paper";
+  pageCount: number;
+  fileId?: string;
+  ocrProcessed: boolean;
+  chunkCount: number;
+  createdAt: number;
+}
+
+export interface AcademicChunkRecord {
+  id: string;
+  sourceId: string;
+  subjectId: string;
+  chunkType: AcademicChunkType;
+  title?: string;
+  hierarchyPath: string;
+  pageNumber: number;
+  paragraphIndex: number;
+  rawContent: string;
+  latexFormulas: string[];
+  boundingBox: AcademicBoundingBox;
+  denseVector?: number[];
+  sparseTokens?: Record<string, number>;
+  createdAt: number;
+}
+
+export interface AcademicEvaluationRecord {
+  id: string;
+  conceptId: string;
+  sourceId: string;
+  studentExplanation: string;
+  masteryScore: number;
+  diagnosticCategory: "dominio_completo" | "comprension_solida" | "comprension_parcial" | "lagunas_criticas";
+  entailedPoints: string[];
+  omissions: Array<{ missingPoint: string; severity: "high" | "medium" | "low"; impact: string }>;
+  contradictions: Array<{ claim: string; correction: string }>;
+  citationProof?: {
+    page: number;
+    paragraph: number;
+    exactSnippet: string;
+  };
+  socraticQuestion: string;
+  evaluatedAt: number;
+}
+
+export interface WorkspaceStateRecord {
+  id: string;
+  activeSubjectId: string;
+  activeSourceId: string | null;
+  activePage: number;
+  activeBoundingBoxFocus?: AcademicBoundingBox | null;
+  panel1WidthPct: number;
+  panel2WidthPct: number;
+  panel3WidthPct: number;
+  openTabs: Array<{ id: string; type: "markdown_note" | "pdf_viewer"; title: string; sourceId?: string; page?: number }>;
+  syncedAt: number;
+}
+
 const db = new Dexie("studylab") as Dexie & {
   folders: EntityTable<FolderRecord, "id">;
   files: EntityTable<FileRecord, "id">;
@@ -117,6 +272,16 @@ const db = new Dexie("studylab") as Dexie & {
   reviewSchedule: EntityTable<ReviewScheduleRecord, "id">;
   flashcards: EntityTable<FlashcardRecord, "id">;
   flashcardDecks: EntityTable<FlashcardDeckRecord, "id">;
+  cardsFsrs: EntityTable<CardFsrsRecord, "id">;
+  reviewLogs: EntityTable<ReviewLogRecord, "id">;
+  concepts: EntityTable<ConceptRecord, "id">;
+  conceptEdges: EntityTable<ConceptEdgeRecord, "id">;
+  workspaceConfigs: EntityTable<WorkspaceConfigRecord, "id">;
+  fatigueTelemetry: EntityTable<FatigueTelemetryRecord, "id">;
+  academicSources: EntityTable<AcademicSourceRecord, "id">;
+  academicChunks: EntityTable<AcademicChunkRecord, "id">;
+  academicEvaluations: EntityTable<AcademicEvaluationRecord, "id">;
+  workspaceState: EntityTable<WorkspaceStateRecord, "id">;
 };
 
 db.version(1).stores({
@@ -134,6 +299,24 @@ db.version(1).stores({
 // v2 — agrega ocrPages: la capa de texto sintética que hace seleccionable un PDF escaneado.
 db.version(2).stores({
   ocrPages: "id, fileId, page",
+});
+
+// v3 — Cognitive OS: FSRS v4.5/v5, Knowledge Graph DAG, Workspace OS & Fatigue Telemetry
+db.version(3).stores({
+  cardsFsrs: "id, deckId, conceptId, state, dueDate, lastReview",
+  reviewLogs: "id, cardId, rating, reviewTimestamp",
+  concepts: "id, domainId, name, status, masteryScore",
+  conceptEdges: "id, sourceConceptId, targetConceptId, type",
+  workspaceConfigs: "id, profileType",
+  fatigueTelemetry: "id, timestamp",
+});
+
+// v4 — Personal Academic Knowledge Engine: Ingesta jerárquica, GraphRAG y Citation-First
+db.version(4).stores({
+  academicSources: "id, subjectId, professorId, documentType, createdAt",
+  academicChunks: "id, sourceId, subjectId, chunkType, pageNumber, hierarchyPath",
+  academicEvaluations: "id, conceptId, sourceId, evaluatedAt",
+  workspaceState: "id, activeSubjectId, activeSourceId",
 });
 
 /** Borra todos los datos locales (IndexedDB + preferencias en localStorage) y recarga la app. */

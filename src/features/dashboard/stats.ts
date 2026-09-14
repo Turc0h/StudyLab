@@ -38,7 +38,14 @@ export function formatRelativeDate(ts: number): string {
 }
 
 export function formatDueDate(ts: number): string {
-  const diffDays = Math.ceil((ts - Date.now()) / (24 * 60 * 60 * 1000));
+  const target = new Date(ts);
+  const now = new Date();
+
+  const targetMidnight = new Date(target.getFullYear(), target.getMonth(), target.getDate()).getTime();
+  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+  const diffDays = Math.round((targetMidnight - todayMidnight) / (24 * 60 * 60 * 1000));
+
   if (diffDays < 0) return "Vencido";
   if (diffDays === 0) return "Hoy";
   if (diffDays === 1) return "Mañana";

@@ -1,29 +1,36 @@
+import React from "react";
 import { clsx } from "clsx";
-import type { HTMLAttributes } from "react";
 
-type Variant = "neutral" | "accent" | "danger" | "warning" | "success";
-
-interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  variant?: Variant;
+export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+  variant?: "neutral" | "accent" | "secondary" | "success" | "warning" | "error" | "danger";
 }
 
-const variantClasses: Record<Variant, string> = {
-  neutral: "bg-bg-surface-2 text-text-secondary",
-  accent: "bg-accent-muted text-accent",
-  danger: "bg-danger-muted text-danger",
-  warning: "bg-warning-muted text-warning",
-  success: "bg-success-muted text-success",
-};
+export const Badge: React.FC<BadgeProps> = ({
+  children,
+  variant = "neutral",
+  className,
+  ...props
+}) => {
+  const variantStyles = {
+    neutral: "bg-bg-secondary text-text-secondary border-border-subtle",
+    accent: "bg-accent-primary/10 text-accent-primary border-accent-primary/20",
+    secondary: "bg-accent-secondary/10 text-accent-secondary border-accent-secondary/20",
+    success: "bg-success/10 text-success border-success/20",
+    warning: "bg-warning/10 text-warning border-warning/20",
+    error: "bg-error/10 text-error border-error/20",
+    danger: "bg-error/10 text-error border-error/20",
+  }[variant];
 
-export function Badge({ variant = "neutral", className, ...props }: BadgeProps) {
   return (
     <span
       className={clsx(
-        "inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-medium tracking-wide uppercase",
-        variantClasses[variant],
+        "inline-flex items-center gap-1 rounded border px-2 py-0.5 text-xs font-sans font-medium",
+        variantStyles,
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </span>
   );
-}
+};
