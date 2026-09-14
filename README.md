@@ -121,13 +121,8 @@ Please keep the **local‑first** principle: avoid adding external API calls or 
 
 ---
 
-## 📄 License
-This project is licensed under the **MIT License** – see the `LICENSE` file for details.
-
----
-
 ## 📞 Contact & Support
-- **Maintainer**: <your‑name> – email@example.com
+- **Maintainer**: YartaWolf
 - **Issue tracker**: Use the GitHub Issues page.
 - **Feature requests**: Open a discussion or submit a PR.
 
