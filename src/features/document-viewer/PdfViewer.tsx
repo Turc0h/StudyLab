@@ -150,8 +150,9 @@ function PdfPage({
     >
       <div
         ref={(el) => registerContainer(pageNumber, el)}
-        className={postItArmed ? "relative cursor-crosshair" : "relative"}
-        style={{ boxShadow: "var(--shadow-surface)" }}
+        className={`relative bg-white dark:bg-zinc-900 rounded border border-border-subtle shadow-xs overflow-hidden ${
+          postItArmed ? "cursor-crosshair" : ""
+        }`}
         onClick={handleClick}
       >
         <canvas ref={canvasRef} className="block" />
@@ -300,7 +301,7 @@ export function PdfViewer({
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto bg-bg-base-alt px-4 py-6">
+      <div className="flex-1 overflow-auto bg-bg-secondary px-4 py-6">
         <div className="mx-auto flex w-fit flex-col items-center gap-6">
           {pdfDoc &&
             Array.from({ length: numPages }, (_, i) => i + 1).map((pageNumber) => (

@@ -72,20 +72,23 @@ export function DocumentAnnotator({ fileId, onClose, hideNotesPanel }: DocumentA
     }
   }
 
+  const [notesCollapsed, setNotesCollapsed] = useState(false);
+
   return (
-    <div className="flex h-full flex-col">
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border-subtle px-4 py-3">
+    <div className="flex h-full flex-col bg-bg-primary text-text-primary">
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border-subtle bg-bg-secondary/95 px-4 py-2.5 backdrop-blur-xs">
         <div className="flex min-w-0 items-center gap-3">
           {onClose && (
             <button
               type="button"
               onClick={onClose}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-text-secondary transition-colors duration-150 hover:bg-bg-surface-2 hover:text-text-primary"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border-subtle bg-bg-elevated text-text-secondary transition-colors duration-150 hover:bg-bg-secondary hover:text-text-primary"
+              title="Cerrar documento (Esc)"
             >
-              <X size={18} strokeWidth={1.75} />
+              <X size={16} strokeWidth={1.75} />
             </button>
           )}
-          <h2 className="truncate font-display text-sm font-semibold text-text-primary">
+          <h2 className="truncate font-serif text-sm font-semibold text-text-primary">
             {file.name}
           </h2>
           {isPdf(file.mimeType) && hasTextLayer !== null && (
@@ -100,7 +103,7 @@ export function DocumentAnnotator({ fileId, onClose, hideNotesPanel }: DocumentA
               type="button"
               onClick={handleRunOcr}
               disabled={ocrRunning}
-              className="flex items-center gap-1.5 rounded-md bg-accent px-3 py-1.5 text-xs font-medium text-accent-contrast transition-colors duration-150 hover:bg-accent-hover disabled:opacity-60"
+              className="flex items-center gap-1.5 rounded-md bg-accent-primary px-3 py-1.5 text-xs font-medium text-bg-elevated transition-colors duration-150 hover:bg-accent-hover disabled:opacity-60"
             >
               {ocrRunning ? (
                 <Loader2 size={14} className="animate-spin" />
@@ -120,8 +123,8 @@ export function DocumentAnnotator({ fileId, onClose, hideNotesPanel }: DocumentA
               className={clsx(
                 "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-150",
                 highlightMode
-                  ? "bg-accent text-accent-contrast"
-                  : "bg-bg-surface-2 text-text-secondary hover:text-text-primary",
+                  ? "bg-accent-primary text-bg-elevated"
+                  : "border border-border-subtle bg-bg-elevated text-text-secondary hover:text-text-primary",
               )}
             >
               <Highlighter size={14} strokeWidth={1.75} />
@@ -138,12 +141,22 @@ export function DocumentAnnotator({ fileId, onClose, hideNotesPanel }: DocumentA
               className={clsx(
                 "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-150",
                 postItArmed
-                  ? "bg-accent text-accent-contrast"
-                  : "bg-bg-surface-2 text-text-secondary hover:text-text-primary",
+                  ? "bg-accent-primary text-bg-elevated"
+                  : "border border-border-subtle bg-bg-elevated text-text-secondary hover:text-text-primary",
               )}
             >
               <StickyNote size={14} strokeWidth={1.75} />
               {postItArmed ? "Hacé click en la página…" : "Post-it"}
+            </button>
+          )}
+          {!hideNotesPanel && (
+            <button
+              type="button"
+              onClick={() => setNotesCollapsed((v) => !v)}
+              className="flex items-center gap-1.5 rounded-md border border-border-subtle bg-bg-elevated px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-text-primary transition-colors"
+              title={notesCollapsed ? "Mostrar panel lateral de notas" : "Ocultar panel lateral (Modo Lectura Limpia)"}
+            >
+              <span>{notesCollapsed ? "Mostrar Notas" : "Ocultar Notas"}</span>
             </button>
           )}
         </div>
@@ -218,8 +231,8 @@ export function DocumentAnnotator({ fileId, onClose, hideNotesPanel }: DocumentA
             </div>
           )}
         </div>
-        {!hideNotesPanel && (
-          <aside className="hidden w-80 shrink-0 md:block">
+        {!hideNotesPanel && !notesCollapsed && (
+          <aside className="hidden w-80 shrink-0 md:block border-l border-border-subtle bg-bg-secondary/40">
             <NotesPanel
               fileId={fileId}
               onJumpToPage={(page) => setJumpTo({ page, token: Date.now() })}

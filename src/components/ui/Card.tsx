@@ -14,7 +14,7 @@ export const Card: React.FC<CardProps> = ({
   return (
     <div
       className={clsx(
-        "rounded border border-border-subtle p-6 transition-colors duration-150",
+        "rounded-lg border border-border-subtle p-5 md:p-6 transition-colors duration-150 shadow-2xs",
         elevated ? "bg-bg-elevated" : "bg-bg-secondary",
         className,
       )}
@@ -36,7 +36,7 @@ export const CardHeader: React.FC<CardHeaderProps> = ({ children, className, ...
 export interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
 
 export const CardTitle: React.FC<CardTitleProps> = ({ children, className, ...props }) => (
-  <h3 className={clsx("font-serif text-lg font-semibold text-text-primary", className)} {...props}>
+  <h3 className={clsx("font-serif text-base md:text-lg font-semibold text-text-primary tracking-tight", className)} {...props}>
     {children}
   </h3>
 );

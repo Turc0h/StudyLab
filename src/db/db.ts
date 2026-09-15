@@ -19,6 +19,8 @@ export interface FileRecord {
   blob: Blob;
   /** Estado de OCR — solo relevante para PDFs escaneados (Fase 5). */
   ocrStatus: "not_applicable" | "pending" | "processing" | "done";
+  /** Marcado de completitud / lectura del estudiante */
+  isCompleted?: boolean;
   createdAt: number;
 }
 
@@ -318,6 +320,11 @@ db.version(4).stores({
   academicEvaluations: "id, conceptId, sourceId, evaluatedAt",
   workspaceState: "id, activeSubjectId, activeSourceId",
 });
+
+/** Alterna el estado de completitud o lectura de un archivo de cátedra. */
+export async function toggleFileCompleted(fileId: string, isCompleted: boolean) {
+  await db.files.update(fileId, { isCompleted });
+}
 
 /** Borra todos los datos locales (IndexedDB + preferencias en localStorage) y recarga la app. */
 export async function resetAllLocalData() {

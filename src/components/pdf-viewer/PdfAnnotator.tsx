@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardHeader, CardTitle } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
@@ -12,7 +12,21 @@ import {
   deleteHighlight,
 } from "../../lib/db";
 import type { PdfDocumentRecord, PdfHighlightRecord } from "../../types";
-import { Upload, ZoomIn, ZoomOut, Highlighter, Trash2, FileText } from "lucide-react";
+import {
+  Upload,
+  ZoomIn,
+  ZoomOut,
+  Highlighter,
+  Trash2,
+  FileText,
+  ScanText,
+  Sparkles,
+} from "lucide-react";
+import { useSpeechReader } from "../../hooks/useSpeechReader";
+import { VoiceReaderControls } from "../speech/VoiceReaderControls";
+import { createWorker } from "tesseract.js";
+import { renderLatexToHtml, autoFormatMathToLatex } from "../../lib/latexHelper";
+import { LatexMathViewer } from "../latex/LatexMathViewer";
 
 export const PdfAnnotator: React.FC = () => {
   const [documents, setDocuments] = useState<PdfDocumentRecord[]>([]);
@@ -23,7 +37,17 @@ export const PdfAnnotator: React.FC = () => {
   const [highlights, setHighlights] = useState<PdfHighlightRecord[]>([]);
   const [noteText, setNoteText] = useState<string>("");
 
+  // Estado de texto y OCR para la página actual
+  const [currentPageText, setCurrentPageText] = useState<string>("");
+  const [isScannedPage, setIsScannedPage] = useState<boolean>(false);
+  const [isOcrRunning, setIsOcrRunning] = useState<boolean>(false);
+  const [ocrProgress, setOcrProgress] = useState<number>(0);
+  const [showMathView, setShowMathView] = useState<boolean>(false);
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  // Hook para lectura en voz alta
+  const speechReader = useSpeechReader();
 
   useEffect(() => {
     let cancelled = false;
@@ -49,7 +73,12 @@ export const PdfAnnotator: React.FC = () => {
     };
   }, [selectedDoc]);
 
-  // Render PDF page to canvas
+  // Detener la lectura si cambia de página o de documento
+  useEffect(() => {
+    speechReader.stop();
+  }, [currentPage, selectedDoc?.id]);
+
+  // Renderizar página del PDF a canvas y extraer texto digital
   useEffect(() => {
     if (!selectedDoc || !canvasRef.current) return;
     let cancelled = false;
@@ -76,6 +105,23 @@ export const PdfAnnotator: React.FC = () => {
         canvas.height = viewport.height;
 
         await page.render({ canvasContext: ctx, viewport, canvas }).promise;
+        if (cancelled) return;
+
+        // Extraer texto nativo de la página
+        const textContent = await page.getTextContent();
+        const extracted = textContent.items
+          .map((item) => ("str" in item ? item.str : ""))
+          .join(" ")
+          .trim();
+
+        if (extracted.length > 30) {
+          setCurrentPageText(extracted);
+          setIsScannedPage(false);
+        } else {
+          // Pocas palabras o vacío: probablemente una foto o escaneo
+          setCurrentPageText("");
+          setIsScannedPage(true);
+        }
       } catch (err) {
         console.error("Error al renderizar página PDF:", err);
       }
@@ -85,6 +131,30 @@ export const PdfAnnotator: React.FC = () => {
       cancelled = true;
     };
   }, [selectedDoc, currentPage, scale]);
+
+  // Ejecutar OCR en la página actual si es una foto o escaneo
+  const handleRunOcrOnCurrentPage = useCallback(async () => {
+    if (!canvasRef.current) return;
+    setIsOcrRunning(true);
+    setOcrProgress(15);
+
+    try {
+      const worker = await createWorker("spa");
+      setOcrProgress(40);
+      const ret = await worker.recognize(canvasRef.current);
+      setOcrProgress(90);
+
+      const text = ret.data.text.trim();
+      setCurrentPageText(text || "No se detectó texto legible en esta página.");
+      setIsScannedPage(false);
+      await worker.terminate();
+      setOcrProgress(100);
+    } catch (err) {
+      console.error("Error en OCR de página:", err);
+    } finally {
+      setIsOcrRunning(false);
+    }
+  }, []);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -134,7 +204,7 @@ export const PdfAnnotator: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6 pb-12">
-      {/* Top Toolbar */}
+      {/* Barra de herramientas superior */}
       <Card elevated className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4">
         <div className="flex items-center gap-3">
           <label className="cursor-pointer">
@@ -208,22 +278,103 @@ export const PdfAnnotator: React.FC = () => {
         )}
       </Card>
 
-      {/* Main Reader View & Notes Sidebar */}
+      {/* Barra de Lectura de Texto por Voz */}
+      {selectedDoc && (
+        <div className="flex flex-col gap-2">
+          {isScannedPage && !currentPageText && !isOcrRunning && (
+            <div className="flex items-center justify-between gap-3 p-3 rounded border border-amber-500/30 bg-amber-500/10 text-xs font-sans text-text-primary">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-amber-500 shrink-0" />
+                <span>
+                  Esta página parece ser una <strong>foto o escaneo</strong> sin capa de texto digital.
+                </span>
+              </div>
+              <Button size="sm" variant="secondary" onClick={handleRunOcrOnCurrentPage} className="gap-1.5 text-xs shrink-0">
+                <ScanText className="h-3.5 w-3.5" />
+                <span>Reconocer texto con OCR</span>
+              </Button>
+            </div>
+          )}
+
+          {isOcrRunning && (
+            <div className="flex items-center gap-3 p-3 rounded border border-border-subtle bg-bg-secondary text-xs font-sans text-text-secondary animate-pulse">
+              <ScanText className="h-4 w-4 text-accent-primary" />
+              <span>Analizando foto/escaneo de la página con OCR... {ocrProgress}%</span>
+            </div>
+          )}
+
+          {currentPageText && (
+            <VoiceReaderControls
+              reader={speechReader}
+              textToRead={currentPageText}
+              label={`Lector de Página ${currentPage}`}
+            />
+          )}
+        </div>
+      )}
+
+      {/* Lector Principal y Barra lateral de notas */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* PDF Canvas View */}
+        {/* Vista Canvas de PDF */}
         <div className="lg:col-span-2 flex flex-col items-center justify-start rounded border border-border-subtle bg-bg-secondary p-4 overflow-x-auto min-h-[500px]">
           {selectedDoc ? (
-            <canvas ref={canvasRef} className="rounded border border-border-subtle shadow-2xs bg-white" />
+            <div className="flex flex-col items-center gap-4">
+              <canvas ref={canvasRef} className="rounded border border-border-subtle shadow-2xs bg-white" />
+              {currentPageText && (
+                <div className="w-full p-4 rounded border border-border-subtle bg-bg-elevated/70 text-xs font-sans text-text-secondary leading-relaxed">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-text-primary">Texto detectado en esta página:</span>
+                      {currentPageText.includes("$") && (
+                        <Badge variant="accent">LaTeX ✨</Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          const formatted = autoFormatMathToLatex(currentPageText);
+                          setCurrentPageText(formatted);
+                          setShowMathView(true);
+                        }}
+                        className="text-[11px] h-6 px-2 text-accent-primary"
+                        title="Detectar y formatear fórmulas matemáticas a LaTeX"
+                      >
+                        <Sparkles className="h-3 w-3 mr-1" />
+                        <span>Detectar Fórmulas</span>
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setShowMathView((v) => !v)}
+                        className="text-[11px] h-6 px-2"
+                      >
+                        {showMathView ? "Ver Texto Plano" : "Ver con LaTeX ✨"}
+                      </Button>
+                      <Badge variant="neutral">{currentPageText.length} caracteres</Badge>
+                    </div>
+                  </div>
+                  {showMathView ? (
+                    <LatexMathViewer content={currentPageText} className="max-h-48" />
+                  ) : (
+                    <p className="line-clamp-4 hover:line-clamp-none transition-all cursor-pointer">
+                      {currentPageText}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
           ) : (
             <div className="py-24 text-center">
               <FileText className="h-10 w-10 text-text-muted mx-auto mb-2 opacity-50" />
               <p className="font-serif text-base text-text-primary">No hay ningún documento abierto</p>
-              <p className="font-sans text-xs text-text-muted mt-1">Carga un archivo PDF para comenzar a leer y anotar.</p>
+              <p className="font-sans text-xs text-text-muted mt-1">Carga un archivo PDF para comenzar a leer, escuchar y anotar.</p>
             </div>
           )}
         </div>
 
-        {/* Marginal Notes & Highlights */}
+        {/* Notas Marginales y Anotaciones */}
         <div className="flex flex-col gap-4">
           <Card elevated>
             <CardHeader>
@@ -250,7 +401,12 @@ export const PdfAnnotator: React.FC = () => {
                         <Trash2 className="h-3 w-3" />
                       </button>
                     </div>
-                    {h.note && <p className="text-text-primary mt-1 leading-relaxed">{h.note}</p>}
+                    {h.note && (
+                      <div
+                        className="text-text-primary mt-1 leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: renderLatexToHtml(h.note) }}
+                      />
+                    )}
                   </div>
                 ))
               )}
@@ -260,7 +416,7 @@ export const PdfAnnotator: React.FC = () => {
               <Input
                 value={noteText}
                 onChange={(e) => setNoteText(e.target.value)}
-                placeholder="Escribir nota al margen..."
+                placeholder="Escribir nota... (ej: $E=mc^2$ o formula)"
                 className="text-xs"
               />
               <Button size="sm" onClick={handleAddNote} disabled={!noteText.trim() || !selectedDoc}>

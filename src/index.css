@@ -1,54 +1,70 @@
 @import "tailwindcss";
 
 :root {
-  /* Fondo */
+  /* Fondo sobrio académico - Paleta de descanso visual */
   --bg-primary: #FAFAF8;
-  --bg-secondary: #F5F4F0;
+  --bg-secondary: #F4F3EF;
   --bg-elevated: #FFFFFF;
 
-  /* Texto */
-  --text-primary: #2A2A2A;
-  --text-secondary: #5C5C5C;
-  --text-muted: #8A8A85;
+  /* Aliases de compatibilidad */
+  --bg-base: #FAFAF8;
+  --bg-base-alt: #F4F3EF;
 
-  /* Acento */
-  --accent-primary: #3B5169;   /* azul apagado */
-  --accent-secondary: #4A5D45; /* verde bosque apagado */
-  --accent-hover: #2E4054;
+  /* Tipografía legible */
+  --text-primary: #242426;
+  --text-secondary: #525256;
+  --text-muted: #84848A;
+  --text-tertiary: #84848A;
 
-  /* Bordes / separadores */
-  --border-subtle: #E5E3DD;
+  /* Acento académico apagado */
+  --accent-primary: #3B5169;   /* Azul pizarra */
+  --accent-secondary: #4A5D45; /* Verde oliva académico */
+  --accent-hover: #2B3D50;
 
-  /* Estados (usar con moderación, versiones desaturadas) */
-  --success: #5A7A5A;
-  --warning: #A8825A;
-  --error: #A85A5A;
+  /* Bordes limpios definidos */
+  --border-subtle: #E2E0D8;
+
+  /* Estados desaturados sin estridencia */
+  --success: #4E7350;
+  --warning: #9E7448;
+  --error: #9E4E4E;
 }
 
-/* Modo oscuro opcional — NUNCA negro puro */
+/* Modo oscuro sobrio — grafito mate, nunca negro puro */
 .dark, [data-theme="dark"] {
-  --bg-primary: #1C1C1E;
-  --bg-secondary: #242426;
-  --bg-elevated: #2A2A2C;
-  --text-primary: #E8E6E1;
-  --text-secondary: #B0AEA8;
-  --text-muted: #7A7873;
-  --border-subtle: #333336;
+  --bg-primary: #18181A;
+  --bg-secondary: #202023;
+  --bg-elevated: #28282C;
+
+  --bg-base: #18181A;
+  --bg-base-alt: #202023;
+
+  --text-primary: #ECEAE5;
+  --text-secondary: #A8A6A0;
+  --text-muted: #72706B;
+  --text-tertiary: #72706B;
+
+  --border-subtle: #2F2F33;
   --accent-primary: #657D96;
   --accent-secondary: #6B8065;
   --accent-hover: #7E97B1;
-  --success: #6E946E;
-  --warning: #BE9A73;
-  --error: #BE7373;
+  --success: #658F67;
+  --warning: #B38E66;
+  --error: #B36666;
 }
 
 @theme {
   --color-bg-primary: var(--bg-primary);
   --color-bg-secondary: var(--bg-secondary);
   --color-bg-elevated: var(--bg-elevated);
+  --color-bg-base: var(--bg-base);
+  --color-bg-base-alt: var(--bg-base-alt);
+
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
+  --color-text-tertiary: var(--text-tertiary);
+
   --color-accent-primary: var(--accent-primary);
   --color-accent-secondary: var(--accent-secondary);
   --color-accent-hover: var(--accent-hover);
@@ -71,7 +87,7 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Animaciones sobrias: 150-200ms ease-in-out únicamente */
+/* Transiciones sobrias y suaves */
 button, a, input, textarea, select {
   transition: color 150ms ease-in-out, background-color 150ms ease-in-out, border-color 150ms ease-in-out, opacity 150ms ease-in-out;
 }
@@ -82,4 +98,20 @@ h1, h2, h3, h4 {
   font-weight: 600;
   letter-spacing: -0.015em;
   color: var(--text-primary);
+}
+
+/* Estilos de scrollbar sobrios */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }

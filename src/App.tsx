@@ -19,6 +19,9 @@ const KnowledgeGraph = lazy(() =>
 const AcademicWorkspace = lazy(() =>
   import("./pages/AcademicWorkspace").then((m) => ({ default: m.AcademicWorkspace })),
 );
+const BookScannerPage = lazy(() =>
+  import("./pages/BookScannerPage").then((m) => ({ default: m.BookScannerPage })),
+);
 const StyleKit = lazy(() =>
   import("./pages/style-kit/StyleKit").then((m) => ({ default: m.StyleKit })),
 );
@@ -43,6 +46,7 @@ const router = createBrowserRouter([
       { path: "methods", element: withSuspense(<MethodsPage />) },
       { path: "pdf", element: withSuspense(<PdfPage />) },
       { path: "ocr", element: withSuspense(<OcrPage />) },
+      { path: "books", element: withSuspense(<BookScannerPage />) },
       { path: "ambient", element: withSuspense(<AmbientPage />) },
       { path: "academic", element: withSuspense(<AcademicWorkspace />) },
       { path: "workspace", element: withSuspense(<Workspace />) },

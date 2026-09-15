@@ -1,9 +1,9 @@
 import { clsx } from "clsx";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Folder, Trash2, Upload } from "lucide-react";
+import { Folder, Trash2, Upload, CheckCircle2 } from "lucide-react";
 import { useRef, useState } from "react";
 import type { FileRecord, FolderRecord } from "../../db/db";
-import { db } from "../../db/db";
+import { db, toggleFileCompleted } from "../../db/db";
 import {
   deleteFileCascade,
   deleteFolderCascade,
@@ -29,10 +29,10 @@ function FolderCard({
       tabIndex={0}
       onClick={onClick}
       onKeyDown={(e) => e.key === "Enter" && onClick()}
-      className="group relative flex cursor-pointer flex-col items-start justify-between gap-3 rounded-lg glass-panel p-4 text-left transition-all duration-200 hover:border-accent/40 hover:shadow-[0_0_20px_-5px_color-mix(in_srgb,var(--color-accent)_25%,transparent)] hover:-translate-y-0.5"
+      className="group relative flex cursor-pointer flex-col items-start justify-between gap-3 rounded-lg border border-border-subtle bg-bg-elevated p-4 text-left transition-colors duration-150 hover:border-accent-primary/50 shadow-2xs"
     >
       <div className="flex w-full items-start justify-between">
-        <div className="flex h-8 w-8 items-center justify-center rounded-md border border-accent/30 bg-accent-muted/40 text-accent">
+        <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border-subtle bg-bg-secondary text-accent-primary">
           <Folder size={18} strokeWidth={1.75} />
         </div>
         <button
@@ -42,16 +42,16 @@ function FolderCard({
             e.stopPropagation();
             onDelete();
           }}
-          className="rounded p-1 text-text-tertiary opacity-0 transition-opacity duration-150 group-hover:opacity-100 hover:bg-danger-muted hover:text-danger"
+          className="rounded p-1 text-text-muted opacity-0 transition-opacity duration-150 group-hover:opacity-100 hover:bg-error/10 hover:text-error"
         >
           <Trash2 size={14} strokeWidth={1.75} />
         </button>
       </div>
       <div className="w-full">
-        <span className="block truncate font-display text-sm font-semibold text-text-primary">
+        <span className="block truncate font-serif text-sm font-semibold text-text-primary">
           {folder.name}
         </span>
-        <span className="font-mono text-[10px] tracking-wider text-text-tertiary uppercase">
+        <span className="font-mono text-[10px] tracking-wider text-text-muted uppercase">
           {folder.type}
         </span>
       </div>
@@ -77,30 +77,54 @@ function FileCard({
       tabIndex={0}
       onClick={onClick}
       onKeyDown={(e) => e.key === "Enter" && onClick()}
-      className="group relative flex cursor-pointer flex-col items-start justify-between gap-3 rounded-lg glass-panel p-4 text-left transition-all duration-200 hover:border-accent/40 hover:shadow-[0_0_20px_-5px_color-mix(in_srgb,var(--color-accent)_25%,transparent)] hover:-translate-y-0.5"
+      className={clsx(
+        "group relative flex cursor-pointer flex-col items-start justify-between gap-3 rounded-lg border p-4 text-left transition-colors duration-150 shadow-2xs",
+        file.isCompleted
+          ? "border-success/30 bg-success/5"
+          : "border-border-subtle bg-bg-elevated hover:border-accent-primary/50",
+      )}
     >
       <div className="flex w-full items-start justify-between">
-        <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-bg-surface-2 text-text-secondary group-hover:border-accent/40 group-hover:text-accent">
+        <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border-subtle bg-bg-secondary text-text-secondary group-hover:text-accent-primary">
           <Icon size={18} strokeWidth={1.75} />
         </div>
-        <button
-          type="button"
-          title="Eliminar archivo"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete();
-          }}
-          className="rounded p-1 text-text-tertiary opacity-0 transition-opacity duration-150 group-hover:opacity-100 hover:bg-danger-muted hover:text-danger"
-        >
-          <Trash2 size={14} strokeWidth={1.75} />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            title={file.isCompleted ? "Marcar como pendiente" : "Marcar como leído"}
+            onClick={async (e) => {
+              e.stopPropagation();
+              await toggleFileCompleted(file.id, !file.isCompleted);
+            }}
+            className={clsx(
+              "flex items-center gap-1 text-[11px] px-2 py-0.5 rounded border transition-colors",
+              file.isCompleted
+                ? "bg-success/15 text-success border-success/30 font-medium"
+                : "bg-bg-secondary text-text-muted border-border-subtle hover:text-text-primary",
+            )}
+          >
+            <CheckCircle2 size={12} />
+            <span>{file.isCompleted ? "Leído" : "Pendiente"}</span>
+          </button>
+          <button
+            type="button"
+            title="Eliminar archivo"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            className="rounded p-1 text-text-muted opacity-0 transition-opacity duration-150 group-hover:opacity-100 hover:bg-error/10 hover:text-error"
+          >
+            <Trash2 size={14} strokeWidth={1.75} />
+          </button>
+        </div>
       </div>
 
       <div className="w-full">
-        <span className="block truncate font-display text-sm font-semibold text-text-primary" title={file.name}>
+        <span className="block truncate font-serif text-sm font-semibold text-text-primary" title={file.name}>
           {file.name}
         </span>
-        <span className="font-mono text-[11px] text-text-tertiary">
+        <span className="font-mono text-[11px] text-text-muted">
           {formatBytes(file.size)} · {formatDate(file.createdAt)}
         </span>
         {isDocPdf && (
