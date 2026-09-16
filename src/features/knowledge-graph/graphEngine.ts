@@ -1,5 +1,7 @@
 import { db, type ConceptRecord, type ConceptEdgeRecord, type ReviewLogRecord, type CardFsrsRecord } from "../../db/db";
 import { calculateHalfLife } from "../fsrs/fsrsModel";
+import { calculateConceptMastery4D } from "../study-engine/masteryEngine";
+import type { ConceptMastery4D } from "../study-engine/types";
 
 export interface GraphNode extends ConceptRecord {
   inDegree: number;
@@ -7,6 +9,17 @@ export interface GraphNode extends ConceptRecord {
   downstreamCount: number;
   isBottleneck: boolean;
   bottleneckScore: number;
+}
+
+export interface ConceptGraphDetails {
+  concept: ConceptRecord;
+  mastery: ConceptMastery4D;
+  cardsCount: number;
+  errorsCount: number;
+  unresolvedErrorsCount: number;
+  prerequisites: Array<{ id: string; name: string; retrievability: number; mastery: number }>;
+  isPrereqWarning: boolean;
+  weakestPrereq?: { id: string; name: string; retrievability: number };
 }
 
 export interface BottleneckReport {
@@ -394,3 +407,64 @@ export async function seedDefaultKnowledgeGraph(): Promise<void> {
     ]);
   });
 }
+
+/**
+ * Knowledge Graph 2.0 (Sección 17 & 17-BIS):
+ * Obtiene el perfil multidimensional de un concepto para el inspector:
+ * - 4D Mastery: Retención, Comprensión, Aplicación, Transferencia.
+ * - Tarjetas FSRS asociadas.
+ * - Errores registrados en el Error Bank.
+ * - Advertencia blanda de prerrequisitos con retención < 70%.
+ */
+export async function calculateConceptGraphDetails(
+  conceptId: string
+): Promise<ConceptGraphDetails | null> {
+  const concept = await db.concepts.get(conceptId);
+  if (!concept) return null;
+
+  // 1. Calcular desglose 4D Mastery
+  const mastery = await calculateConceptMastery4D(conceptId);
+
+  // 2. Tarjetas y Errores asociados
+  const cards = await db.cardsFsrs.where("conceptId").equals(conceptId).toArray();
+  const errors = await db.studentErrors.where("conceptId").equals(conceptId).toArray();
+  const unresolved = errors.filter((e) => !e.resolved).length;
+
+  // 3. Inspeccionar prerrequisitos y advertencia blanda (Sección 17-BIS)
+  const prereqs: Array<{ id: string; name: string; retrievability: number; mastery: number }> = [];
+  let weakest: { id: string; name: string; retrievability: number } | undefined;
+
+  for (const pId of concept.prerequisites || []) {
+    const parent = await db.concepts.get(pId);
+    if (parent) {
+      prereqs.push({
+        id: parent.id,
+        name: parent.name,
+        retrievability: parent.currentRetrievability,
+        mastery: parent.masteryScore,
+      });
+
+      if (!weakest || parent.currentRetrievability < weakest.retrievability) {
+        weakest = {
+          id: parent.id,
+          name: parent.name,
+          retrievability: parent.currentRetrievability,
+        };
+      }
+    }
+  }
+
+  const isPrereqWarning = Boolean(weakest && weakest.retrievability < 0.70);
+
+  return {
+    concept,
+    mastery,
+    cardsCount: cards.length,
+    errorsCount: errors.length,
+    unresolvedErrorsCount: unresolved,
+    prerequisites: prereqs,
+    isPrereqWarning,
+    weakestPrereq: isPrereqWarning ? weakest : undefined,
+  };
+}
+

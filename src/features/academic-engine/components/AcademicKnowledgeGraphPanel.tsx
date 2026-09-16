@@ -4,7 +4,6 @@ import { Badge } from "../../../components/ui/Badge";
 import { Button } from "../../../components/ui/Button";
 import { Modal } from "../../../components/ui/Modal";
 import {
-  Lock,
   Unlock,
   CheckCircle2,
   AlertTriangle,
@@ -261,13 +260,13 @@ export const AcademicKnowledgeGraphPanel: React.FC<AcademicKnowledgeGraphPanelPr
           const isLocked = concept.isLockedByPrereq;
 
           let cardBorder = "border-slate-800 bg-slate-900/50 hover:border-slate-700";
-          let badgeVariant: "success" | "accent" | "danger" = "accent";
+          let badgeVariant: "success" | "accent" | "danger" | "warning" = "accent";
           let statusText = "En Progreso";
 
           if (isLocked) {
-            cardBorder = "border-rose-900/40 bg-rose-950/10 opacity-70 hover:opacity-100";
-            badgeVariant = "danger";
-            statusText = "Bloqueado";
+            cardBorder = "border-amber-500/30 bg-amber-950/15 hover:border-amber-500/50";
+            badgeVariant = "warning";
+            statusText = "Base Débil";
           } else if (isMastered) {
             cardBorder = "border-emerald-500/30 bg-emerald-950/10 hover:border-emerald-500/50";
             badgeVariant = "success";
@@ -287,7 +286,7 @@ export const AcademicKnowledgeGraphPanel: React.FC<AcademicKnowledgeGraphPanelPr
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-1.5 min-w-0">
                   {isLocked ? (
-                    <Lock className="w-4 h-4 text-rose-400 shrink-0" />
+                    <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
                   ) : isMastered ? (
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                   ) : (
@@ -366,17 +365,19 @@ export const AcademicKnowledgeGraphPanel: React.FC<AcademicKnowledgeGraphPanelPr
             </div>
 
             {selectedConcept.isLockedByPrereq && (
-              <div className="p-3 rounded-lg bg-rose-950/30 border border-rose-500/40 text-rose-300 text-[11px] flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
-                <div>
-                  <strong className="block font-bold">Concepto Bloqueado</strong>
-                  Para desbloquear este nodo con rigor académico, primero debes alcanzar R ≥ 70% en sus bases:{" "}
-                  <span className="underline">{selectedConcept.unmetPrereqs.join(", ")}</span>.
+              <div className="p-3 rounded-lg bg-amber-950/30 border border-amber-500/40 text-amber-200 text-[11px] flex flex-col gap-2">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="block font-bold text-amber-300">Prerrequisito con Retención Baja</strong>
+                    Este concepto se fundamenta en: <span className="underline font-semibold">{selectedConcept.unmetPrereqs.join(", ")}</span> (R &lt; 50%).
+                    CognitiveOS no te bloquea de forma rígida, pero la evidencia pedagógica demuestra que estudiar temas derivados sin asentar las bases incrementa los errores en un 60%.
+                  </div>
                 </div>
               </div>
             )}
 
-            <div className="pt-2 flex justify-end gap-2 border-t border-slate-800">
+            <div className="pt-2 flex flex-wrap items-center justify-end gap-2 border-t border-slate-800">
               <Button
                 variant="secondary"
                 size="sm"
@@ -385,6 +386,26 @@ export const AcademicKnowledgeGraphPanel: React.FC<AcademicKnowledgeGraphPanelPr
               >
                 Cerrar
               </Button>
+
+              {selectedConcept.isLockedByPrereq && selectedConcept.unmetPrereqs.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const pName = selectedConcept.unmetPrereqs[0];
+                    const pConcept = concepts.find((c) => c.name === pName);
+                    setIsModalOpen(false);
+                    if (pConcept) {
+                      onStartExpressStudy?.(pConcept);
+                    }
+                  }}
+                  className="text-xs font-mono text-amber-300 border-amber-500/40 hover:bg-amber-500/10"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Repasar "{selectedConcept.unmetPrereqs[0]}" (4 min)
+                </Button>
+              )}
+
               <Button
                 variant="primary"
                 size="sm"
@@ -392,7 +413,11 @@ export const AcademicKnowledgeGraphPanel: React.FC<AcademicKnowledgeGraphPanelPr
                 className="text-xs font-mono flex items-center gap-1.5 shadow-lg shadow-cyan-500/20"
               >
                 <Sparkles className="w-3.5 h-3.5" />
-                Estudiar este nodo ahora (Sesión FSRS Exprés)
+                <span>
+                  {selectedConcept.isLockedByPrereq
+                    ? "Entrar igual (Estudiar de todos modos)"
+                    : "Estudiar este nodo ahora (FSRS)"}
+                </span>
               </Button>
             </div>
           </div>

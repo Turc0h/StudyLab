@@ -13,11 +13,14 @@ import {
 import {
   calculateRetrievability,
   previewNextStates,
+  detectCardLeech,
   type FsrsRating,
 } from "../../fsrs/fsrsModel";
 import { executeFsrsReview } from "../../fsrs/scheduler";
 import { generateFsrsCardsFromChunk } from "../flashcardGenerator";
 import { AcademicKnowledgeGraphPanel } from "./AcademicKnowledgeGraphPanel";
+import { parseOcclusionCard } from "../../image-occlusion/occlusionEngine";
+import { ImageOcclusionViewer } from "../../image-occlusion/ImageOcclusionViewer";
 import {
   Brain,
   CheckCircle,
@@ -30,6 +33,7 @@ import {
   ArrowRight,
   Target,
   Share2,
+  AlertTriangle,
 } from "lucide-react";
 
 interface AcademicCognitiveWidgetsProps {
@@ -294,12 +298,54 @@ export const AcademicCognitiveWidgets: React.FC<AcademicCognitiveWidgetsProps> =
                   </span>
                 </div>
 
-                <div className="my-3 text-xs leading-relaxed text-slate-200 font-sans">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1">
-                    Pregunta / Estímulo:
-                  </div>
-                  {renderMathText(currentCard.front)}
-                </div>
+                {(() => {
+                  const leech = detectCardLeech(currentCard.lapses || 0);
+                  if (!leech.isLeech) return null;
+                  return (
+                    <div className="my-2 p-2.5 rounded-lg border border-rose-500/40 bg-rose-950/30 text-rose-200 text-[11px] flex flex-col gap-1">
+                      <div className="flex items-center gap-1.5 font-bold text-rose-300">
+                        <AlertTriangle className="w-3.5 h-3.5" />
+                        <span>Tarjeta Dificultosa (Leech · {leech.lapses} fallos)</span>
+                      </div>
+                      <p className="text-[10px] text-rose-300/80 leading-snug">
+                        {leech.message}
+                      </p>
+                      <div className="flex items-center gap-1.5 mt-1 pt-1 border-t border-rose-500/20 text-[9px]">
+                        <span className="font-mono text-rose-400">Acción pedagógica:</span>
+                        <span className="font-bold uppercase tracking-wider text-rose-200">
+                          {leech.actionRecommendation === "split"
+                            ? "Dividir en dos más chicas"
+                            : leech.actionRecommendation === "audit"
+                            ? "Auditar con Cátedra"
+                            : "Reformular"}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {(() => {
+                  const occlusionPayload = parseOcclusionCard(currentCard);
+                  if (occlusionPayload) {
+                    return (
+                      <div className="my-2">
+                        <ImageOcclusionViewer
+                          payload={occlusionPayload}
+                          isFlipped={isFlipped}
+                          onReveal={() => setIsFlipped(true)}
+                        />
+                      </div>
+                    );
+                  }
+                  return (
+                    <div className="my-3 text-xs leading-relaxed text-slate-200 font-sans">
+                      <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1">
+                        Pregunta / Estímulo:
+                      </div>
+                      {renderMathText(currentCard.front)}
+                    </div>
+                  );
+                })()}
 
                 {isFlipped ? (
                   <div className="mt-2 pt-3 border-t border-cyan-500/20 bg-cyan-950/10 rounded-lg p-2.5 text-xs text-cyan-100 animate-in fade-in duration-200">

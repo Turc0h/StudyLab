@@ -1,21 +1,47 @@
-import { db, type AcademicChunkRecord, type AcademicSourceRecord } from "../../db/db";
-import { chunkAcademicText, computeLocalEmbedding } from "./academicChunker";
+import { db, type AcademicChunkRecord, type AcademicSourceRecord, type AcademicBoundingBox } from "../../db/db";
+import { computeEmbeddingVector } from "./embeddings/embeddingManager";
 
 export interface SearchResult {
   chunk: AcademicChunkRecord;
   sourceTitle: string;
-  combinedScore: number;
+  sourceId: string;
+  pageNumber: number;
+  boundingBox?: AcademicBoundingBox;
+  score: number; // Combined RRF Score
+  vectorRank: number;
+  keywordRank: number;
   denseScore: number;
   sparseScore: number;
+  exactMatchBoost: number;
   graphBoost: number;
   matchedLatex: string[];
 }
 
+export interface SourceDiscrepancy {
+  topic: string;
+  sourceA: { id: string; title: string; snippet: string; pageNumber: number };
+  sourceB: { id: string; title: string; snippet: string; pageNumber: number };
+  reason: string;
+}
+
+export interface HybridSearchResponse {
+  results: SearchResult[];
+  hasSufficientEvidence: boolean;
+  refusalReason?: string;
+  queryAnalyzed: {
+    exactPatterns: string[];
+    technicalTerms: string[];
+  };
+  discrepancies?: SourceDiscrepancy[];
+}
+
+export const EVIDENCE_THRESHOLD = 0.015; // Minimum RRF score required to consider evidence sufficient
+
 /**
- * Calculates cosine similarity between two unit-normalized vectors
+ * Calculates cosine similarity between two unit-normalized vectors.
  */
-export function cosineSimilarity(vecA: number[], vecB: number[]): number {
-  if (!vecA || !vecB || vecA.length !== vecB.length) return 0;
+export function cosineSimilarity(vecA?: number[], vecB?: number[]): number {
+  if (!vecA || !vecB || vecA.length === 0 || vecA.length !== vecB.length) return 0;
   let dot = 0;
   for (let i = 0; i < vecA.length; i++) {
     dot += vecA[i] * vecB[i];
@@ -24,106 +50,285 @@ export function cosineSimilarity(vecA: number[], vecB: number[]): number {
 }
 
 /**
- * Calculates BM25 score approximation between query tokens and chunk sparse tokens
+ * Calculates Okapi BM25 score approximation between query tokens and chunk sparse tokens.
+ * Accounts for term frequency (TF), saturation (k1 = 1.5, b = 0.75), and length normalization.
  */
-export function sparseLexicalScore(
-  queryTokens: Record<string, number>,
+export function computeBM25Score(
+  queryTerms: string[],
   chunkTokens: Record<string, number> = {},
+  chunkLength = 100,
+  avgDocLength = 120,
 ): number {
+  const k1 = 1.5;
+  const b = 0.75;
   let score = 0;
-  for (const term in queryTokens) {
-    if (chunkTokens[term]) {
-      const qf = queryTokens[term];
-      const cf = chunkTokens[term];
-      // TF term saturation
-      const tf = (cf * 2.2) / (cf + 1.2);
-      score += tf * qf;
+
+  for (const term of queryTerms) {
+    const tf = chunkTokens[term] || 0;
+    if (tf > 0) {
+      const lenNorm = 1 - b + b * (chunkLength / Math.max(1, avgDocLength));
+      const saturatedTf = (tf * (k1 + 1)) / (tf + k1 * lenNorm);
+      score += saturatedTf;
     }
   }
+
   return score;
 }
 
 /**
- * Hybrid Vector + BM25 + Graph Reciprocal Rank Fusion (RRF) Search
+ * Detects engineering exact matches such as equation numbers, standards, and norms.
+ * e.g., "ecuación 4.17", "ec. 2.4", "IRAM 2437", "IEEE 802.11", "teorema 3.1".
+ */
+export function extractExactTechnicalPatterns(text: string): string[] {
+  const patterns: string[] = [];
+
+  // Equation patterns
+  const eqMatches = text.match(/(?:ecuaci[oó]n|ec\.)\s*(\d+(?:\.\d+)?)/gi);
+  if (eqMatches) patterns.push(...eqMatches.map((m) => m.toLowerCase().replace(/\s+/g, " ")));
+
+  // Theorem & proposition patterns
+  const thMatches = text.match(/(?:teorema|proposici[oó]n|lema|definici[oó]n)\s*(\d+(?:\.\d+)?)/gi);
+  if (thMatches) patterns.push(...thMatches.map((m) => m.toLowerCase().replace(/\s+/g, " ")));
+
+  // Technical standards and norms (IRAM, ISO, IEEE, DIN, ASTM)
+  const normMatches = text.match(/\b(IRAM|ISO|IEEE|DIN|ASTM|IEC)\s*[-_]?\s*(\d+)/gi);
+  if (normMatches) patterns.push(...normMatches.map((m) => m.toLowerCase().replace(/\s+/g, " ")));
+
+  return patterns;
+}
+
+/**
+ * Hybrid Vector + BM25 + Exact Nomenclature + Reciprocal Rank Fusion (RRF) Search.
  */
 export async function searchAcademicKnowledge(params: {
   query: string;
   subjectFilter?: string | null;
+  sourceIds?: string[];
   topK?: number;
 }): Promise<SearchResult[]> {
-  const { query, subjectFilter, topK = 6 } = params;
-  if (!query.trim()) return [];
+  const response = await searchAcademicKnowledgeWithEvidence(params);
+  return response.results;
+}
+
+/**
+ * Full Hybrid Search with Evidence Verification for Citation-First integrity.
+ */
+export async function searchAcademicKnowledgeWithEvidence(params: {
+  query: string;
+  subjectFilter?: string | null;
+  sourceIds?: string[];
+  topK?: number;
+}): Promise<HybridSearchResponse> {
+  const { query, subjectFilter, sourceIds, topK = 6 } = params;
+  const trimmed = query.trim();
+
+  if (!trimmed) {
+    return {
+      results: [],
+      hasSufficientEvidence: false,
+      refusalReason: "No se ha ingresado una consulta de búsqueda.",
+      queryAnalyzed: { exactPatterns: [], technicalTerms: [] },
+    };
+  }
 
   let allChunks = await db.academicChunks.toArray();
-  if (subjectFilter) {
+  if (sourceIds && sourceIds.length > 0) {
+    const sourceIdSet = new Set(sourceIds);
+    allChunks = allChunks.filter((c) => sourceIdSet.has(c.sourceId));
+  } else if (subjectFilter) {
     allChunks = allChunks.filter((c) => c.subjectId === subjectFilter);
   }
 
-  if (allChunks.length === 0) return [];
+  if (allChunks.length === 0) {
+    return {
+      results: [],
+      hasSufficientEvidence: false,
+      refusalReason: "No existen fragmentos indexados en la base de datos para esta cátedra.",
+      queryAnalyzed: { exactPatterns: [], technicalTerms: [] },
+    };
+  }
 
-  const queryDense = computeLocalEmbedding(query);
-  const queryTerms = query
+  // 1. Analyze Query
+  const exactPatterns = extractExactTechnicalPatterns(trimmed);
+  const queryTerms = trimmed
     .toLowerCase()
     .replace(/[^\w\sáéíóúüñ]/gi, " ")
     .split(/\s+/)
     .filter((w) => w.length >= 3);
 
-  const querySparse: Record<string, number> = {};
-  for (const t of queryTerms) {
-    querySparse[t] = (querySparse[t] || 0) + 1;
-  }
+  // 2. Compute Query Embedding (on-device Transformers.js / fallback)
+  const queryDense = await computeEmbeddingVector(trimmed);
 
-  // Fetch sources mapping
-  const sources = await db.academicSources.toArray();
+  // 3. Mapping sources & graph concepts
+  const [sources, concepts] = await Promise.all([
+    db.academicSources.toArray(),
+    db.concepts.toArray(),
+  ]);
   const sourceMap = new Map(sources.map((s) => [s.id, s.title]));
-
-  // Fetch knowledge graph concepts to apply inter-subject graph boost
-  const concepts = await db.concepts.toArray();
   const conceptNames = new Set(concepts.map((c) => c.name.toLowerCase()));
 
-  const results: SearchResult[] = [];
+  // 4. Calculate Raw Dense and Sparse Scores for each chunk
+  interface ScoredCandidate {
+    chunk: AcademicChunkRecord;
+    denseScore: number;
+    bm25Score: number;
+    exactMatchBoost: number;
+    graphBoost: number;
+    matchedLatex: string[];
+    vectorRank: number;
+    keywordRank: number;
+    rrfScore: number;
+  }
 
-  for (const chunk of allChunks) {
+  const candidates: ScoredCandidate[] = allChunks.map((chunk) => {
+    // Dense similarity
     const denseScore = chunk.denseVector
       ? cosineSimilarity(queryDense, chunk.denseVector)
       : 0;
 
-    const rawSparse = chunk.sparseTokens
-      ? sparseLexicalScore(querySparse, chunk.sparseTokens)
-      : 0;
-    const sparseScore = Math.min(1.0, rawSparse / Math.max(1, queryTerms.length * 2));
+    // BM25 sparse score
+    const bm25Score = computeBM25Score(queryTerms, chunk.sparseTokens);
 
-    // Graph boost if chunk content mentions a core concept
+    // Exact pattern matching (equation numbers, norms, theorems)
+    let exactMatchBoost = 0;
+    const chunkLower = chunk.rawContent.toLowerCase();
+    for (const pat of exactPatterns) {
+      if (chunkLower.includes(pat)) {
+        exactMatchBoost += 2.5; // Significant boost for exact technical match
+      }
+    }
+
+    // Knowledge graph concept boost
     let graphBoost = 0;
     for (const cName of conceptNames) {
-      if (chunk.rawContent.toLowerCase().includes(cName)) {
+      if (chunkLower.includes(cName)) {
         graphBoost += 0.08;
       }
     }
     graphBoost = Math.min(0.25, graphBoost);
 
-    // Reciprocal Rank / Hybrid Composite Score
-    const combinedScore = Number((denseScore * 0.5 + sparseScore * 0.35 + graphBoost * 0.15).toFixed(4));
+    return {
+      chunk,
+      denseScore,
+      bm25Score: bm25Score + exactMatchBoost,
+      exactMatchBoost,
+      graphBoost,
+      matchedLatex: chunk.latexFormulas || [],
+      vectorRank: 0,
+      keywordRank: 0,
+      rrfScore: 0,
+    };
+  });
 
-    if (combinedScore > 0.10) {
-      results.push({
-        chunk,
-        sourceTitle: sourceMap.get(chunk.sourceId) || "Documento Académico",
-        combinedScore,
-        denseScore,
-        sparseScore,
-        graphBoost,
-        matchedLatex: chunk.latexFormulas || [],
-      });
+  // 5. Rank by Dense Vector
+  candidates.sort((a, b) => b.denseScore - a.denseScore);
+  candidates.forEach((c, idx) => {
+    c.vectorRank = idx + 1;
+  });
+
+  // 6. Rank by BM25 Keyword
+  candidates.sort((a, b) => b.bm25Score - a.bm25Score);
+  candidates.forEach((c, idx) => {
+    c.keywordRank = idx + 1;
+  });
+
+  // 7. Reciprocal Rank Fusion (RRF) with k = 60
+  const kRRF = 60;
+  candidates.forEach((c) => {
+    const rrfDense = 1.0 / (kRRF + c.vectorRank);
+    const rrfKeyword = 1.0 / (kRRF + c.keywordRank);
+    c.rrfScore = rrfDense + rrfKeyword + c.graphBoost * 0.01;
+  });
+
+  // 8. Sort by combined RRF Score descending
+  candidates.sort((a, b) => b.rrfScore - a.rrfScore);
+
+  const topCandidates = candidates.slice(0, topK);
+  const bestMatch = topCandidates[0];
+
+  const hasSufficientEvidence = !!(
+    bestMatch &&
+    (bestMatch.rrfScore >= EVIDENCE_THRESHOLD || bestMatch.exactMatchBoost > 0 || bestMatch.denseScore > 0.45)
+  );
+
+  const results: SearchResult[] = topCandidates.map((c) => ({
+    chunk: c.chunk,
+    sourceTitle: sourceMap.get(c.chunk.sourceId) || "Documento Académico",
+    sourceId: c.chunk.sourceId,
+    pageNumber: c.chunk.pageNumber,
+    boundingBox: c.chunk.boundingBox,
+    score: Number(c.rrfScore.toFixed(5)),
+    vectorRank: c.vectorRank,
+    keywordRank: c.keywordRank,
+    denseScore: Number(c.denseScore.toFixed(4)),
+    sparseScore: Number(c.bm25Score.toFixed(4)),
+    exactMatchBoost: c.exactMatchBoost,
+    graphBoost: c.graphBoost,
+    matchedLatex: c.matchedLatex,
+  }));
+
+  // 9. Detect discrepancies across distinct sources
+  const discrepancies: SourceDiscrepancy[] = [];
+  const distinctSourceIds = Array.from(new Set(results.map((r) => r.sourceId)));
+  if (distinctSourceIds.length >= 2) {
+    for (let i = 0; i < results.length; i++) {
+      for (let j = i + 1; j < results.length; j++) {
+        const resA = results[i];
+        const resB = results[j];
+        if (resA.sourceId !== resB.sourceId) {
+          const textA = resA.chunk.rawContent.toLowerCase();
+          const textB = resB.chunk.rawContent.toLowerCase();
+
+          const hasPolarConflict =
+            (textA.includes("aumenta") && textB.includes("disminuye")) ||
+            (textA.includes("disminuye") && textB.includes("aumenta")) ||
+            (textA.includes("directamente proporcional") && textB.includes("inversamente proporcional")) ||
+            (textA.includes("inversamente proporcional") && textB.includes("directamente proporcional")) ||
+            (textA.includes("siempre") && textB.includes("nunca")) ||
+            (textA.includes("atractiva") && textB.includes("repulsiva")) ||
+            (textA.includes("conservativa") && textB.includes("no conservativa"));
+
+          if (hasPolarConflict) {
+            discrepancies.push({
+              topic: trimmed,
+              sourceA: {
+                id: resA.sourceId,
+                title: resA.sourceTitle,
+                snippet: resA.chunk.rawContent.slice(0, 150),
+                pageNumber: resA.pageNumber,
+              },
+              sourceB: {
+                id: resB.sourceId,
+                title: resB.sourceTitle,
+                snippet: resB.chunk.rawContent.slice(0, 150),
+                pageNumber: resB.pageNumber,
+              },
+              reason: "Las fuentes afirman comportamientos o relaciones opuestas respecto a esta consulta.",
+            });
+            break;
+          }
+        }
+      }
+      if (discrepancies.length > 0) break;
     }
   }
 
-  // Sort descending by combined score
-  return results.sort((a, b) => b.combinedScore - a.combinedScore).slice(0, topK);
+  return {
+    results,
+    hasSufficientEvidence,
+    refusalReason: hasSufficientEvidence
+      ? undefined
+      : "No encuentro evidencia suficiente en las fuentes cargadas para fundamentar una deducción rigurosa.",
+    queryAnalyzed: {
+      exactPatterns,
+      technicalTerms: queryTerms,
+    },
+    discrepancies: discrepancies.length > 0 ? discrepancies : undefined,
+  };
 }
 
 /**
- * Seeds default university textbook and lecture notes if none exist in IndexedDB
+ * Seeds sample university textbook and lecture notes if none exist in IndexedDB.
  */
 export async function seedAcademicSources(): Promise<void> {
   const existing = await db.academicSources.count();
@@ -146,75 +351,5 @@ export async function seedAcademicSources(): Promise<void> {
     createdAt: now,
   };
 
-  const sampleRawText1 = `# Capítulo 4: Electrodinámica Clásica y Ley de Faraday-Lenz
---- Page 12 ---
-La inducción electromagnética relaciona la variación temporal del flujo magnético con la circulación del campo eléctrico inducido en un contorno cerrado.
-
-Teorema 4.1: Ley de Faraday-Lenz
-En todo circuito cerrado atravesado por un flujo magnético variable $\\Phi_B$, la fuerza electromotriz (fem) $\\mathcal{E}$ inducida es igual a la tasa de variación temporal negativa del flujo:
-$$\\mathcal{E} = -\\frac{d\\Phi_B}{dt} = -\\frac{d}{dt} \\iint_S \\mathbf{B} \\cdot d\\mathbf{A}$$
-Demostración:
-A partir de la ecuación de Maxwell en forma diferencial:
-$$\\nabla \\times \\mathbf{E} = -\\frac{\\partial \\mathbf{B}}{\\partial t}$$
-Aplicando el Teorema de Stokes a una superficie abierta $S$ delimitada por la curva cerrada $C$:
-$$\\oint_C \\mathbf{E} \\cdot d\\mathbf{l} = \\iint_S (\\nabla \\times \\mathbf{E}) \\cdot d\\mathbf{A} = -\\iint_S \\frac{\\partial \\mathbf{B}}{\\partial t} \\cdot d\\mathbf{A}$$
-Por definición de potencial de circuito $\\mathcal{E} = \\oint_C \\mathbf{E} \\cdot d\\mathbf{l}$, queda demostrada la igualdad. Q.E.D. ■
-
-El signo negativo impuesto por Heinrich Lenz obedece estrictamente a la conservación de la energía: las corrientes inducidas generan un campo magnético secundario que se opone al cambio del flujo original.
-
---- Page 18 ---
-# Capítulo 5: Formalismo de la Mecánica Cuántica y Espacios de Hilbert
-En mecánica cuántica, los estados físicos se representan mediante rayos en un espacio de Hilbert complejo separable $\\mathcal{H}$, y los observables físicos medibles corresponden a operadores lineales Hermíticos (autoadjuntos).
-
-Definición 5.1: Operador Hermítico
-Un operador lineal $\\hat{A}$ sobre $\\mathcal{H}$ es Hermítico o autoadjunto si coincide con su adjunto Hermítico:
-$$\\langle \\phi | \\hat{A} \\psi \\rangle = \\langle \\hat{A} \\phi | \\psi \\rangle, \\quad \\forall |\\phi\\rangle, |\\psi\\rangle \\in \\mathcal{H}$$
-lo que implica formalmente $\\hat{A} = \\hat{A}^\\dagger$.
-
-Teorema 5.2: Realidad de los Autovalores Cuánticos
-Todos los autovalores de un operador Hermítico son números estrictamente reales, y los autovectores correspondientes a autovalores distintos son mutuamente ortogonales:
-$$\\hat{A} |a_n\\rangle = a_n |a_n\\rangle \\implies a_n \\in \\mathbb{R}$$
-Demostración:
-Multiplicando por la izquierda por el bra $\\langle a_n|$:
-$$\\langle a_n | \\hat{A} | a_n \\rangle = a_n \\langle a_n | a_n \\rangle$$
-Tomando el conjugado complejo y usando la propiedad de hermiticidad:
-$$\\langle a_n | \\hat{A} | a_n \\rangle^* = a_n^* \\langle a_n | a_n \\rangle$$
-Como $\\langle a_n | \\hat{A} | a_n \\rangle = \\langle \\hat{A} a_n | a_n \\rangle = \\langle a_n | \\hat{A} | a_n \\rangle^*$, se deduce $(a_n - a_n^*) \\|a_n\\|^2 = 0$. Dado que $|a_n\\rangle \\neq 0$, se concluye $a_n = a_n^*$, probando que $a_n \\in \\mathbb{R}$. Q.E.D. ■`;
-
-  const source2: AcademicSourceRecord = {
-    id: "src-algebra-spectral",
-    subjectId: "algebra-lineal",
-    professorId: "Dra. Emmy Noether",
-    career: "Matemática / Ciencias de la Computación",
-    year: 2026,
-    semester: "1C",
-    title: "Álgebra Lineal: Descomposición Espectral y Formas Canónicas",
-    documentType: "lecture_notes",
-    pageCount: 45,
-    ocrProcessed: true,
-    chunkCount: 5,
-    createdAt: now,
-  };
-
-  const sampleRawText2 = `# Capítulo 3: Diagonalización y Teorema Espectral
---- Page 24 ---
-Definición 3.1: Autovalores y Polinomio Característico
-Sea $V$ un espacio vectorial sobre un cuerpo $\\mathbb{K}$ y $T: V \\to V$ una transformación lineal. Un escalar $\\lambda \\in \\mathbb{K}$ es autovalor si existe un vector no nulo $v \\in V$ tal que:
-$$T(v) = \\lambda v \\iff (T - \\lambda I)v = 0$$
-El conjunto de autovalores se determina por las raíces del polinomio característico:
-$$p(\\lambda) = \\det(A - \\lambda I) = 0$$
-
-Teorema 3.2: Teorema Espectral para Matrices Simétricas Reales
-Toda matriz simétrica real $A = A^T \\in \\mathbb{R}^{n \\times n}$ es ortogonalmente diagonalizable. Existe una matriz ortogonal $Q$ ($Q^{-1} = Q^T$) y una matriz diagonal $\\Lambda$ tal que:
-$$A = Q \\Lambda Q^T = \\sum_{i=1}^n \\lambda_i q_i q_i^T$$
-donde los $\\lambda_i$ son autovalores reales y los $q_i$ forman una base ortonormal de $\\mathbb{R}^n$. ■`;
-
-  const chunks1 = chunkAcademicText(source1.id, source1.subjectId, sampleRawText1, 12);
-  const chunks2 = chunkAcademicText(source2.id, source2.subjectId, sampleRawText2, 24);
-
-  await db.transaction("rw", [db.academicSources, db.academicChunks], async () => {
-    await db.academicSources.add(source1);
-    await db.academicSources.add(source2);
-    await db.academicChunks.bulkAdd([...chunks1, ...chunks2]);
-  });
+  await db.academicSources.put(source1);
 }

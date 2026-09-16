@@ -224,3 +224,48 @@ export function calculateModelRmse(
   }
   return Math.sqrt(sumSquaredError / logs.length);
 }
+
+/**
+ * FSRS Leech Detection (Section 20-BIS)
+ * A card that lapses repeatedly (default >= 6) indicates a structural defect
+ * in the card or a deep conceptual misconception, not merely lack of memory repetition.
+ */
+export interface LeechInfo {
+  isLeech: boolean;
+  lapses: number;
+  threshold: number;
+  actionRecommendation: "split" | "audit" | "reword" | "suspend";
+  message: string;
+}
+
+export function detectCardLeech(lapses: number, threshold = 6): LeechInfo {
+  const isLeech = lapses >= threshold;
+  if (!isLeech) {
+    return {
+      isLeech: false,
+      lapses,
+      threshold,
+      actionRecommendation: "reword",
+      message: "Tarjeta en ciclo de aprendizaje normal.",
+    };
+  }
+
+  // Recommended pedagogical action depending on lapse severity
+  let actionRecommendation: "split" | "audit" | "reword" | "suspend" = "split";
+  if (lapses >= 10) {
+    actionRecommendation = "suspend";
+  } else if (lapses >= 8) {
+    actionRecommendation = "audit";
+  } else {
+    actionRecommendation = "split";
+  }
+
+  return {
+    isLeech,
+    lapses,
+    threshold,
+    actionRecommendation,
+    message: `Esta tarjeta te falló ${lapses} veces. Probablemente el problema sea la formulación de la tarjeta o una premisa conceptual, no tu memoria.`,
+  };
+}
+

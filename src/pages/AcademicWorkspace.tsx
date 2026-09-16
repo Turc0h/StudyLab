@@ -10,7 +10,8 @@ import { AcademicSourceManager } from "../features/academic-engine/components/Ac
 import { AcademicCanvas } from "../features/academic-engine/components/AcademicCanvas";
 import { AcademicCognitiveWidgets } from "../features/academic-engine/components/AcademicCognitiveWidgets";
 import { AcademicTutorialOverlay } from "../features/academic-engine/components/AcademicTutorialOverlay";
-import { BrainCircuit, BookOpen, HelpCircle, Compass, Eye, EyeOff, ArrowLeftRight } from "lucide-react";
+import { AudioOverviewModal } from "../features/academic-engine/components/AudioOverviewModal";
+import { BrainCircuit, BookOpen, HelpCircle, Compass, Eye, EyeOff, ArrowLeftRight, Headphones } from "lucide-react";
 import { useTutorialStore } from "../stores/useTutorialStore";
 
 export const AcademicWorkspace: React.FC = () => {
@@ -20,6 +21,9 @@ export const AcademicWorkspace: React.FC = () => {
   const [chunks, setChunks] = useState<AcademicChunkRecord[]>([]);
   const [activeChunk, setActiveChunk] = useState<AcademicChunkRecord | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Audio Overview modal state
+  const [isAudioOverviewOpen, setIsAudioOverviewOpen] = useState(false);
 
   // Guided Tour State
   const [isTourOpen, setIsTourOpen] = useState(false);
@@ -193,6 +197,20 @@ export const AcademicWorkspace: React.FC = () => {
 
           <span className="text-slate-500 hidden sm:inline">Local-First (Dexie v4)</span>
 
+          {/* Audio Overview (NotebookLM bridge) */}
+          <div className="flex items-center gap-1.5 border-l border-slate-800 pl-2">
+            <button
+              type="button"
+              onClick={() => setIsAudioOverviewOpen(true)}
+              disabled={sources.length === 0}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-950/60 border border-amber-500/40 text-amber-300 hover:bg-amber-500/20 text-xs font-mono transition-all cursor-pointer shadow-xs disabled:opacity-40"
+              title="Generar Resumen Narrado de Cátedra (Audio Overview)"
+            >
+              <Headphones className="w-3.5 h-3.5 text-amber-400" />
+              <span>Resumen Narrado</span>
+            </button>
+          </div>
+
           {/* Cognitive Hub & Layout Controls */}
           <div className="flex items-center gap-1.5 border-l border-slate-800 pl-2">
             <button
@@ -284,6 +302,14 @@ export const AcademicWorkspace: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Audio Overview Modal (NotebookLM Bridge) */}
+      <AudioOverviewModal
+        isOpen={isAudioOverviewOpen}
+        onClose={() => setIsAudioOverviewOpen(false)}
+        sourceIds={activeSourceId ? [activeSourceId] : sources.map((s) => s.id)}
+        onNavigateCitation={handleNavigateToCitation}
+      />
 
       {/* Interactive Step-by-Step Tutorial Tour */}
       <AcademicTutorialOverlay

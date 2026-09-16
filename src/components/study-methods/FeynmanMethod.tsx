@@ -3,13 +3,15 @@ import { Card, CardHeader, CardTitle } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Input, Textarea } from "../ui/Input";
 import { saveStudySession } from "../../lib/db";
-import { CheckCircle2, Play, Pause, RotateCcw } from "lucide-react";
+import { CheckCircle2, Play, Pause, RotateCcw, Sparkles } from "lucide-react";
+import { Feynman2Runner } from "../../features/session-engine/components/Feynman2Runner";
 
 export interface FeynmanMethodProps {
   onSessionFinished?: () => void;
 }
 
 export const FeynmanMethod: React.FC<FeynmanMethodProps> = ({ onSessionFinished }) => {
+  const [feynmanVersion, setFeynmanVersion] = useState<"v2" | "classic">("v2");
   const [step, setStep] = useState<number>(1);
   const [concept, setConcept] = useState<string>("");
   const [explanation, setExplanation] = useState<string>("");
@@ -51,10 +53,47 @@ export const FeynmanMethod: React.FC<FeynmanMethodProps> = ({ onSessionFinished 
     }, 1500);
   };
 
+  if (feynmanVersion === "v2") {
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between rounded-xl border border-border-subtle bg-bg-surface-2 p-2">
+          <span className="text-xs font-semibold text-text-muted">Modo de estudio:</span>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setFeynmanVersion("v2")}
+              className="flex items-center gap-1 rounded bg-primary px-3 py-1 text-xs font-semibold text-white shadow-sm"
+            >
+              <Sparkles className="h-3 w-3" /> Feynman 2.0 (Dialéctico &amp; 4D)
+            </button>
+            <button
+              type="button"
+              onClick={() => setFeynmanVersion("classic")}
+              className="rounded px-3 py-1 text-xs font-medium text-text-muted hover:text-text-main"
+            >
+              Protocolo Tradicional (4 pasos)
+            </button>
+          </div>
+        </div>
+        <Feynman2Runner onFinish={onSessionFinished} />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6">
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => setFeynmanVersion("v2")}
+          className="flex items-center gap-1 text-xs text-primary hover:underline font-semibold"
+        >
+          <Sparkles className="h-3.5 w-3.5" /> Cambiar a Feynman 2.0 (Auditoría Cátedra &amp; 4D)
+        </button>
+      </div>
       {/* Header with Timer and Protocol Steps */}
       <Card elevated>
+
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <span className="font-sans text-xs uppercase tracking-wider text-accent-secondary font-medium">

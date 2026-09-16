@@ -2,8 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
 import type { ConceptRecord, ConceptEdgeRecord } from "../../db/db";
-import { Lock, Unlock, CheckCircle2, AlertTriangle, Play, Layers } from "lucide-react";
-import type { BottleneckReport } from "./graphEngine";
+import { Unlock, CheckCircle2, AlertTriangle, Play, Layers, BrainCircuit, ArrowRight } from "lucide-react";
+import {
+  calculateConceptGraphDetails,
+  type BottleneckReport,
+  type ConceptGraphDetails,
+} from "./graphEngine";
 
 interface NodePosition {
   id: string;
@@ -382,6 +386,15 @@ export function GraphCanvas({
   };
 
   const selectedNode = nodes.find((n) => n.id === selectedConceptId);
+  const [conceptDetails, setConceptDetails] = useState<ConceptGraphDetails | null>(null);
+
+  useEffect(() => {
+    if (selectedNode) {
+      void calculateConceptGraphDetails(selectedNode.concept.id).then(setConceptDetails);
+    } else {
+      setConceptDetails(null);
+    }
+  }, [selectedNode?.concept.id]);
 
   return (
     <div className="relative w-full h-[620px] rounded-2xl border border-accent-primary/20 bg-bg-surface-1/90 overflow-hidden shadow-2xl backdrop-blur-xl">
@@ -389,7 +402,7 @@ export function GraphCanvas({
       <div className="absolute top-4 left-4 z-10 flex items-center gap-3 bg-bg-surface-2/80 backdrop-blur-md px-3.5 py-2 rounded-xl border border-border-subtle shadow-md">
         <Layers className="h-4 w-4 text-accent-primary animate-pulse" />
         <span className="text-xs font-mono font-semibold text-text-primary">
-          Grafo de Conocimiento ({concepts.length} Nodos · {edges.length} Enlaces)
+          Grafo de Conocimiento 2.0 ({concepts.length} Nodos · {edges.length} Enlaces)
         </span>
         <div className="flex items-center gap-2 border-l border-border-subtle pl-3 text-[11px] font-mono">
           <span className="flex items-center gap-1 text-success">
@@ -398,8 +411,8 @@ export function GraphCanvas({
           <span className="flex items-center gap-1 text-accent-primary">
             <Unlock className="h-3 w-3" /> Disponible
           </span>
-          <span className="flex items-center gap-1 text-danger">
-            <Lock className="h-3 w-3" /> Bloqueado (R &lt; 70%)
+          <span className="flex items-center gap-1 text-warning">
+            <AlertTriangle className="h-3 w-3" /> Prerrequisito Flojo
           </span>
         </div>
       </div>
@@ -480,20 +493,57 @@ export function GraphCanvas({
             </p>
           </div>
 
-          {/* Telemetry metrics */}
-          <div className="grid grid-cols-2 gap-2 bg-bg-surface-1/80 p-3 rounded-lg border border-border-subtle font-mono text-xs">
-            <div>
-              <span className="text-text-tertiary text-[10px] block">Retención (R)</span>
+          {/* 4D Mastery Model (Sección 4 & 17) */}
+          <div className="flex flex-col gap-1.5 bg-bg-surface-1/90 p-3 rounded-xl border border-border-subtle font-mono text-xs">
+            <div className="flex items-center justify-between border-b border-border-subtle/60 pb-1.5 mb-1">
+              <span className="font-semibold text-text-primary flex items-center gap-1.5">
+                <BrainCircuit className="h-3.5 w-3.5 text-accent-primary" />
+                Dominio 4D
+              </span>
               <span className="font-bold text-accent-primary text-sm">
-                {(selectedNode.concept.currentRetrievability * 100).toFixed(1)}%
+                {conceptDetails ? `${conceptDetails.mastery.compositeScore}%` : `${(selectedNode.concept.masteryScore * 100).toFixed(0)}%`}
               </span>
             </div>
-            <div>
-              <span className="text-text-tertiary text-[10px] block">Maestría</span>
-              <span className="font-bold text-success text-sm">
-                {(selectedNode.concept.masteryScore * 100).toFixed(0)}%
-              </span>
+
+            <div className="grid grid-cols-2 gap-2 text-[11px]">
+              <div>
+                <span className="text-text-muted text-[10px] block">Retención (R)</span>
+                <span className="font-bold text-text-primary">
+                  {conceptDetails ? `${Math.round(conceptDetails.mastery.retention * 100)}%` : `${(selectedNode.concept.currentRetrievability * 100).toFixed(0)}%`}
+                </span>
+              </div>
+              <div>
+                <span className="text-text-muted text-[10px] block">Comprensión (C)</span>
+                <span className="font-bold text-text-primary">
+                  {conceptDetails ? `${Math.round(conceptDetails.mastery.comprehension * 100)}%` : "--"}
+                </span>
+              </div>
+              <div>
+                <span className="text-text-muted text-[10px] block">Aplicación (A)</span>
+                <span className="font-bold text-text-primary">
+                  {conceptDetails ? `${Math.round(conceptDetails.mastery.application * 100)}%` : "--"}
+                </span>
+              </div>
+              <div>
+                <span className="text-text-muted text-[10px] block">Transferencia (T)</span>
+                <span className="font-bold text-text-primary">
+                  {conceptDetails ? `${Math.round(conceptDetails.mastery.transfer * 100)}%` : "--"}
+                </span>
+              </div>
             </div>
+
+            {conceptDetails && (
+              <div className="flex items-center justify-between pt-1.5 border-t border-border-subtle/50 text-[10px] text-text-muted mt-1">
+                <span>{conceptDetails.cardsCount} tarjetas FSRS</span>
+                <span>
+                  {conceptDetails.unresolvedErrorsCount > 0 ? (
+                    <span className="text-warning font-semibold">{conceptDetails.unresolvedErrorsCount} errores abiertos</span>
+                  ) : (
+                    "0 errores"
+                  )}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Bottleneck Warning */}
@@ -509,9 +559,41 @@ export function GraphCanvas({
             </div>
           )}
 
-          {/* Prerequisites details */}
+          {/* Soft Prerequisite Warning Banner (Sección 17-BIS) */}
+          {conceptDetails?.isPrereqWarning && conceptDetails.weakestPrereq && (
+            <div className="rounded-xl border border-warning/40 bg-warning/10 p-3 text-xs flex flex-col gap-2">
+              <div className="flex items-start gap-2 text-warning">
+                <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                <div>
+                  <strong className="block font-semibold">Advertencia de Prerrequisito</strong>
+                  <span className="text-[11px] opacity-90 leading-snug">
+                    Depende de <strong>"{conceptDetails.weakestPrereq.name}"</strong>, que tenés al {Math.round(conceptDetails.weakestPrereq.retrievability * 100)}% de retención.
+                  </span>
+                </div>
+              </div>
+
+              {onStartStudy && (
+                <div className="flex flex-col gap-1.5 pt-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      const prereqConcept = concepts.find((c) => c.id === conceptDetails.weakestPrereq!.id);
+                      if (prereqConcept) onStartStudy(prereqConcept);
+                    }}
+                    className="w-full text-xs font-mono justify-between text-warning border-warning/40 hover:bg-warning/20"
+                  >
+                    <span>Repasar {conceptDetails.weakestPrereq.name} (4 min)</span>
+                    <ArrowRight className="h-3 w-3" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Prerequisites tags */}
           {selectedNode.concept.prerequisites.length > 0 && (
-            <div className="flex flex-col gap-1.5 border-t border-border-subtle pt-3">
+            <div className="flex flex-col gap-1.5 border-t border-border-subtle pt-2">
               <span className="text-[11px] font-mono font-medium text-text-tertiary">
                 Prerrequisitos ({selectedNode.concept.prerequisites.length}):
               </span>
@@ -531,23 +613,16 @@ export function GraphCanvas({
             </div>
           )}
 
+          {/* Action Button: Never hard-locked! */}
           {onStartStudy && (
             <Button
               size="sm"
-              variant={selectedNode.concept.status === "locked" ? "secondary" : "primary"}
+              variant={conceptDetails?.isPrereqWarning ? "outline" : "primary"}
               onClick={() => onStartStudy(selectedNode.concept)}
-              disabled={selectedNode.concept.status === "locked"}
-              className="w-full flex items-center justify-center gap-2 mt-2"
+              className="w-full flex items-center justify-center gap-2 mt-1"
             >
-              {selectedNode.concept.status === "locked" ? (
-                <>
-                  <Lock className="h-3.5 w-3.5" /> Desbloquear prerrequisitos
-                </>
-              ) : (
-                <>
-                  <Play className="h-3.5 w-3.5" /> Estudiar Concepto
-                </>
-              )}
+              <Play className="h-3.5 w-3.5" />
+              <span>{conceptDetails?.isPrereqWarning ? "Entrar igual a estudiar" : "Estudiar Concepto"}</span>
             </Button>
           )}
         </div>

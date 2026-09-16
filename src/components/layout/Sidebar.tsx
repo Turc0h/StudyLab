@@ -13,6 +13,7 @@ import {
   Library,
   Volume2,
   Settings,
+  ShieldCheck,
   HelpCircle,
 } from "lucide-react";
 import { clsx } from "clsx";
@@ -52,6 +53,7 @@ export const Sidebar: React.FC = () => {
       title: "Sistema",
       items: [
         { to: "/settings", label: "Configuración", icon: Settings },
+        { to: "/qa", label: "Consola QA", icon: ShieldCheck },
       ],
     },
   ];

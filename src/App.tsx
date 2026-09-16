@@ -22,6 +22,9 @@ const AcademicWorkspace = lazy(() =>
 const BookScannerPage = lazy(() =>
   import("./pages/BookScannerPage").then((m) => ({ default: m.BookScannerPage })),
 );
+const QaHubPage = lazy(() =>
+  import("./pages/QaHubPage").then((m) => ({ default: m.QaHubPage })),
+);
 const StyleKit = lazy(() =>
   import("./pages/style-kit/StyleKit").then((m) => ({ default: m.StyleKit })),
 );
@@ -54,6 +57,8 @@ const router = createBrowserRouter([
       { path: "files", element: withSuspense(<Files />) },
       { path: "session", element: withSuspense(<Session />) },
       { path: "settings", element: withSuspense(<Settings />) },
+      { path: "qa", element: withSuspense(<QaHubPage />) },
+      { path: "verificacion", element: withSuspense(<QaHubPage />) },
     ],
   },
   { path: "/kit", element: withSuspense(<StyleKit />) },

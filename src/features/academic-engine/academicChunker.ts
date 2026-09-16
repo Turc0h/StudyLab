@@ -1,4 +1,5 @@
 import type { AcademicBoundingBox, AcademicChunkRecord, AcademicChunkType } from "../../db/db";
+import { computeFallbackProjection } from "./embeddings/embeddingManager";
 
 export interface RawDocumentSection {
   title?: string;
@@ -55,28 +56,11 @@ export function extractSparseTokens(text: string): Record<string, number> {
 }
 
 /**
- * Computes a pseudo-dense embedding vector (16-dimensional hash projection)
- * for fast offline client-side cosine similarity search when backend is offline.
+ * Computes a pseudo-dense embedding vector (64-dimensional hash projection)
+ * for fast offline client-side cosine similarity search when model is offline.
  */
 export function computeLocalEmbedding(text: string): number[] {
-  const dim = 16;
-  const vector = Array.from({ length: dim }, () => 0);
-  const words = text.toLowerCase().split(/\s+/).filter(Boolean);
-
-  for (let i = 0; i < words.length; i++) {
-    const word = words[i];
-    let hash = 0;
-    for (let c = 0; c < word.length; c++) {
-      hash = (hash << 5) - hash + word.charCodeAt(c);
-      hash |= 0;
-    }
-    const idx = Math.abs(hash) % dim;
-    vector[idx] += 1.0 / Math.sqrt(words.length);
-  }
-
-  // Normalize vector to unit length
-  const norm = Math.sqrt(vector.reduce((sum, v) => sum + v * v, 0)) || 1.0;
-  return vector.map((v) => Number((v / norm).toFixed(4)));
+  return computeFallbackProjection(text, 64);
 }
 
 /**

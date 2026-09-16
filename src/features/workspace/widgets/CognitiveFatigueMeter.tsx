@@ -1,102 +1,46 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "../../../components/ui/Badge";
-import { db } from "../../../db/db";
 import { automationBus } from "../automationEngine";
-import { Activity, RotateCcw } from "lucide-react";
+import { Activity, RotateCcw, Clock, Zap } from "lucide-react";
+import { calculateSessionFatigue, type FatigueState } from "../../study-engine/fatigueMonitor";
 
 export function CognitiveFatigueMeter() {
-  const [fatigueScore, setFatigueScore] = useState(18); // Default calm starting score
-  const [keystrokeCount, setKeystrokeCount] = useState(0);
-  const [backspaceCount, setBackspaceCount] = useState(0);
-  const [pauseCount, setPauseCount] = useState(0);
-
-  const lastKeyTimeRef = useRef<number>(Date.now());
-  const intervalsRef = useRef<number[]>([]);
-  const backspacesInWindowRef = useRef<number>(0);
-  const lastSpikeEmittedRef = useRef<number>(0);
+  const [sessionStartTime, setSessionStartTime] = useState<number>(Date.now());
+  const [fatigueState, setFatigueState] = useState<FatigueState>({
+    fatigueScore: 18,
+    level: "low",
+    sessionDurationMinutes: 1,
+    averageLatencyMs: 0,
+    latencyIncreaseRatio: 1.0,
+    accuracyDropPercentage: 0,
+    recommendation: "Nivel óptimo de concentración y rendimiento neurocognitivo.",
+    requiresBreak: false,
+  });
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const now = Date.now();
-      const interval = now - lastKeyTimeRef.current;
-      lastKeyTimeRef.current = now;
+    // Monitor de fatiga ético: calcula periódicamente en base a duración y reviewLogs
+    const updateMetrics = async () => {
+      const state = await calculateSessionFatigue(sessionStartTime);
+      setFatigueState(state);
 
-      setKeystrokeCount((c) => c + 1);
-
-      if (e.key === "Backspace" || e.key === "Delete") {
-        setBackspaceCount((b) => b + 1);
-        backspacesInWindowRef.current += 1;
-      }
-
-      if (interval > 4000 && interval < 30000) {
-        setPauseCount((p) => p + 1);
-      }
-
-      // Keep recent 30 intervals to compute typing variance
-      intervalsRef.current.push(interval);
-      if (intervalsRef.current.length > 30) {
-        intervalsRef.current.shift();
-      }
-
-      // Compute standard deviation of intervals (jitter)
-      const intervals = intervalsRef.current;
-      if (intervals.length >= 5) {
-        const mean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
-        const variance =
-          intervals.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / intervals.length;
-        const stdDev = Math.sqrt(variance);
-
-        // Fatigue algorithm:
-        // High jitter (unstable typing rhythm) + high backspace frequency + prolonged hesitation pauses
-        const jitterComponent = Math.min(40, (stdDev / 800) * 40);
-        const errorComponent = Math.min(35, backspacesInWindowRef.current * 4);
-        const baseScore = 15;
-
-        const calculated = Math.min(100, Math.round(baseScore + jitterComponent + errorComponent));
-        setFatigueScore(calculated);
-
-        // Check spike
-        if (calculated >= 75 && now - lastSpikeEmittedRef.current > 120000) {
-          lastSpikeEmittedRef.current = now;
-          automationBus.emit("FATIGUE_SPIKE", { fatigueScore: calculated });
-        }
+      if (state.fatigueScore >= 75) {
+        automationBus.emit("FATIGUE_SPIKE", { fatigueScore: state.fatigueScore });
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
+    void updateMetrics();
+    const interval = setInterval(() => {
+      void updateMetrics();
+    }, 30000); // Cada 30 segundos sin registrar pulsaciones
 
-    // Periodically decay backspace bursts and persist telemetry
-    const intervalTimer = setInterval(() => {
-      backspacesInWindowRef.current = Math.max(0, backspacesInWindowRef.current - 1);
-      setFatigueScore((prev) => Math.max(12, prev - 1));
-
-      // Persist snapshot to db
-      db.fatigueTelemetry
-        .add({
-          id: crypto.randomUUID(),
-          timestamp: Date.now(),
-          fatigueScore,
-          keystrokeVariance: 0,
-          pauseRate: pauseCount,
-          sessionDurationSec: 60,
-        })
-        .catch(() => {});
-    }, 15000);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      clearInterval(intervalTimer);
-    };
-  }, [fatigueScore, pauseCount]);
+    return () => clearInterval(interval);
+  }, [sessionStartTime]);
 
   function handleReset() {
-    setFatigueScore(15);
-    setKeystrokeCount(0);
-    setBackspaceCount(0);
-    setPauseCount(0);
-    intervalsRef.current = [];
-    backspacesInWindowRef.current = 0;
+    setSessionStartTime(Date.now());
   }
+
+  const fatigueScore = fatigueState.fatigueScore;
 
   const statusColor =
     fatigueScore >= 75 ? "#ff3b5c" : fatigueScore >= 45 ? "#ffb020" : "#00e5a3";
@@ -161,28 +105,32 @@ export function CognitiveFatigueMeter() {
             {statusLabel}
           </Badge>
           <p className="text-xs text-text-secondary leading-relaxed">
-            {fatigueScore >= 75
-              ? "Degradación en la latencia de respuesta y ráfagas de corrección. Tomá 5m de descanso."
-              : fatigueScore >= 45
-                ? "Variabilidad moderada detectada. Mantén ritmo constante de foco."
-                : "Cadencia de tecleo estable y baja tasa de correcciones de error."}
+            {fatigueState.recommendation}
           </p>
         </div>
       </div>
 
-      {/* Telemetry counters */}
+      {/* Ethical Cognitive Metrics (Sección 26-BIS: Sin telemetría de tecleo) */}
       <div className="grid grid-cols-3 gap-2 pt-3 border-t border-border-subtle/60 text-center font-mono text-[11px]">
         <div className="rounded bg-bg-surface-1/70 p-2 border border-border-subtle/50">
-          <span className="text-text-tertiary block text-[10px]">Tecleos</span>
-          <strong className="text-text-primary">{keystrokeCount}</strong>
+          <span className="text-text-tertiary block text-[10px] flex items-center justify-center gap-1">
+            <Clock className="w-2.5 h-2.5" /> Tiempo
+          </span>
+          <strong className="text-text-primary">{fatigueState.sessionDurationMinutes} min</strong>
         </div>
         <div className="rounded bg-bg-surface-1/70 p-2 border border-border-subtle/50">
-          <span className="text-text-tertiary block text-[10px]">Correcciones</span>
-          <strong className="text-warning">{backspaceCount}</strong>
+          <span className="text-text-tertiary block text-[10px] flex items-center justify-center gap-1">
+            <Zap className="w-2.5 h-2.5 text-cyan-400" /> Latencia
+          </span>
+          <strong className="text-text-primary">
+            {fatigueState.averageLatencyMs > 0 ? `${(fatigueState.averageLatencyMs / 1000).toFixed(1)}s` : "--"}
+          </strong>
         </div>
         <div className="rounded bg-bg-surface-1/70 p-2 border border-border-subtle/50">
-          <span className="text-text-tertiary block text-[10px]">Pausas &gt;4s</span>
-          <strong className="text-text-secondary">{pauseCount}</strong>
+          <span className="text-text-tertiary block text-[10px]">Caída Acierto</span>
+          <strong className={fatigueState.accuracyDropPercentage > 15 ? "text-warning" : "text-text-secondary"}>
+            {fatigueState.accuracyDropPercentage > 0 ? `-${fatigueState.accuracyDropPercentage}%` : "0%"}
+          </strong>
         </div>
       </div>
     </div>

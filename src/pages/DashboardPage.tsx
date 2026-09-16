@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { StudyTipsWidget } from "../components/study-tips/StudyTipsWidget";
 import { CourseProgressCard } from "../components/progress/CourseProgressCard";
+import { DailyStudyRecommendationCard } from "../features/study-engine/components/DailyStudyRecommendationCard";
 
 interface MethodPreview {
   id: StudyMethodId;
@@ -179,6 +180,9 @@ export const DashboardPage: React.FC = () => {
           </div>
         </Card>
       </div>
+
+      {/* Cognitive OS v5.0: Recomendación Diaria Adaptativa "¿Qué debería estudiar hoy y por qué?" */}
+      <DailyStudyRecommendationCard />
 
       {/* Grid Principal Fluid: 2 Columnas Responsivas (Desktop: 7 col / 5 col) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">

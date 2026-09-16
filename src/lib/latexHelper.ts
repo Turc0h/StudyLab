@@ -94,10 +94,10 @@ export function autoFormatMathToLatex(text: string): string {
 
     // Patrón de ecuación destacada: ej. "f(x) = (x^2 + 1)/(x - 1)" o "a^2 + b^2 = c^2"
     const isStandaloneEquation =
-      /^[A-Za-z0-9\(\)\s+\-*/^_=<>|.,\\{}]{4,80}$/.test(trimmed) &&
+      /^[A-Za-z0-9()\s+\-*/^_=<>|.,\\{}]{4,80}$/.test(trimmed) &&
       /[=<>≤≥≈]/.test(trimmed) &&
       /[0-9a-zA-Z]/.test(trimmed) &&
-      /[\^_{}\\\/]|(\b[a-zA-Z]\([a-zA-Z0-9]+\))/.test(trimmed);
+      /[\^_{}\\/]|(\b[a-zA-Z]\([a-zA-Z0-9]+\))/.test(trimmed);
 
     if (isStandaloneEquation) {
       const latexEq = convertSimpleMathToLatex(trimmed);

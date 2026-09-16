@@ -1,20 +1,35 @@
 import React, { useState, useRef } from "react";
-import { UploadCloud, FileText, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import {
+  UploadCloud,
+  FileText,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  Globe,
+  Headphones,
+  Edit3,
+} from "lucide-react";
 import { db, type AcademicSourceRecord } from "../../../db/db";
-import { pdfjsLib } from "../../../lib/pdf";
-import { chunkAcademicText } from "../academicChunker";
+import {
+  pdfAdapter,
+  pastedTextAdapter,
+  webPageAdapter,
+  transcriptAdapter,
+} from "../sourceIngestAdapters";
 
 interface AcademicFileUploaderProps {
   onSourceIngested: (source: AcademicSourceRecord) => void;
   careerDefault?: string;
 }
 
+type TabType = "file" | "paste" | "web" | "transcript";
 type IngestStep = "idle" | "reading" | "extracting" | "indexing" | "success" | "error";
 
 export const AcademicFileUploader: React.FC<AcademicFileUploaderProps> = ({
   onSourceIngested,
   careerDefault = "Ingeniería / Ciencias",
 }) => {
+  const [activeTab, setActiveTab] = useState<TabType>("file");
   const [isDragging, setIsDragging] = useState(false);
   const [step, setStep] = useState<IngestStep>("idle");
   const [progressPct, setProgressPct] = useState(0);
@@ -22,112 +37,82 @@ export const AcademicFileUploader: React.FC<AcademicFileUploaderProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Form states for non-file ingestion
+  const [pastedTitle, setPastedTitle] = useState("");
+  const [pastedContent, setPastedContent] = useState("");
+
+  const [webUrl, setWebUrl] = useState("");
+  const [webTitle, setWebTitle] = useState("");
+
+  const [transcriptTitle, setTranscriptTitle] = useState("");
+  const [transcriptContent, setTranscriptContent] = useState("");
+
+  // 1. Process File (PDF, MD, TXT)
   const processFile = async (file: File) => {
     setCurrentFilename(file.name);
     setErrorMessage(null);
     setStep("reading");
-    setProgressPct(15);
+    setProgressPct(20);
 
     try {
-      const sourceId = `src_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
-      const fileId = `file_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
-      const rawTitle = file.name.replace(/\.[^/.]+$/, "");
       const ext = file.name.split(".").pop()?.toLowerCase() || "";
-
-      let extractedText = "";
-      let pageCount = 1;
 
       if (ext === "pdf" || file.type === "application/pdf") {
         setStep("extracting");
-        setProgressPct(35);
+        const res = await pdfAdapter({
+          file,
+          career: careerDefault,
+          onProgress: (pct) => setProgressPct(pct),
+        });
 
-        const arrayBuffer = await file.arrayBuffer();
-        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-        const pdfDoc = await loadingTask.promise;
-        pageCount = pdfDoc.numPages;
+        setStep("indexing");
+        setProgressPct(85);
 
-        const textParts: string[] = [];
-        for (let pageNum = 1; pageNum <= pageCount; pageNum++) {
-          const page = await pdfDoc.getPage(pageNum);
-          const textContent = await page.getTextContent();
-          const pageString = textContent.items
-            .map((item) => ("str" in item ? item.str : ""))
-            .join(" ");
-          textParts.push(`--- Pág. ${pageNum} ---\n${pageString}`);
-          setProgressPct(35 + Math.round((pageNum / pageCount) * 35));
+        // Save blob in db.files
+        if (res.source.fileId) {
+          await db.files.put({
+            id: res.source.fileId,
+            folderId: "academic_sources",
+            name: file.name,
+            mimeType: file.type || "application/pdf",
+            size: file.size,
+            blob: file,
+            ocrStatus: "done",
+            createdAt: Date.now(),
+          });
         }
 
-        extractedText = textParts.join("\n\n");
+        if (res.chunks.length > 0) {
+          await db.academicChunks.bulkPut(res.chunks);
+        }
+        await db.academicSources.put(res.source);
+
+        setProgressPct(100);
+        setStep("success");
+        onSourceIngested(res.source);
       } else {
-        // Markdown, TXT or others
+        // Text / Markdown
         setStep("extracting");
-        setProgressPct(50);
-        extractedText = await file.text();
-        pageCount = Math.max(1, Math.ceil(extractedText.length / 2500));
+        setProgressPct(40);
+        const text = await file.text();
+        const res = await pastedTextAdapter({
+          title: file.name.replace(/\.[^/.]+$/, ""),
+          text,
+          career: careerDefault,
+        });
+
+        setStep("indexing");
+        setProgressPct(85);
+
+        if (res.chunks.length > 0) {
+          await db.academicChunks.bulkPut(res.chunks);
+        }
+        await db.academicSources.put(res.source);
+
+        setProgressPct(100);
+        setStep("success");
+        onSourceIngested(res.source);
       }
-
-      setStep("indexing");
-      setProgressPct(80);
-
-      // Save binary blob to Dexie db.files so PdfViewer can render it
-      await db.files.put({
-        id: fileId,
-        folderId: "academic_sources",
-        name: file.name,
-        mimeType: file.type || (ext === "pdf" ? "application/pdf" : "text/plain"),
-        size: file.size,
-        blob: file,
-        ocrStatus: "done",
-        createdAt: Date.now(),
-      });
-
-      // Semantic chunking with formulas & AST
-      const subjectId = "academic_general";
-      const chunks = chunkAcademicText(sourceId, subjectId, extractedText, 1);
-
-      if (chunks.length > 0) {
-        await db.academicChunks.bulkPut(chunks);
-      }
-
-      const docType: AcademicSourceRecord["documentType"] =
-        ext === "pdf" ? "textbook" : ext === "md" ? "lecture_notes" : "paper";
-
-      const newSource: AcademicSourceRecord = {
-        id: sourceId,
-        subjectId,
-        professorId: "Cátedra Universitaria",
-        career: careerDefault,
-        year: 2026,
-        semester: "1C",
-        title: rawTitle,
-        documentType: docType,
-        pageCount,
-        fileId,
-        ocrProcessed: true,
-        chunkCount: chunks.length,
-        createdAt: Date.now(),
-      };
-
-      await db.academicSources.put(newSource);
-
-      // Attempt background backend sync if server is reachable (fail-safe)
-      try {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("title", rawTitle);
-        formData.append("subject", subjectId);
-        formData.append("totalPages", String(pageCount));
-        void fetch("/api/academic/sources/ingest", {
-          method: "POST",
-          body: formData,
-        }).catch(() => {});
-      } catch {
-        // Ignore backend errors; local-first is already persisted
-      }
-
-      setProgressPct(100);
-      setStep("success");
-      onSourceIngested(newSource);
 
       setTimeout(() => {
         setStep("idle");
@@ -141,141 +126,357 @@ export const AcademicFileUploader: React.FC<AcademicFileUploaderProps> = ({
     }
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  };
+  // 2. Process Pasted Text
+  const handleIngestPastedText = async () => {
+    if (!pastedContent.trim()) return;
+    setStep("extracting");
+    setProgressPct(40);
+    setErrorMessage(null);
 
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-  };
+    try {
+      const res = await pastedTextAdapter({
+        title: pastedTitle || "Apunte Personal de Cátedra",
+        text: pastedContent,
+        career: careerDefault,
+      });
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
+      setStep("indexing");
+      setProgressPct(80);
 
-    const files = e.dataTransfer.files;
-    if (files && files.length > 0) {
-      void processFile(files[0]);
+      if (res.chunks.length > 0) {
+        await db.academicChunks.bulkPut(res.chunks);
+      }
+      await db.academicSources.put(res.source);
+
+      setProgressPct(100);
+      setStep("success");
+      onSourceIngested(res.source);
+      setPastedContent("");
+      setPastedTitle("");
+
+      setTimeout(() => {
+        setStep("idle");
+        setProgressPct(0);
+      }, 2500);
+    } catch (err: unknown) {
+      setStep("error");
+      setErrorMessage(err instanceof Error ? err.message : "Error al procesar el texto pegado");
     }
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      void processFile(files[0]);
+  // 3. Process Web Page URL
+  const handleIngestWebPage = async () => {
+    if (!webUrl.trim()) return;
+    setStep("reading");
+    setProgressPct(30);
+    setErrorMessage(null);
+
+    try {
+      let htmlOrText = "";
+      try {
+        const response = await fetch(webUrl);
+        if (response.ok) {
+          htmlOrText = await response.text();
+        }
+      } catch {
+        // If CORS blocks fetch, process with URL anchor
+      }
+
+      setStep("extracting");
+      setProgressPct(60);
+
+      const res = await webPageAdapter({
+        url: webUrl,
+        title: webTitle,
+        rawHtmlOrText: htmlOrText,
+        career: careerDefault,
+      });
+
+      setStep("indexing");
+      setProgressPct(85);
+
+      if (res.chunks.length > 0) {
+        await db.academicChunks.bulkPut(res.chunks);
+      }
+      await db.academicSources.put(res.source);
+
+      setProgressPct(100);
+      setStep("success");
+      onSourceIngested(res.source);
+      setWebUrl("");
+      setWebTitle("");
+
+      setTimeout(() => {
+        setStep("idle");
+        setProgressPct(0);
+      }, 2500);
+    } catch (err: unknown) {
+      setStep("error");
+      setErrorMessage(err instanceof Error ? err.message : "Error al procesar la página web");
+    }
+  };
+
+  // 4. Process Transcript (.srt or timestamped text)
+  const handleIngestTranscript = async () => {
+    if (!transcriptContent.trim()) return;
+    setStep("extracting");
+    setProgressPct(50);
+    setErrorMessage(null);
+
+    try {
+      const res = await transcriptAdapter({
+        title: transcriptTitle || "Transcripción de Clase",
+        content: transcriptContent,
+        career: careerDefault,
+      });
+
+      setStep("indexing");
+      setProgressPct(85);
+
+      if (res.chunks.length > 0) {
+        await db.academicChunks.bulkPut(res.chunks);
+      }
+      await db.academicSources.put(res.source);
+
+      setProgressPct(100);
+      setStep("success");
+      onSourceIngested(res.source);
+      setTranscriptContent("");
+      setTranscriptTitle("");
+
+      setTimeout(() => {
+        setStep("idle");
+        setProgressPct(0);
+      }, 2500);
+    } catch (err: unknown) {
+      setStep("error");
+      setErrorMessage(err instanceof Error ? err.message : "Error al procesar la transcripción");
     }
   };
 
   return (
-    <div className="w-full flex flex-col gap-2">
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".pdf,.md,.txt,.docx,application/pdf,text/markdown,text/plain"
-        onChange={handleFileSelect}
-        className="hidden"
-      />
+    <div className="w-full flex flex-col gap-2.5">
+      {/* Source Ingestion Tabs */}
+      <div className="flex items-center gap-1 border-b border-border-subtle pb-1.5 text-[11px] font-mono">
+        <button
+          type="button"
+          onClick={() => setActiveTab("file")}
+          className={`flex items-center gap-1 px-2 py-1 rounded transition-all cursor-pointer ${
+            activeTab === "file"
+              ? "bg-accent-primary/20 text-accent-primary font-bold border border-accent-primary/30"
+              : "text-text-tertiary hover:text-text-secondary"
+          }`}
+        >
+          <FileText className="h-3 w-3" />
+          <span>PDF / Doc</span>
+        </button>
 
-      <div
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={() => step === "idle" && fileInputRef.current?.click()}
-        className={`group relative flex flex-col items-center justify-center p-3.5 rounded-xl border-2 border-dashed transition-all cursor-pointer text-center ${
-          isDragging
-            ? "border-cyan-400 bg-cyan-950/20 shadow-lg shadow-cyan-500/10 scale-[1.01]"
-            : step === "error"
-              ? "border-rose-500/60 bg-rose-950/10"
-              : step === "success"
-                ? "border-emerald-500/60 bg-emerald-950/10"
-                : "border-slate-800 hover:border-cyan-500/50 bg-slate-900/40 hover:bg-slate-900/80"
-        }`}
-      >
-        {step === "idle" && (
-          <>
-            <div className="p-2 rounded-lg bg-cyan-950/40 border border-cyan-500/20 text-cyan-400 mb-2 group-hover:scale-110 transition-transform">
-              <UploadCloud className="w-5 h-5" />
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <span className="font-display font-semibold text-xs text-slate-200">
-                Arrastra tu PDF / Apunte aquí
+        <button
+          type="button"
+          onClick={() => setActiveTab("paste")}
+          className={`flex items-center gap-1 px-2 py-1 rounded transition-all cursor-pointer ${
+            activeTab === "paste"
+              ? "bg-accent-primary/20 text-accent-primary font-bold border border-accent-primary/30"
+              : "text-text-tertiary hover:text-text-secondary"
+          }`}
+        >
+          <Edit3 className="h-3 w-3" />
+          <span>Pegar Texto</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("web")}
+          className={`flex items-center gap-1 px-2 py-1 rounded transition-all cursor-pointer ${
+            activeTab === "web"
+              ? "bg-accent-primary/20 text-accent-primary font-bold border border-accent-primary/30"
+              : "text-text-tertiary hover:text-text-secondary"
+          }`}
+        >
+          <Globe className="h-3 w-3" />
+          <span>Página Web</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("transcript")}
+          className={`flex items-center gap-1 px-2 py-1 rounded transition-all cursor-pointer ${
+            activeTab === "transcript"
+              ? "bg-accent-primary/20 text-accent-primary font-bold border border-accent-primary/30"
+              : "text-text-tertiary hover:text-text-secondary"
+          }`}
+        >
+          <Headphones className="h-3 w-3" />
+          <span>Clase (.srt)</span>
+        </button>
+      </div>
+
+      {/* Tab 1: File Dropzone */}
+      {activeTab === "file" && (
+        <>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.md,.txt,.docx,application/pdf,text/markdown,text/plain"
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files && files.length > 0) void processFile(files[0]);
+            }}
+            className="hidden"
+          />
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsDragging(true);
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              setIsDragging(false);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              setIsDragging(false);
+              const files = e.dataTransfer.files;
+              if (files && files.length > 0) void processFile(files[0]);
+            }}
+            onClick={() => fileInputRef.current?.click()}
+            className={`group relative flex flex-col items-center justify-center p-4 border-2 border-dashed rounded-xl transition-all duration-200 cursor-pointer ${
+              isDragging
+                ? "border-accent-primary bg-accent-primary/10 scale-[0.99]"
+                : "border-border-subtle bg-bg-surface-2/40 hover:border-accent-primary/50 hover:bg-bg-surface-2/80"
+            }`}
+          >
+            <UploadCloud className="h-6 w-6 text-text-tertiary group-hover:text-accent-primary transition-colors mb-1.5" />
+            <span className="font-display font-semibold text-xs text-text-primary text-center">
+              Arrastrá acá o tocá para subir
+            </span>
+            <span className="text-[10px] text-text-tertiary font-mono mt-0.5">
+              PDF, Markdown, TXT (hasta 500 pág.)
+            </span>
+          </div>
+        </>
+      )}
+
+      {/* Tab 2: Pasted Text */}
+      {activeTab === "paste" && (
+        <div className="flex flex-col gap-2 p-3 rounded-xl border border-border-subtle bg-bg-surface-2/40 text-xs">
+          <input
+            type="text"
+            placeholder="Título del apunte (ej: Teorema de Gauss - Clase 4)"
+            value={pastedTitle}
+            onChange={(e) => setPastedTitle(e.target.value)}
+            className="w-full px-2.5 py-1.5 rounded-lg border border-border-subtle bg-bg-surface-1 font-sans text-text-primary focus:outline-hidden focus:border-accent-primary text-xs"
+          />
+          <textarea
+            rows={4}
+            placeholder="Pegá tus apuntes de clase en texto plano o markdown acá..."
+            value={pastedContent}
+            onChange={(e) => setPastedContent(e.target.value)}
+            className="w-full p-2.5 rounded-lg border border-border-subtle bg-bg-surface-1 font-mono text-xs text-text-primary focus:outline-hidden focus:border-accent-primary resize-none"
+          />
+          <button
+            type="button"
+            onClick={handleIngestPastedText}
+            disabled={!pastedContent.trim() || step !== "idle"}
+            className="w-full py-1.5 rounded-lg bg-accent-primary text-bg-surface-1 font-semibold text-xs transition-all disabled:opacity-40 cursor-pointer"
+          >
+            Indexar Apunte Directo
+          </button>
+        </div>
+      )}
+
+      {/* Tab 3: Web URL */}
+      {activeTab === "web" && (
+        <div className="flex flex-col gap-2 p-3 rounded-xl border border-border-subtle bg-bg-surface-2/40 text-xs">
+          <input
+            type="text"
+            placeholder="Título opcional (ej: Guía de Teoremas de Circuitos)"
+            value={webTitle}
+            onChange={(e) => setWebTitle(e.target.value)}
+            className="w-full px-2.5 py-1.5 rounded-lg border border-border-subtle bg-bg-surface-1 font-sans text-text-primary focus:outline-hidden focus:border-accent-primary text-xs"
+          />
+          <input
+            type="url"
+            placeholder="https://catedra.universidad.edu.ar/apunte.html"
+            value={webUrl}
+            onChange={(e) => setWebUrl(e.target.value)}
+            className="w-full px-2.5 py-1.5 rounded-lg border border-border-subtle bg-bg-surface-1 font-mono text-xs text-text-primary focus:outline-hidden focus:border-accent-primary"
+          />
+          <button
+            type="button"
+            onClick={handleIngestWebPage}
+            disabled={!webUrl.trim() || step !== "idle"}
+            className="w-full py-1.5 rounded-lg bg-accent-primary text-bg-surface-1 font-semibold text-xs transition-all disabled:opacity-40 cursor-pointer"
+          >
+            Extraer e Indexar Artículo Web
+          </button>
+        </div>
+      )}
+
+      {/* Tab 4: Class Transcript */}
+      {activeTab === "transcript" && (
+        <div className="flex flex-col gap-2 p-3 rounded-xl border border-border-subtle bg-bg-surface-2/40 text-xs">
+          <input
+            type="text"
+            placeholder="Título de la clase (ej: Teórica 07 - Magnetostática)"
+            value={transcriptTitle}
+            onChange={(e) => setTranscriptTitle(e.target.value)}
+            className="w-full px-2.5 py-1.5 rounded-lg border border-border-subtle bg-bg-surface-1 font-sans text-text-primary focus:outline-hidden focus:border-accent-primary text-xs"
+          />
+          <textarea
+            rows={4}
+            placeholder="Pegá el contenido .srt o líneas con marcas de tiempo [mm:ss]..."
+            value={transcriptContent}
+            onChange={(e) => setTranscriptContent(e.target.value)}
+            className="w-full p-2.5 rounded-lg border border-border-subtle bg-bg-surface-1 font-mono text-xs text-text-primary focus:outline-hidden focus:border-accent-primary resize-none"
+          />
+          <button
+            type="button"
+            onClick={handleIngestTranscript}
+            disabled={!transcriptContent.trim() || step !== "idle"}
+            className="w-full py-1.5 rounded-lg bg-accent-primary text-bg-surface-1 font-semibold text-xs transition-all disabled:opacity-40 cursor-pointer"
+          >
+            Indexar Transcripción de Clase
+          </button>
+        </div>
+      )}
+
+      {/* Progress / Status Feedback */}
+      {step !== "idle" && (
+        <div className="flex flex-col gap-1.5 p-2.5 rounded-xl border border-border-subtle bg-bg-surface-2 text-xs font-mono">
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-1.5 text-text-primary">
+              {step === "reading" && <Loader2 className="h-3 w-3 animate-spin text-accent-primary" />}
+              {step === "extracting" && <Loader2 className="h-3 w-3 animate-spin text-accent-primary" />}
+              {step === "indexing" && <Loader2 className="h-3 w-3 animate-spin text-accent-primary" />}
+              {step === "success" && <CheckCircle2 className="h-3 w-3 text-success" />}
+              {step === "error" && <AlertCircle className="h-3 w-3 text-danger" />}
+              <span className="truncate max-w-[220px]">
+                {currentFilename ? `${currentFilename}: ` : ""}
+                {step === "reading" && "Leyendo fuente..."}
+                {step === "extracting" && "Extrayendo bloques y fórmulas..."}
+                {step === "indexing" && "Generando embeddings locales..."}
+                {step === "success" && "¡Material indexado con éxito!"}
+                {step === "error" && "Error en la ingesta"}
               </span>
-              <span className="text-[10px] font-mono text-slate-400">
-                o haz clic para explorar (.pdf, .md, .txt)
-              </span>
-            </div>
-          </>
-        )}
-
-        {step === "reading" && (
-          <div className="flex flex-col items-center gap-2 py-1">
-            <Loader2 className="w-5 h-5 text-cyan-400 animate-spin" />
-            <span className="text-[11px] font-mono text-cyan-300">
-              Leyendo {currentFilename}...
             </span>
+            <span className="text-[10px] text-text-tertiary">{progressPct}%</span>
           </div>
-        )}
 
-        {step === "extracting" && (
-          <div className="flex flex-col items-center gap-2 py-1">
-            <Loader2 className="w-5 h-5 text-purple-400 animate-spin" />
-            <span className="text-[11px] font-mono text-purple-300">
-              Extrayendo texto y fórmulas...
-            </span>
-          </div>
-        )}
-
-        {step === "indexing" && (
-          <div className="flex flex-col items-center gap-2 py-1">
-            <Loader2 className="w-5 h-5 text-amber-400 animate-spin" />
-            <span className="text-[11px] font-mono text-amber-300">
-              Segmentación AST y Chunks...
-            </span>
-          </div>
-        )}
-
-        {step === "success" && (
-          <div className="flex flex-col items-center gap-1.5 py-1 text-emerald-400">
-            <CheckCircle2 className="w-5 h-5" />
-            <span className="text-[11px] font-mono font-bold">
-              ¡Documento Ingestado Exitosamente!
-            </span>
-            <span className="text-[10px] text-slate-400 truncate max-w-[200px]">
-              {currentFilename}
-            </span>
-          </div>
-        )}
-
-        {step === "error" && (
-          <div className="flex flex-col items-center gap-1 py-1 text-rose-400">
-            <AlertCircle className="w-5 h-5" />
-            <span className="text-[11px] font-mono font-bold">Error en la ingesta</span>
-            <span className="text-[10px] text-slate-400">{errorMessage}</span>
-          </div>
-        )}
-
-        {/* Progress Bar */}
-        {step !== "idle" && step !== "error" && (
-          <div className="w-full bg-slate-950 rounded-full h-1.5 mt-2.5 overflow-hidden border border-slate-800">
+          <div className="w-full h-1 bg-bg-surface-1 rounded-full overflow-hidden">
             <div
-              className="bg-gradient-to-r from-cyan-500 via-purple-500 to-emerald-400 h-full transition-all duration-300"
+              className={`h-full transition-all duration-300 ${
+                step === "error" ? "bg-danger" : step === "success" ? "bg-success" : "bg-accent-primary"
+              }`}
               style={{ width: `${progressPct}%` }}
             />
           </div>
-        )}
-      </div>
 
-      <div className="flex items-center justify-between text-[9px] font-mono text-slate-400 px-1">
-        <span className="flex items-center gap-1">
-          <FileText className="w-3 h-3 text-cyan-400" /> Formatos: PDF, MD, TXT
-        </span>
-        <span>Local-First OCR</span>
-      </div>
+          {errorMessage && (
+            <p className="text-[10px] text-danger mt-1 leading-snug">{errorMessage}</p>
+          )}
+        </div>
+      )}
     </div>
   );
 };

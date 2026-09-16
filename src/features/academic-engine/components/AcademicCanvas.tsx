@@ -12,11 +12,17 @@ import {
   type CardFsrsRecord,
   type ConceptRecord,
 } from "../../../db/db";
-import { searchAcademicKnowledge } from "../vectorIndex";
+import { searchAcademicKnowledgeWithEvidence } from "../vectorIndex";
 import { evaluateStudentExplanation, type SocraticEvaluationResult } from "../socraticEvaluator";
-import { generateSocraticProfessorResponse } from "../socraticProfessorEngine";
+import {
+  generateSocraticProfessorResponse,
+  resolveActiveLanguageEngine,
+  type ProfessorMode,
+  type HelpLevel,
+} from "../socraticProfessorEngine";
 import { CitationPill } from "./CitationPill";
 import { PdfViewer } from "../../document-viewer/PdfViewer";
+import { ImageOcclusionModal } from "../../image-occlusion/ImageOcclusionModal";
 import {
   BrainCircuit,
   FileText,
@@ -35,6 +41,11 @@ import {
   AlertCircle,
   XCircle,
   RotateCcw,
+  Cpu,
+  GraduationCap,
+  ShieldCheck,
+  HelpCircle,
+  Layers,
 } from "lucide-react";
 
 interface AcademicCanvasProps {
@@ -95,6 +106,22 @@ export function AcademicCanvas({
     },
   ]);
   const [isSearching, setIsSearching] = useState(false);
+  const [professorMode, setProfessorMode] = useState<ProfessorMode>("consulta");
+  const [helpLevel, setHelpLevel] = useState<HelpLevel>(0);
+  const [activeEngineName, setActiveEngineName] = useState<string>("Catedrático · Modo reglas de cátedra");
+  const [isOcclusionModalOpen, setIsOcclusionModalOpen] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    void resolveActiveLanguageEngine().then((res) => {
+      if (isMounted) {
+        setActiveEngineName(res.displayName);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const storageKey = `studylab_academic_chat_${activeSource?.id || "global"}`;
 
@@ -280,6 +307,52 @@ export function AcademicCanvas({
     showToast("✨ Flashcard FSRS creada con éxito en tu mazo.");
   };
 
+  const handleCreateClozeFromSelection = async () => {
+    if (!selectionMenu) return;
+    const text = selectionMenu.text;
+    const cardId = `card_cloze_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+
+    // Buscar contexto circundante en los chunks de la página activa
+    let clozeFront = `{{c1::${text}}}`;
+    const chunkWithText = activePageChunks.find((c) => c.rawContent.includes(text));
+    if (chunkWithText) {
+      const sentences = chunkWithText.rawContent.split(/(?<=[.?!])\s+/);
+      const matchSentence = sentences.find((s) => s.includes(text));
+      if (matchSentence && matchSentence.length < 250) {
+        clozeFront = matchSentence.replace(text, `{{c1::${text}}}`);
+      } else {
+        clozeFront = `Complete la siguiente relación conceptual:\n\n"${chunkWithText.rawContent.slice(0, 160).replace(text, `{{c1::${text}}}`)}..."`;
+      }
+    }
+
+    const newCard: CardFsrsRecord = {
+      id: cardId,
+      deckId: `deck_${activeSource?.id || "general"}`,
+      conceptId: activeSource?.subjectId || "general_concept",
+      front: clozeFront,
+      back: `Fragmento omitido: "${text}"\n\nFuente de Cátedra: ${activeSource?.title || "Documento Académico"} (Pág. ${activeViewerPage})`,
+      state: "new",
+      stability: 1.5,
+      difficulty: 5.0,
+      reps: 0,
+      lapses: 0,
+      lastReview: Date.now(),
+      dueDate: Date.now(),
+      halfLife: 1.5,
+      createdAt: Date.now(),
+    };
+
+    await db.cardsFsrs.put(newCard);
+    setSelectionMenu(null);
+    window.getSelection()?.removeAllRanges();
+    showToast("✨ Tarjeta Cloze {{c1::...}} creada en tu mazo FSRS.");
+  };
+
+  const handleCreateImageOcclusionFromSelection = () => {
+    setIsOcclusionModalOpen(true);
+    setSelectionMenu(null);
+  };
+
   const handleEvaluateFeynmanFromSelection = () => {
     if (!selectionMenu) return;
     const text = selectionMenu.text;
@@ -324,10 +397,11 @@ export function AcademicCanvas({
     }
   };
 
-  const handleSendChat = async () => {
+  const handleSendChat = async (overrideHelpLevel?: HelpLevel) => {
     if (!chatInput.trim() || isSearching) return;
     const query = chatInput.trim();
     setChatInput("");
+    const effectiveHelp = overrideHelpLevel !== undefined ? overrideHelpLevel : helpLevel;
 
     const userMsg: ChatMessage = {
       id: `usr-${Date.now()}`,
@@ -338,15 +412,15 @@ export function AcademicCanvas({
     setChatMessages((prev) => [...prev, userMsg]);
     setIsSearching(true);
 
-    const searchResults = await searchAcademicKnowledge({
+    const searchOutput = await searchAcademicKnowledgeWithEvidence({
       query,
       subjectFilter: activeSource?.subjectId,
       topK: 3,
     });
 
     let evaluationResult: SocraticEvaluationResult | undefined;
-    if (searchResults.length > 0) {
-      const topMatch = searchResults[0];
+    if (searchOutput.results.length > 0) {
+      const topMatch = searchOutput.results[0];
       // Run deep socratic evaluation if the query is an explanation or synthesis attempt
       if (
         query.toLowerCase().includes("porque") ||
@@ -364,9 +438,16 @@ export function AcademicCanvas({
 
     const professorResponse = await generateSocraticProfessorResponse({
       query,
-      searchResults,
+      searchResults: searchOutput.results,
       evaluationResult,
+      mode: professorMode,
+      helpLevel: effectiveHelp,
+      hasSufficientEvidence: searchOutput.hasSufficientEvidence,
     });
+
+    if (professorResponse.engineDisplayName) {
+      setActiveEngineName(professorResponse.engineDisplayName);
+    }
 
     const assistantMsg: ChatMessage = {
       id: `asst-${Date.now()}`,
@@ -378,6 +459,9 @@ export function AcademicCanvas({
 
     setChatMessages((prev) => [...prev, assistantMsg]);
     setIsSearching(false);
+    if (effectiveHelp > 0) {
+      setHelpLevel(0);
+    }
   };
 
   const activePageChunks = chunks.filter((c) => c.pageNumber === activeViewerPage);
@@ -408,6 +492,24 @@ export function AcademicCanvas({
           >
             <Sparkles className="w-3 h-3 text-cyan-400" />
             Flashcard FSRS
+          </button>
+          <button
+            type="button"
+            onClick={handleCreateClozeFromSelection}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-950/60 hover:bg-amber-500/20 text-amber-300 text-[11px] font-mono border border-amber-500/30 transition-colors"
+            title="Ocultar esta selección y crear tarjeta cloze {{c1::...}} directamente"
+          >
+            <EyeOff className="w-3 h-3 text-amber-400" />
+            Ocultar esto (Cloze)
+          </button>
+          <button
+            type="button"
+            onClick={handleCreateImageOcclusionFromSelection}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-950/60 hover:bg-indigo-500/20 text-indigo-300 text-[11px] font-mono border border-indigo-500/30 transition-colors"
+            title="Generar tarjeta de oclusión con coordenadas del visor PDF"
+          >
+            <Layers className="w-3 h-3 text-indigo-400" />
+            Oclusión
           </button>
           <button
             type="button"
@@ -677,7 +779,14 @@ export function AcademicCanvas({
             <span className="font-semibold text-text-primary">
               Cátedra Socrática · Citation-First RAG
             </span>
-            <span className="hidden md:inline text-[10px] text-text-tertiary">
+            <div
+              className="hidden lg:flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono border border-border-subtle bg-bg-surface-2 text-text-secondary"
+              title="Motor del Catedrático Socrático activo (100% honesto)"
+            >
+              <Cpu className="h-3 w-3 text-cyan-400 shrink-0" />
+              <span>{activeEngineName}</span>
+            </div>
+            <span className="hidden xl:inline text-[10px] text-text-tertiary">
               (El Catedrático audita y explica con citas obligatorias)
             </span>
           </div>
@@ -899,14 +1008,106 @@ export function AcademicCanvas({
           ))}
         </div>
 
+        {/* Socratic Mode & Scaffolding Toolbar */}
+        <div className="px-3 py-1.5 border-t border-border-subtle/60 bg-bg-surface-2/60 flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono">
+          {/* Mode Switcher */}
+          <div className="flex items-center gap-1">
+            <span className="text-text-tertiary mr-1 hidden sm:inline">Modo:</span>
+            <button
+              type="button"
+              onClick={() => setProfessorMode("consulta")}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded transition-all cursor-pointer ${
+                professorMode === "consulta"
+                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold"
+                  : "text-text-tertiary hover:text-text-primary hover:bg-bg-surface-1"
+              }`}
+              title="Modo Consulta: El catedrático explica y deduce conceptos citando las fuentes"
+            >
+              <BookOpen className="w-3 h-3 text-cyan-400" />
+              <span>Consulta</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setProfessorMode("auditoria")}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded transition-all cursor-pointer ${
+                professorMode === "auditoria"
+                  ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold"
+                  : "text-text-tertiary hover:text-text-primary hover:bg-bg-surface-1"
+              }`}
+              title="Modo Auditoría: Audita tu razonamiento, detecta inconsistencias y no resuelve mecánicamente"
+            >
+              <ShieldCheck className="w-3 h-3 text-amber-400" />
+              <span>Auditoría</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setProfessorMode("examen")}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded transition-all cursor-pointer ${
+                professorMode === "examen"
+                  ? "bg-rose-500/20 text-rose-300 border border-rose-500/40 font-semibold"
+                  : "text-text-tertiary hover:text-text-primary hover:bg-bg-surface-1"
+              }`}
+              title="Modo Examen: Bloqueado hasta presentar tu intento formal de resolución"
+            >
+              <GraduationCap className="w-3 h-3 text-rose-400" />
+              <span>Examen</span>
+            </button>
+          </div>
+
+          {/* Progressive Help Scaffolding (Levels 0-4) */}
+          {professorMode !== "examen" ? (
+            <div className="flex items-center gap-1">
+              <span className="text-text-tertiary mr-1 flex items-center gap-0.5">
+                <HelpCircle className="w-3 h-3 text-accent-primary" />
+                <span className="hidden sm:inline">Pista:</span>
+              </span>
+              {(
+                [
+                  { lvl: 0 as HelpLevel, label: "L0" },
+                  { lvl: 1 as HelpLevel, label: "L1 Conceptual" },
+                  { lvl: 2 as HelpLevel, label: "L2 Ecuación" },
+                  { lvl: 3 as HelpLevel, label: "L3 Paso" },
+                  { lvl: 4 as HelpLevel, label: "L4 Desglose" },
+                ] as const
+              ).map((h) => (
+                <button
+                  key={h.lvl}
+                  type="button"
+                  onClick={() => setHelpLevel(h.lvl)}
+                  className={`px-1.5 py-0.5 rounded transition-all cursor-pointer ${
+                    helpLevel === h.lvl
+                      ? "bg-accent-primary/20 text-accent-primary border border-accent-primary/40 font-semibold"
+                      : "text-text-tertiary hover:text-text-primary hover:bg-bg-surface-1"
+                  }`}
+                  title={`Nivel ${h.lvl}: ${h.label}`}
+                >
+                  {h.label}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <span className="text-[10px] text-rose-400/80 italic">
+              Pistas deshabilitadas en Modo Examen
+            </span>
+          )}
+        </div>
+
         {/* Input Bar */}
-        <div className="p-3 border-t border-border-subtle flex items-center gap-2 bg-bg-surface-1">
+        <div className="p-3 flex items-center gap-2 bg-bg-surface-1">
           <input
             type="text"
             value={chatInput}
             onChange={(e) => setChatInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && void handleSendChat()}
-            placeholder="Haz una consulta académica o explica un concepto con tus palabras para evaluarte..."
+            placeholder={
+              professorMode === "examen"
+                ? "Modo Examen activo: Escriba 'Planteo: [sus hipótesis y desarrollo]'..."
+                : professorMode === "auditoria"
+                ? "Modo Auditoría: Exponga su razonamiento o hipótesis para auditar..."
+                : helpLevel > 0
+                ? `Solicitando Pista Nivel ${helpLevel}: escriba su consulta...`
+                : "Haz una consulta académica o explica un concepto con tus palabras para evaluarte..."
+            }
             className="flex-1 rounded-lg border border-border-subtle bg-bg-surface-2 px-3 py-2 text-xs font-mono text-text-primary focus:outline-hidden focus:border-accent-primary"
           />
           <Button
@@ -1048,6 +1249,19 @@ export function AcademicCanvas({
           </button>
         </div>
       )}
+
+      {/* Editor de Oclusión de Imágenes SVG (Sección 9-BIS) */}
+      <ImageOcclusionModal
+        open={isOcclusionModalOpen}
+        onClose={() => setIsOcclusionModalOpen(false)}
+        pageNumber={activeViewerPage}
+        sourceTitle={activeSource?.title || "Documento Académico"}
+        fileId={activeSource?.fileId}
+        conceptId={activeSource?.subjectId}
+        onCardsCreated={(count) => {
+          showToast(`🖼️ ${count} tarjetas de oclusión FSRS generadas con éxito.`);
+        }}
+      />
     </div>
   );
 }

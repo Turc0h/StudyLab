@@ -206,7 +206,7 @@ export interface AcademicSourceRecord {
   year?: number;
   semester?: string;
   title: string;
-  documentType: "textbook" | "lecture_notes" | "exam" | "paper";
+  documentType: "textbook" | "lecture_notes" | "exam" | "paper" | "pasted_text" | "web_page" | "transcript";
   pageCount: number;
   fileId?: string;
   ocrProcessed: boolean;
@@ -228,6 +228,9 @@ export interface AcademicChunkRecord {
   boundingBox: AcademicBoundingBox;
   denseVector?: number[];
   sparseTokens?: Record<string, number>;
+  charOffset?: { start: number; end: number };
+  webUrlFragment?: { url: string; textSnippet: string };
+  transcriptTimestamp?: { startSeconds: number; endSeconds: number; formatted: string };
   createdAt: number;
 }
 
@@ -284,7 +287,59 @@ const db = new Dexie("studylab") as Dexie & {
   academicChunks: EntityTable<AcademicChunkRecord, "id">;
   academicEvaluations: EntityTable<AcademicEvaluationRecord, "id">;
   workspaceState: EntityTable<WorkspaceStateRecord, "id">;
+  studentErrors: EntityTable<StudentErrorRecord, "id">;
+  examPlans: EntityTable<ExamPlanRecord, "id">;
 };
+
+export type StudentErrorCategory =
+  | "knowledge_gap"
+  | "misconception"
+  | "calculation_error"
+  | "reading_error"
+  | "procedure_error"
+  | "prerequisite_gap"
+  | "careless_error"
+  | "overconfidence";
+
+export interface StudentErrorRecord {
+  id: string;
+  conceptId: string;
+  conceptName: string;
+  subjectId?: string;
+  category: StudentErrorCategory;
+  originalExercise: string;
+  studentAnswer: string;
+  expectedAnswer: string;
+  explanation: string;
+  citationProof?: {
+    sourceTitle: string;
+    page: number;
+    snippet: string;
+  };
+  timestamp: number;
+  repetitionCount: number;
+  resolved: boolean;
+}
+
+export interface ExamPhaseMilestone {
+  name: string;
+  description: string;
+  startDayOffset: number;
+  endDayOffset: number;
+  targetMilestone: string;
+  completed: boolean;
+}
+
+export interface ExamPlanRecord {
+  id: string;
+  subjectId: string;
+  subjectName: string;
+  examDate: number;
+  availableMinutesPerDay: number;
+  status: "active" | "completed" | "archived";
+  createdAt: number;
+  phases: ExamPhaseMilestone[];
+}
 
 db.version(1).stores({
   folders: "id, parentId, type",
@@ -319,6 +374,12 @@ db.version(4).stores({
   academicChunks: "id, sourceId, subjectId, chunkType, pageNumber, hierarchyPath",
   academicEvaluations: "id, conceptId, sourceId, evaluatedAt",
   workspaceState: "id, activeSubjectId, activeSourceId",
+});
+
+// v5 — CognitiveOS v5.0: Error Bank, Misconceptions & Reverse Exam Planner
+db.version(5).stores({
+  studentErrors: "id, conceptId, subjectId, category, resolved, timestamp",
+  examPlans: "id, subjectId, examDate, status",
 });
 
 /** Alterna el estado de completitud o lectura de un archivo de cátedra. */
