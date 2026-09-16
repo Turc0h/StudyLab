@@ -183,29 +183,6 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     shortcutOrTip: "Tip: Si sientes cansancio antes de terminar, activa una pausa breve de respiración.",
     accent: "amber",
   },
-  {
-    id: "settings",
-    route: "/settings",
-    title: "8. Configuración & Calibración de Memoria",
-    subtitle: "Ajuste de parámetros FSRS v4.5, tema visual y privacidad local",
-    category: "Core",
-    description:
-      "Control total sobre el comportamiento de la plataforma. Calibra la velocidad del algoritmo de repetición espaciada, alterna temas y gestiona la base de datos.",
-    keyFeatures: [
-      "Conmutador de tema HUD Oscuro / Claro con persistencia.",
-      "Control de fondo ambiental animado y reducción de movimiento.",
-      "Visualización y calibración de los pesos canónicos del algoritmo FSRS.",
-      "Gestión de almacenamiento local y botón de reinicio de datos.",
-    ],
-    cognitiveBenefit:
-      "Alineación ergonómica y comodidad visual: adaptar el contraste y reducir la fatiga ocular fotópica previene cefaleas tensionales durante sesiones nocturnas.",
-    howToUse: [
-      "Ajusta tu retención meta FSRS (recomendado 85–90%).",
-      "Activa o desactiva las animaciones de fondo según tu preferencia o potencia del equipo.",
-    ],
-    shortcutOrTip: "Tip: Toda tu información reside en tu disco local, asegurando privacidad total.",
-    accent: "amber",
-  },
 ];
 
 interface TutorialState {

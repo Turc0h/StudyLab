@@ -23,16 +23,14 @@ import {
 
 export const GlobalTutorialModal: React.FC = () => {
   const navigate = useNavigate();
-  const {
-    isOpen,
-    activeTab,
-    currentStepIndex,
-    closeTutorial,
-    nextStep,
-    prevStep,
-    goToStep,
-    setTab,
-  } = useTutorialStore();
+  const isOpen = useTutorialStore((s) => s.isOpen);
+  const activeTab = useTutorialStore((s) => s.activeTab);
+  const currentStepIndex = useTutorialStore((s) => s.currentStepIndex);
+  const closeTutorial = useTutorialStore((s) => s.closeTutorial);
+  const nextStep = useTutorialStore((s) => s.nextStep);
+  const prevStep = useTutorialStore((s) => s.prevStep);
+  const goToStep = useTutorialStore((s) => s.goToStep);
+  const setTab = useTutorialStore((s) => s.setTab);
 
   const [filterCategory, setFilterCategory] = useState<string>("all");
 
