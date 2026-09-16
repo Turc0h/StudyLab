@@ -39,6 +39,7 @@ export function DocumentAnnotator({ fileId, onClose, hideNotesPanel }: DocumentA
   const [ocrProgress, setOcrProgress] = useState(0);
 
   const [ocrError, setOcrError] = useState<string | null>(null);
+  const [notesCollapsed, setNotesCollapsed] = useState(false);
 
   if (!file) return null;
 
@@ -72,8 +73,6 @@ export function DocumentAnnotator({ fileId, onClose, hideNotesPanel }: DocumentA
     }
   }
 
-  const [notesCollapsed, setNotesCollapsed] = useState(false);
-
   return (
     <div className="flex h-full flex-col bg-bg-primary text-text-primary">
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border-subtle bg-bg-secondary/95 px-4 py-2.5 backdrop-blur-xs">
@@ -82,6 +81,7 @@ export function DocumentAnnotator({ fileId, onClose, hideNotesPanel }: DocumentA
             <button
               type="button"
               onClick={onClose}
+
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border-subtle bg-bg-elevated text-text-secondary transition-colors duration-150 hover:bg-bg-secondary hover:text-text-primary"
               title="Cerrar documento (Esc)"
             >

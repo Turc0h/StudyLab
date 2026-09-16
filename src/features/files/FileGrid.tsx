@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Folder, Trash2, Upload, CheckCircle2 } from "lucide-react";
-import { useRef, useState } from "react";
+import { ArrowDown, ArrowUp, CheckCircle2, Folder, Trash2, Upload } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
 import type { FileRecord, FolderRecord } from "../../db/db";
 import { db, toggleFileCompleted } from "../../db/db";
 import {
@@ -150,6 +150,10 @@ function FileCard({
   );
 }
 
+export type FileSortBy = "name" | "createdAt" | "size" | "status";
+export type FileSortOrder = "asc" | "desc";
+export type FileFilterStatus = "all" | "pending" | "completed";
+
 interface FileGridProps {
   folderId: string | null;
   searchQuery: string;
@@ -161,6 +165,14 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const [sortBy, setSortBy] = useState<FileSortBy>(() => {
+    return (localStorage.getItem("studylab_files_sort_by") as FileSortBy) || "name";
+  });
+  const [sortOrder, setSortOrder] = useState<FileSortOrder>(() => {
+    return (localStorage.getItem("studylab_files_sort_order") as FileSortOrder) || "asc";
+  });
+  const [filterStatus, setFilterStatus] = useState<FileFilterStatus>("all");
+
   const allFolders = useLiveQuery(() => db.folders.toArray(), []) ?? [];
   const allFiles = useLiveQuery(() => db.files.toArray(), []) ?? [];
 
@@ -171,11 +183,39 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
     ? []
     : allFolders
         .filter((f) => f.parentId === folderId)
-        .sort((a, b) => a.name.localeCompare(b.name));
+        .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" }));
 
-  const files = isSearching
+  const rawFiles = isSearching
     ? allFiles.filter((f) => f.name.toLowerCase().includes(query))
     : allFiles.filter((f) => f.folderId === folderId);
+
+  const sortedFiles = useMemo(() => {
+    let result = rawFiles;
+    if (filterStatus === "pending") {
+      result = result.filter((f) => !f.isCompleted);
+    } else if (filterStatus === "completed") {
+      result = result.filter((f) => f.isCompleted);
+    }
+
+    return [...result].sort((a, b) => {
+      let diff = 0;
+      switch (sortBy) {
+        case "name":
+          diff = a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" });
+          break;
+        case "createdAt":
+          diff = (a.createdAt || 0) - (b.createdAt || 0);
+          break;
+        case "size":
+          diff = a.size - b.size;
+          break;
+        case "status":
+          diff = (a.isCompleted ? 1 : 0) - (b.isCompleted ? 1 : 0);
+          break;
+      }
+      return sortOrder === "asc" ? diff : -diff;
+    });
+  }, [rawFiles, sortBy, sortOrder, filterStatus]);
 
   async function handleUpload(fileList: FileList | null) {
     if (!fileList || fileList.length === 0 || folderId === null) return;
@@ -197,6 +237,7 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
   }
 
   const canUploadHere = folderId !== null && !isSearching;
+  const hasItems = childFolders.length > 0 || rawFiles.length > 0;
 
   return (
     <div
@@ -213,11 +254,103 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
         void handleUpload(e.dataTransfer.files);
       }}
       className={clsx(
-        "flex flex-col gap-6 rounded-lg border border-dashed p-6 transition-colors duration-150",
+        "flex flex-col gap-5 rounded-lg border border-dashed p-5 transition-colors duration-150",
         dragOver ? "bg-accent-muted/30 border-accent shadow-[0_0_20px_-4px_color-mix(in_srgb,var(--color-accent)_30%,transparent)]" : "border-border-subtle",
       )}
     >
-      {childFolders.length === 0 && files.length === 0 ? (
+      {/* Barra de herramientas para ordenar y filtrar documentos */}
+      {hasItems && (
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-subtle pb-3">
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-medium text-text-secondary">
+              {childFolders.length > 0 && `${childFolders.length} carpeta${childFolders.length === 1 ? "" : "s"} · `}
+              {sortedFiles.length} {sortedFiles.length === 1 ? "documento" : "documentos"}
+            </span>
+
+            {rawFiles.length > 0 && (
+              <div className="flex items-center gap-0.5 rounded-md border border-border-subtle bg-bg-surface-2 p-0.5 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setFilterStatus("all")}
+                  className={clsx(
+                    "rounded px-2 py-0.5 transition-colors text-[11px] cursor-pointer",
+                    filterStatus === "all"
+                      ? "bg-bg-elevated font-medium text-text-primary shadow-2xs"
+                      : "text-text-muted hover:text-text-primary",
+                  )}
+                >
+                  Todos
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFilterStatus("pending")}
+                  className={clsx(
+                    "rounded px-2 py-0.5 transition-colors text-[11px] cursor-pointer",
+                    filterStatus === "pending"
+                      ? "bg-bg-elevated font-medium text-text-primary shadow-2xs"
+                      : "text-text-muted hover:text-text-primary",
+                  )}
+                >
+                  Pendientes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFilterStatus("completed")}
+                  className={clsx(
+                    "rounded px-2 py-0.5 transition-colors text-[11px] cursor-pointer",
+                    filterStatus === "completed"
+                      ? "bg-bg-elevated font-medium text-text-primary shadow-2xs"
+                      : "text-text-muted hover:text-text-primary",
+                  )}
+                >
+                  Leídos
+                </button>
+              </div>
+            )}
+          </div>
+
+          {rawFiles.length > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-text-muted">Ordenar:</span>
+              <div className="flex items-center gap-1.5">
+                <select
+                  value={sortBy}
+                  onChange={(e) => {
+                    const val = e.target.value as FileSortBy;
+                    setSortBy(val);
+                    localStorage.setItem("studylab_files_sort_by", val);
+                  }}
+                  className="h-7 rounded-md border border-border-subtle bg-bg-elevated px-2 text-xs text-text-primary focus:border-accent-primary focus:outline-hidden cursor-pointer"
+                >
+                  <option value="name">Nombre (A-Z)</option>
+                  <option value="createdAt">Fecha de subida</option>
+                  <option value="size">Tamaño</option>
+                  <option value="status">Estado (leído)</option>
+                </select>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const nextOrder = sortOrder === "asc" ? "desc" : "asc";
+                    setSortOrder(nextOrder);
+                    localStorage.setItem("studylab_files_sort_order", nextOrder);
+                  }}
+                  className="flex h-7 w-7 items-center justify-center rounded-md border border-border-subtle bg-bg-elevated text-text-secondary transition-colors hover:bg-bg-secondary hover:text-text-primary cursor-pointer"
+                  title={sortOrder === "asc" ? "Ascendente (clic para descendente)" : "Descendente (clic para ascendente)"}
+                >
+                  {sortOrder === "asc" ? (
+                    <ArrowUp size={14} strokeWidth={2} />
+                  ) : (
+                    <ArrowDown size={14} strokeWidth={2} />
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {!hasItems ? (
         <div className="flex flex-col items-center gap-3 py-16 text-center">
           <Upload size={22} strokeWidth={1.75} className="text-accent" />
           <p className="text-sm font-medium text-text-primary">
@@ -239,19 +372,20 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-          {childFolders.map((folder) => (
-            <FolderCard
-              key={folder.id}
-              folder={folder}
-              onClick={() => onOpenFolder(folder.id)}
-              onDelete={() => {
-                if (window.confirm(`¿Eliminar la carpeta "${folder.name}" y todo su contenido?`)) {
-                  void deleteFolderCascade(folder.id);
-                }
-              }}
-            />
-          ))}
-          {files.map((file) => (
+          {filterStatus === "all" &&
+            childFolders.map((folder) => (
+              <FolderCard
+                key={folder.id}
+                folder={folder}
+                onClick={() => onOpenFolder(folder.id)}
+                onDelete={() => {
+                  if (window.confirm(`¿Eliminar la carpeta "${folder.name}" y todo su contenido?`)) {
+                    void deleteFolderCascade(folder.id);
+                  }
+                }}
+              />
+            ))}
+          {sortedFiles.map((file) => (
             <FileCard
               key={file.id}
               file={file}
