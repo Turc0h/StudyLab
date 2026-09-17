@@ -11,6 +11,7 @@ import { runOcrOnFile } from "./ocr";
 import type { JumpTarget } from "./PdfViewer";
 import { PdfViewer } from "./PdfViewer";
 import { PostItMarks } from "./PostItMarks";
+import { PanelGuide } from "../../components/guide/PanelGuide";
 
 interface DocumentAnnotatorProps {
   fileId: string;
@@ -96,6 +97,20 @@ export function DocumentAnnotator({ fileId, onClose, hideNotesPanel }: DocumentA
               {ready ? "Listo para subrayar" : "OCR pendiente"}
             </Badge>
           )}
+          <PanelGuide
+            id="pdf-annotator-guide"
+            title="Herramientas del Lector de PDF"
+            whatItDoes="Lector de alta fidelidad con anotaciones persistentes, reconocimiento OCR y notas en vivo."
+            howToUse={[
+              "Subrayar: Hacé clic en el botón 'Subrayar' (se pone azul) y arrastrá el mouse sobre el texto.",
+              "Post-it: Hacé clic en 'Post-it' y luego un clic sobre cualquier parte de la hoja para pegar la nota.",
+              "OCR: Si el PDF es escaneado, tocá 'Ejecutar OCR' para que el texto sea seleccionable.",
+              "Navegación & Zoom: En la barra flotante del visor usá [← Pag / Total →] y los botones de lupa.",
+              "Panel lateral: Tocá 'Ir a la página X' en cualquier nota para que el visor salte ahí.",
+            ]}
+            tip="Tus subrayados y post-its se guardan con coordenadas normalizadas para que nunca se desalineen al cambiar de zoom."
+            align="left"
+          />
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {showOcrPrompt && (

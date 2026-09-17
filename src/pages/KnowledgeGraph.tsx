@@ -15,6 +15,7 @@ import {
   wouldCreateCycle,
 } from "../features/knowledge-graph/graphEngine";
 import { AlertTriangle, Plus, Zap, Network, CheckCircle2 } from "lucide-react";
+import { PanelGuide } from "../components/guide/PanelGuide";
 
 export function KnowledgeGraph() {
   const navigate = useNavigate();
@@ -102,15 +103,30 @@ export function KnowledgeGraph() {
           title="Grafo de Conocimiento & Árbol de Dependencias"
           description="Estructura topológica de conceptos, bloqueo dinámico por retención (R < 70%) y detección de cuellos de botella."
         />
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center gap-2 self-start sm:self-auto shadow-md"
-        >
-          <Plus className="h-4 w-4" />
-          Nuevo Concepto
-        </Button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <PanelGuide
+            id="knowledge-graph-overview"
+            title="Grafo Causal y Ruta Crítica"
+            whatItDoes="Mapea los conceptos de tu carrera como un árbol de dependencias. Te impide estudiar temas avanzados si tenés bases frágiles."
+            howToUse={[
+              "Navegá el mapa arrastrando con el mouse y usando la rueda para zoom.",
+              "🟢 Verde: Conceptos dominados (retención R ≥ 80%).",
+              "🔵 Cian: Conceptos en estudio o disponibles.",
+              "🔴 Rojo con Candado 🔒: Conceptos bloqueados porque un prerrequisito está flojo.",
+              "Tocá 'Nuevo Concepto' para agregar temas y conectar sus dependencias sin crear ciclos.",
+            ]}
+            tip="Si un concepto base tiene muchas fallas, el sistema te lo marca arriba como 'Cuello de Botella' para que lo repases primero."
+          />
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center gap-2 shadow-md"
+          >
+            <Plus className="h-4 w-4" />
+            Nuevo Concepto
+          </Button>
+        </div>
       </div>
 
       {/* Critical Bottlenecks Banner */}
@@ -146,6 +162,25 @@ export function KnowledgeGraph() {
           </Button>
         </div>
       )}
+
+      {/* Main Canvas View Header */}
+      <div className="flex items-center justify-between px-1">
+        <span className="font-mono text-xs text-text-tertiary uppercase tracking-wider">
+          Lienzo Topológico Interactivo
+        </span>
+        <PanelGuide
+          id="canvas-interaction-guide"
+          title="Interacción con el Lienzo del Grafo"
+          whatItDoes="Simulación de física de partículas 2D que distribuye tus conceptos de forma espacial y visual."
+          howToUse={[
+            "Arrastrar lienzo: Hacé clic sostenido en el fondo para desplazarte por el mapa.",
+            "Zoom: Usá la rueda del mouse para acercarte o alejarte.",
+            "Seleccionar nodo: Hacé clic sobre cualquier círculo para ver su porcentaje de maestría y retención.",
+            "Estudiar nodo: En la tarjeta del nodo seleccionado, tocá 'Estudiar este nodo' para lanzar una sesión FSRS inmediata.",
+          ]}
+          tip="Cada línea con flecha indica una relación de prerrequisito: A → B significa que necesitás dominar A antes de aprender B."
+        />
+      </div>
 
       {/* Main Canvas View */}
       <GraphCanvas

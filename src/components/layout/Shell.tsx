@@ -2,10 +2,9 @@ import React, { useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
-import { GlobalTutorialModal } from "../tutorial/GlobalTutorialModal";
+import { GuideStatusBar } from "../guide/GuideStatusBar";
 import { useThemeStore } from "../../stores/useThemeStore";
 import { useFocusModeStore } from "../../stores/useFocusModeStore";
-import { useTutorialStore } from "../../stores/useTutorialStore";
 import { Minimize2 } from "lucide-react";
 import { clsx } from "clsx";
 
@@ -14,17 +13,7 @@ export const Shell: React.FC = () => {
   const toggleTheme = useThemeStore((s) => s.toggleTheme);
   const isFocusMode = useFocusModeStore((s) => s.isFocusMode);
   const exitFocusMode = useFocusModeStore((s) => s.exitFocusMode);
-  const hasSeenTour = useTutorialStore((s) => s.hasSeenTour);
-  const openTutorial = useTutorialStore((s) => s.openTutorial);
   const location = useLocation();
-
-  // Auto-abrir la guía la primera vez que el usuario entra a la app
-  useEffect(() => {
-    if (!hasSeenTour) {
-      const timer = setTimeout(() => openTutorial(0, "tour"), 800);
-      return () => clearTimeout(timer);
-    }
-  }, [hasSeenTour, openTutorial]);
 
   useEffect(() => {
     if (theme === "dark") {
@@ -127,7 +116,7 @@ export const Shell: React.FC = () => {
         </main>
       </div>
 
-      <GlobalTutorialModal />
+      <GuideStatusBar />
     </div>
   );
 };

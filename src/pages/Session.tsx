@@ -10,6 +10,7 @@ import { DocumentAnnotator } from "../features/document-viewer/DocumentAnnotator
 import { FilePickerInline } from "../features/session-engine/FilePickerInline";
 import { getMethod } from "../features/session-engine/methods";
 import { SessionRunner } from "../features/session-engine/SessionRunner";
+import { PanelGuide } from "../components/guide/PanelGuide";
 
 export function Session() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -89,13 +90,26 @@ export function Session() {
             mobileTab === "method" ? "flex" : "hidden md:flex",
           )}
         >
-          <Link
-            to="/methods"
-            className="flex items-center gap-1.5 text-xs font-medium text-text-tertiary transition-colors duration-150 hover:text-text-primary"
-          >
-            <ArrowLeft size={14} strokeWidth={1.75} />
-            Métodos
-          </Link>
+          <div className="flex items-center justify-between">
+            <Link
+              to="/methods"
+              className="flex items-center gap-1.5 text-xs font-medium text-text-tertiary transition-colors duration-150 hover:text-text-primary"
+            >
+              <ArrowLeft size={14} strokeWidth={1.75} />
+              Métodos
+            </Link>
+            <PanelGuide
+              id="session-runner-guide"
+              title="Panel de Ejecución de la Sesión"
+              whatItDoes="Controla el temporizador de estudio y guía paso a paso el protocolo del método activo."
+              howToUse={[
+                "Seguí los pasos y respondé las consignas que aparecen en este panel lateral.",
+                "Usá el temporizador (bloques de 25 o 45 min) para sostener tu concentración.",
+                "Tu material de estudio está abierto a la derecha para consultar y subrayar sin salir de la página.",
+              ]}
+              tip="En celular podés alternar entre el método y el documento con las pestañas de arriba."
+            />
+          </div>
 
           <div>
             <span className="font-mono text-[10px] tracking-[0.25em] text-accent uppercase">

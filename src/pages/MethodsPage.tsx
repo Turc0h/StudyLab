@@ -10,6 +10,7 @@ import { Card, CardHeader, CardTitle } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { Badge } from "../components/ui/Badge";
 import { Clock, ArrowLeft, ArrowRight, Eye, Play, Sparkles } from "lucide-react";
+import { PanelGuide } from "../components/guide/PanelGuide";
 
 // Lazy loaded method runners
 const FeynmanMethod = lazy(() =>
@@ -112,6 +113,17 @@ export const MethodsPage: React.FC = () => {
               {catalogEntry?.name}
             </span>
             <Badge variant="success">Sesión en Curso</Badge>
+            <PanelGuide
+              id="active-runner-guide"
+              title={`Protocolo Guiado: ${catalogEntry?.name || "Método Activo"}`}
+              whatItDoes="Mantiene el foco y la estructura del método con temporizadores por bloque y pasos guiados."
+              howToUse={[
+                "Seguí las instrucciones específicas que aparecen en el recuadro central.",
+                "Usá los botones de pausa/avance para controlar el temporizador.",
+                "Al finalizar el bloque, tus minutos estudiados se sumarán al Dashboard.",
+              ]}
+              tip="Podés salir en cualquier momento tocando 'Volver al Catálogo de Métodos' arriba a la izquierda."
+            />
           </div>
         </div>
 
@@ -131,13 +143,26 @@ export const MethodsPage: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Editorial Header */}
-      <div className="border-b border-border-subtle pb-4">
-        <h1 className="font-serif text-2xl font-semibold tracking-tight text-text-primary">
-          Catálogo de Métodos de Estudio
-        </h1>
-        <p className="mt-1 font-sans text-sm text-text-secondary">
-          Explora la justificación neurocognitiva, el protocolo y la vista previa de cada técnica antes de iniciar tu sesión.
-        </p>
+      <div className="flex items-start justify-between border-b border-border-subtle pb-4">
+        <div>
+          <h1 className="font-serif text-2xl font-semibold tracking-tight text-text-primary">
+            Catálogo de Métodos de Estudio
+          </h1>
+          <p className="mt-1 font-sans text-sm text-text-secondary">
+            Explora la justificación neurocognitiva, el protocolo y la vista previa de cada técnica antes de iniciar tu sesión.
+          </p>
+        </div>
+        <PanelGuide
+          id="methods-catalog-guide"
+          title="Catálogo de Métodos Cognitivos"
+          whatItDoes="Selección de las 8 técnicas de estudio con mayor evidencia científica, adaptadas para ingeniería, medicina y ciencias exactas."
+          howToUse={[
+            "Filtrá por categoría arriba (Comprensión, Retención, Estructura, etc.).",
+            "Tocá 'Vista previa' en cualquier tarjeta para ver el fundamento neurocognitivo y cómo funciona.",
+            "Tocá 'Iniciar Sesión' para arrancar el bloque guiado con temporizador.",
+          ]}
+          tip="Para estudiar fórmulas o demostraciones, la combinación recomendada es Feynman (para entender) + FSRS (para no olvidar)."
+        />
       </div>
 
       {/* Category Filters */}

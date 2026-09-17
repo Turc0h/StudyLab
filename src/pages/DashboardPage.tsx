@@ -22,6 +22,7 @@ import {
 import { StudyTipsWidget } from "../components/study-tips/StudyTipsWidget";
 import { CourseProgressCard } from "../components/progress/CourseProgressCard";
 import { DailyStudyRecommendationCard } from "../features/study-engine/components/DailyStudyRecommendationCard";
+import { PanelGuide } from "../components/guide/PanelGuide";
 
 interface MethodPreview {
   id: StudyMethodId;
@@ -106,6 +107,17 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2.5 shrink-0">
+          <PanelGuide
+            id="dashboard-overview"
+            title="Panel Principal (Dashboard)"
+            whatItDoes="Tu centro de control diario. Monitorea horas de estudio reales, te recomienda qué estudiar hoy y te da acceso inmediato a tus cátedras."
+            howToUse={[
+              "Revisá tus horas acumuladas de la semana contra tu objetivo de 20 horas.",
+              "Leé la tarjeta '¿Qué estudiar hoy?' para ver el tema prioritario según la retención FSRS.",
+              "Tocá 'Iniciar Sesión' para abrir el temporizador con tu apunte elegido.",
+            ]}
+            tip="Todos los datos de sesiones se guardan localmente en IndexedDB: no dependés de internet para estudiar."
+          />
           <Link to="/session">
             <Button variant="primary" size="md" className="gap-2 text-xs font-semibold shadow-xs">
               <Play className="h-3.5 w-3.5 fill-current" />
@@ -116,6 +128,22 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* Fila Superior: Métricas Clave Limpias (Sin gráficos pesados) */}
+      <div className="flex items-center justify-between px-1">
+        <span className="font-mono text-xs text-text-tertiary uppercase tracking-wider">
+          Métricas de Aprendizaje
+        </span>
+        <PanelGuide
+          id="study-metrics"
+          title="Métricas de Esfuerzo y Retención"
+          whatItDoes="Cuantifica tu dedicación real semanal sin distracciones ni métricas de vanidad."
+          howToUse={[
+            "Horas de Estudio: Suma exacta de minutos de todas tus sesiones de Pomodoro y métodos activos.",
+            "Sesiones Totales: Cantidad de bloques de trabajo profundo concluidos.",
+            "Objetivo Semanal: Barra de progreso hacia la meta biológica recomendada de 20 horas.",
+          ]}
+          tip="Estudiar en bloques de 25 o 45 minutos con descansos previene la fatiga cognitiva crónica."
+        />
+      </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <Card elevated className="p-4 flex flex-col justify-between">
           <div className="flex items-center justify-between">
@@ -200,12 +228,26 @@ export const DashboardPage: React.FC = () => {
                   Selecciona una técnica empírica para iniciar tu sesión
                 </span>
               </div>
-              <Link to="/methods">
-                <Button variant="outline" size="sm" className="gap-1 text-xs">
-                  <span>Ver las 8 técnicas</span>
-                  <ArrowRight className="h-3 w-3" />
-                </Button>
-              </Link>
+              <div className="flex items-center gap-2">
+                <PanelGuide
+                  id="featured-methods-guide"
+                  title="Métodos de Estudio Guiados"
+                  whatItDoes="Técnicas activas que estructuran tu estudio con temporizadores y protocolos específicos según el tipo de materia."
+                  howToUse={[
+                    "Técnica Feynman: Para conceptos difíciles; te pide explicarlos en palabras simples y detecta lagunas.",
+                    "Active Recall: Oculta el documento y te fuerza a recuperar la información de memoria.",
+                    "Pomodoro: 4 ciclos de 25 min de foco + 5 min de descanso para no agotarte.",
+                    "Práctica Intercalada: Para alternar temas y mejorar la discriminación de problemas.",
+                  ]}
+                  tip="Hacé clic en 'Ver las 8 técnicas' para acceder al catálogo completo con FSRS, Leitner, Cornell y SQ3R."
+                />
+                <Link to="/methods">
+                  <Button variant="outline" size="sm" className="gap-1 text-xs">
+                    <span>Ver las 8 técnicas</span>
+                    <ArrowRight className="h-3 w-3" />
+                  </Button>
+                </Link>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -249,9 +291,23 @@ export const DashboardPage: React.FC = () => {
 
           {/* Accesos Rápidos de Herramientas Académicas */}
           <Card elevated className="p-5 flex flex-col gap-3">
-            <CardTitle className="text-sm border-b border-border-subtle pb-2.5">
-              Herramientas de Estudio Rápido
-            </CardTitle>
+            <div className="flex items-center justify-between border-b border-border-subtle pb-2.5">
+              <CardTitle className="text-sm">
+                Herramientas de Estudio Rápido
+              </CardTitle>
+              <PanelGuide
+                id="quick-tools-guide"
+                title="Herramientas Especializadas"
+                whatItDoes="Módulos dedicados para tareas específicas de procesamiento de textos y concentración."
+                howToUse={[
+                  "Escanear y Desglosar Libro (/books): Si tenés un PDF de 500+ páginas, lo divide en capítulos individuales para que no sea pesado.",
+                  "Anotador de PDF (/pdf): Visor independiente para leer con post-its y subrayados.",
+                  "Extracción OCR (/ocr): Convierte fotos o escaneos de apuntes en texto seleccionable.",
+                  "Sonido Ambiente (/ambient): Genera ruido blanco o lluvia para aislarte del ruido del ambiente.",
+                ]}
+                tip="Podés acceder a estas herramientas en cualquier momento desde la barra lateral izquierda."
+              />
+            </div>
 
             <div className="flex flex-col gap-2">
               <Link

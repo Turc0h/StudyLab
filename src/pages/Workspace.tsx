@@ -8,6 +8,7 @@ import { CognitiveFatigueMeter } from "../features/workspace/widgets/CognitiveFa
 import { EphemeralScratchpad } from "../features/workspace/widgets/EphemeralScratchpad";
 import { LatexTerminal } from "../features/workspace/widgets/LatexTerminal";
 import { automationBus, type AutomationRule } from "../features/workspace/automationEngine";
+import { PanelGuide } from "../components/guide/PanelGuide";
 import {
   BrainCircuit,
   Sliders,
@@ -142,15 +143,30 @@ export function Workspace() {
           title="Espacio de Trabajo Modular"
           description="Entorno unificado de alto rendimiento cognitivo con perfiles sintonizados, terminal KaTeX, audio binaural y motor IFTTT."
         />
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => setIsRulesModalOpen(true)}
-          className="flex items-center gap-2 self-start sm:self-auto"
-        >
-          <Sliders className="h-4 w-4 text-accent-primary" />
-          Reglas IFTTT Autonómicas ({rules.filter((r) => r.enabled).length})
-        </Button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <PanelGuide
+            id="workspace-overview-guide"
+            title="Workspace OS & Perfiles Cognitivos"
+            whatItDoes="Configura tu pantalla con micro-herramientas según la exigencia de tu estudio (matemáticas, memorización o investigación)."
+            howToUse={[
+              "Elegí uno de los 4 perfiles superiores para activar las herramientas ideales.",
+              "Deep Problem Solving: Terminal KaTeX + Ondas Gamma (40Hz) + Medidor de Fatiga.",
+              "Memory Fortress: Bloc Efímero de 60s + Ondas Alfa (10Hz) + Medidor de Fatiga.",
+              "Research Synthesis: Terminal KaTeX + Bloc Efímero + Ondas Theta (6Hz).",
+              "Personalizado: Activá o desactivá los widgets con los botones de la barra.",
+            ]}
+            tip="Podés configurar reglas IFTTT automáticas para que el sistema te obligue a descansar si tu fatiga supera el 75%."
+          />
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => setIsRulesModalOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <Sliders className="h-4 w-4 text-accent-primary" />
+            Reglas IFTTT ({rules.filter((r) => r.enabled).length})
+          </Button>
+        </div>
       </div>
 
       {/* Profile Selector Cards */}
@@ -185,10 +201,25 @@ export function Workspace() {
 
       {/* Quick Widget Toggles Bar */}
       <div className="flex items-center justify-between px-4 py-2.5 rounded-xl border border-border-subtle bg-bg-surface-1 font-mono text-xs text-text-secondary">
-        <span className="flex items-center gap-2 text-text-tertiary">
-          <Sparkles className="h-3.5 w-3.5 text-accent-primary" />
-          Widgets Activos:
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="flex items-center gap-2 text-text-tertiary">
+            <Sparkles className="h-3.5 w-3.5 text-accent-primary" />
+            Widgets Activos:
+          </span>
+          <PanelGuide
+            id="widgets-guide"
+            title="Micro-Widgets Cognitivos"
+            whatItDoes="Herramientas especializadas que podés combinar en pantalla a tu gusto."
+            howToUse={[
+              "KaTeX REPL: Renderiza fórmulas matemáticas al vuelo con botones de símbolos rápidos.",
+              "Audio Binaural: Osciladores estéreo desacoplados (Alfa/Gamma/Theta) para inducir estados cerebrales óptimos.",
+              "Medidor de Fatiga: Estima el agotamiento cognitivo analizando ritmo de pulsaciones y pausas.",
+              "Bloc Efímero: Texto que se desvanece a los 60 segundos para forzar tu síntesis mental inmediata.",
+            ]}
+            tip="Hacé clic en cualquier botón de widget para encenderlo o apagarlo en vivo."
+            align="left"
+          />
+        </div>
         <div className="flex items-center gap-3">
           {[
             { id: "latex", label: "KaTeX REPL" },
