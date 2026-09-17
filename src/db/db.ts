@@ -16,7 +16,11 @@ export interface FileRecord {
   name: string;
   mimeType: string;
   size: number;
-  blob: Blob;
+  blob?: Blob;
+  /** Ruta física en disco cuando se ejecuta en Desktop */
+  diskPath?: string;
+  /** Hash SHA-256 para integridad y deduplicación */
+  hash?: string;
   /** Estado de OCR — solo relevante para PDFs escaneados (Fase 5). */
   ocrStatus: "not_applicable" | "pending" | "processing" | "done";
   /** Marcado de completitud / lectura del estudiante */

@@ -9,12 +9,13 @@ import { Breadcrumbs } from "../features/files/Breadcrumbs";
 import { FileGrid } from "../features/files/FileGrid";
 import { FolderTree } from "../features/files/FolderTree";
 import { NewFolderModal } from "../features/files/NewFolderModal";
+import { isDesktop } from "../platform";
 
 export function Files() {
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
-  const [openFileId, setOpenFileId] = useState<string | null>(null);
+  const [openFileState, setOpenFileState] = useState<{ id: string; page?: number } | null>(null);
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
@@ -51,7 +52,7 @@ export function Files() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar por nombre de archivo…"
+            placeholder={isDesktop() ? "Buscar por nombre o contenido de documentos…" : "Buscar por nombre de archivo…"}
             className="pl-9"
           />
         </div>
@@ -102,7 +103,7 @@ export function Files() {
             folderId={currentFolderId}
             searchQuery={search}
             onOpenFolder={setCurrentFolderId}
-            onOpenFile={setOpenFileId}
+            onOpenFile={(id, page) => setOpenFileState({ id, page })}
           />
         </div>
       </div>
@@ -113,7 +114,13 @@ export function Files() {
         parentId={currentFolderId}
       />
 
-      {openFileId && <DocumentPanel fileId={openFileId} onClose={() => setOpenFileId(null)} />}
+      {openFileState && (
+        <DocumentPanel
+          fileId={openFileState.id}
+          initialPage={openFileState.page}
+          onClose={() => setOpenFileState(null)}
+        />
+      )}
     </div>
   );
 }

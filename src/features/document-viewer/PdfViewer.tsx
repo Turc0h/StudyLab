@@ -252,8 +252,11 @@ function PdfPage({
   );
 }
 
+import { convertFileSrc, isDesktop } from "../../platform";
+
 interface PdfViewerProps {
-  blob: Blob;
+  blob?: Blob;
+  filePath?: string;
   scale: number;
   onScaleChange: (scale: number) => void;
   onLoaded?: (info: { numPages: number; hasTextLayer: boolean }) => void;
@@ -272,6 +275,7 @@ interface PdfViewerProps {
 
 export function PdfViewer({
   blob,
+  filePath,
   scale,
   onScaleChange,
   onLoaded,
@@ -299,32 +303,50 @@ export function PdfViewer({
     setPdfDoc(null);
 
     (async () => {
-      const arrayBuffer = await blob.arrayBuffer();
-      loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-      const doc = await loadingTask.promise;
-      if (cancelled) {
-        void doc.cleanup();
-        void loadingTask.destroy();
-        return;
-      }
-      currentDoc = doc;
-      setPdfDoc(doc);
-      setNumPages(doc.numPages);
-
       try {
-        const firstPage = await doc.getPage(1);
-        const baseViewport = firstPage.getViewport({ scale: 1 });
-        if (!cancelled) {
-          setDefaultPageSize({ width: baseViewport.width, height: baseViewport.height });
+        if (filePath && isDesktop()) {
+          const assetUrl = convertFileSrc(filePath);
+          loadingTask = pdfjsLib.getDocument({
+            url: assetUrl,
+            rangeChunkSize: 65536,
+            disableAutoFetch: true,
+          });
+        } else if (blob) {
+          const arrayBuffer = await blob.arrayBuffer();
+          loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+        } else {
+          return;
         }
-        const content = await firstPage.getTextContent();
-        const hasTextLayer = content.items.some(
-          (item) => "str" in item && item.str.trim().length > 0,
-        );
-        if (!cancelled) onLoaded?.({ numPages: doc.numPages, hasTextLayer });
-        firstPage.cleanup();
+
+        const doc = await loadingTask.promise;
+        if (cancelled) {
+          void doc.cleanup();
+          void loadingTask.destroy();
+          return;
+        }
+        currentDoc = doc;
+        setPdfDoc(doc);
+        setNumPages(doc.numPages);
+
+        try {
+          const firstPage = await doc.getPage(1);
+          const baseViewport = firstPage.getViewport({ scale: 1 });
+          if (!cancelled) {
+            setDefaultPageSize({ width: baseViewport.width, height: baseViewport.height });
+          }
+          const content = await firstPage.getTextContent();
+          const hasTextLayer = content.items.some(
+            (item) => "str" in item && item.str.trim().length > 0,
+          );
+          if (!cancelled) onLoaded?.({ numPages: doc.numPages, hasTextLayer });
+          firstPage.cleanup();
+        } catch (err) {
+          console.warn("No se pudo leer la primera página para metadatos:", err);
+        }
       } catch (err) {
-        console.warn("No se pudo leer la primera página para metadatos:", err);
+        if (!cancelled) {
+          console.error("Error al cargar documento PDF:", err);
+        }
       }
     })();
 
@@ -334,7 +356,7 @@ export function PdfViewer({
       if (loadingTask) void loadingTask.destroy();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blob]);
+  }, [blob, filePath]);
 
   useEffect(() => {
     setInputPage(String(activePage));
@@ -342,12 +364,21 @@ export function PdfViewer({
 
   useEffect(() => {
     if (!jumpTo) return;
-    const target = pageRefs.current.get(jumpTo.page);
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
-      setActivePage(jumpTo.page);
+    const scroll = () => {
+      const target = pageRefs.current.get(jumpTo.page);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        setActivePage(jumpTo.page);
+        return true;
+      }
+      return false;
+    };
+
+    if (!scroll()) {
+      const timer = setTimeout(scroll, 150);
+      return () => clearTimeout(timer);
     }
-  }, [jumpTo]);
+  }, [jumpTo, numPages]);
 
   function scrollToPage(pageNum: number) {
     const clamped = Math.max(1, Math.min(numPages, pageNum));

@@ -25,6 +25,7 @@ import { resetAllLocalData } from "../db/db";
 import { ambientTracks } from "../features/ambient-sound/tracks";
 import { useGoogleCalendarStatus } from "../features/google-calendar/useGoogleCalendar";
 import { useThemeStore } from "../stores/useThemeStore";
+import { useNotificationStore } from "../stores/useNotificationStore";
 import {
   getStorageEstimate,
   requestStoragePersistence,
@@ -60,7 +61,18 @@ function SettingsSection({ title, description, children }: SettingsSectionProps)
 
 export function Settings() {
   const navigate = useNavigate();
-  const { theme, toggleTheme, ambientEnabled, setAmbientEnabled } = useThemeStore();
+  const {
+    theme,
+    toggleTheme,
+    ambientEnabled,
+    setAmbientEnabled,
+    animationsEnabled,
+    setAnimationsEnabled,
+    reducedMotion,
+    setReducedMotion,
+  } = useThemeStore();
+  const notifPreferences = useNotificationStore((s) => s.preferences);
+  const updateNotifPreferences = useNotificationStore((s) => s.updatePreferences);
   const [searchParams] = useSearchParams();
   const calendarResult = searchParams.get("calendar");
   const calendarStatus = useGoogleCalendarStatus();
@@ -262,6 +274,36 @@ export function Settings() {
             checked={ambientEnabled}
             onChange={setAmbientEnabled}
             label="Fondo ambiental animado"
+          />
+          <Switch
+            id="settings-animations"
+            checked={animationsEnabled}
+            onChange={setAnimationsEnabled}
+            label="Animaciones de interfaz (slide de menú y transiciones de pantalla)"
+          />
+          <Switch
+            id="settings-reduced-motion"
+            checked={reducedMotion}
+            onChange={setReducedMotion}
+            label="Animaciones reducidas (modo prefers-reduced-motion: transiciones instantáneas)"
+          />
+        </SettingsSection>
+
+        <SettingsSection
+          title="Notificaciones y Avisos de Estudio"
+          description="Controlá cómo y cuándo StudyLab te avisa sobre entregas, repasos programados y tareas de procesamiento."
+        >
+          <Switch
+            id="settings-notif-desktop"
+            checked={notifPreferences.desktopNotificationsEnabled}
+            onChange={(checked) => updateNotifPreferences({ desktopNotificationsEnabled: checked })}
+            label="Notificaciones nativas del sistema operativo (Windows Desktop)"
+          />
+          <Switch
+            id="settings-notif-deepwork"
+            checked={notifPreferences.urgentOnlyInDeepWork}
+            onChange={(checked) => updateNotifPreferences({ urgentOnlyInDeepWork: checked })}
+            label="Modo Estudio Profundo (sólo mostrar avisos urgentes durante sesiones)"
           />
         </SettingsSection>
 

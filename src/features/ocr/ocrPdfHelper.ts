@@ -273,6 +273,11 @@ async function processPdfFile(
           blocks,
         });
       }
+
+      // Liberación de recursos de canvas y página
+      canvas.width = 0;
+      canvas.height = 0;
+      page.cleanup();
     }
   } finally {
     if (worker) {

@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import { useLiveQuery } from "dexie-react-hooks";
-import { ArrowDown, ArrowUp, CheckCircle2, Folder, Trash2, Upload } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { ArrowDown, ArrowUp, CheckCircle2, FileText, Folder, FolderOpen, Trash2, Upload } from "lucide-react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import type { FileRecord, FolderRecord } from "../../db/db";
 import { db, toggleFileCompleted } from "../../db/db";
 import {
@@ -13,6 +13,13 @@ import {
   iconForMime,
   isPdf,
 } from "./fileHelpers";
+import {
+  isDesktop,
+  revealInExplorer,
+  saveBufferToLibrary,
+  searchFtsDocuments,
+  type FtsDocumentResult,
+} from "../../platform";
 
 function FolderCard({
   folder,
@@ -106,6 +113,19 @@ function FileCard({
             <CheckCircle2 size={12} />
             <span>{file.isCompleted ? "Leído" : "Pendiente"}</span>
           </button>
+          {file.diskPath && isDesktop() && (
+            <button
+              type="button"
+              title="Abrir ubicación en el Explorador de Windows"
+              onClick={(e) => {
+                e.stopPropagation();
+                void revealInExplorer(file.diskPath!);
+              }}
+              className="rounded p-1 text-text-muted opacity-0 transition-opacity duration-150 group-hover:opacity-100 hover:bg-bg-secondary hover:text-text-primary"
+            >
+              <FolderOpen size={14} strokeWidth={1.75} />
+            </button>
+          )}
           <button
             type="button"
             title="Eliminar archivo"
@@ -150,6 +170,80 @@ function FileCard({
   );
 }
 
+function FtsResultCard({
+  result,
+  file,
+  onClick,
+}: {
+  result: FtsDocumentResult;
+  file?: FileRecord;
+  onClick: () => void;
+}) {
+  const parts = result.snippet.split(/(<b>.*?<\/b>)/g);
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={(e) => e.key === "Enter" && onClick()}
+      className="group flex cursor-pointer flex-col gap-2.5 rounded-lg border border-border-subtle bg-bg-elevated p-3.5 text-left transition-all duration-150 hover:border-accent-primary/50 shadow-2xs hover:shadow-xs"
+    >
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border-subtle bg-bg-secondary text-accent-primary">
+            <FileText size={15} strokeWidth={1.75} />
+          </div>
+          <span className="truncate font-serif text-xs font-semibold text-text-primary" title={result.file_name}>
+            {result.file_name}
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span className="rounded bg-accent-primary/10 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-accent-primary">
+            Pág. {result.page_number}
+          </span>
+          {file?.diskPath && isDesktop() && (
+            <button
+              type="button"
+              title="Abrir ubicación en el Explorador de Windows"
+              onClick={(e) => {
+                e.stopPropagation();
+                void revealInExplorer(file.diskPath!);
+              }}
+              className="rounded p-1 text-text-muted opacity-0 transition-opacity duration-150 group-hover:opacity-100 hover:bg-bg-secondary hover:text-text-primary"
+            >
+              <FolderOpen size={13} strokeWidth={1.75} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="rounded border border-border-subtle/50 bg-bg-secondary/60 p-2.5 text-xs leading-relaxed text-text-secondary">
+        {parts.map((part, i) => {
+          if (part.startsWith("<b>") && part.endsWith("</b>")) {
+            return (
+              <mark
+                key={i}
+                className="rounded bg-accent-primary/20 px-0.5 font-medium text-accent-primary underline decoration-accent-primary/40 underline-offset-2"
+              >
+                {part.slice(3, -4)}
+              </mark>
+            );
+          }
+          return <span key={i}>{part}</span>;
+        })}
+      </div>
+
+      <div className="flex items-center justify-between text-[11px] text-text-tertiary">
+        <span className="font-mono text-[10px] text-text-muted">Texto indexado (FTS5)</span>
+        <span className="font-medium text-accent-primary group-hover:underline">
+          Abrir en pág. {result.page_number} →
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export type FileSortBy = "name" | "createdAt" | "size" | "status";
 export type FileSortOrder = "asc" | "desc";
 export type FileFilterStatus = "all" | "pending" | "completed";
@@ -158,7 +252,7 @@ interface FileGridProps {
   folderId: string | null;
   searchQuery: string;
   onOpenFolder: (id: string) => void;
-  onOpenFile: (id: string) => void;
+  onOpenFile: (id: string, page?: number) => void;
 }
 
 export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: FileGridProps) {
@@ -173,11 +267,47 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
   });
   const [filterStatus, setFilterStatus] = useState<FileFilterStatus>("all");
 
+  const [ftsResults, setFtsResults] = useState<FtsDocumentResult[]>([]);
+  const [isSearchingFts, setIsSearchingFts] = useState(false);
+  const [searchTab, setSearchTab] = useState<"all" | "files" | "content">("all");
+
   const allFolders = useLiveQuery(() => db.folders.toArray(), []) ?? [];
   const allFiles = useLiveQuery(() => db.files.toArray(), []) ?? [];
 
   const query = searchQuery.trim().toLowerCase();
   const isSearching = query.length > 0;
+
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (!isDesktop() || q.length < 2) {
+      setFtsResults([]);
+      setIsSearchingFts(false);
+      return;
+    }
+
+    let cancelled = false;
+    setIsSearchingFts(true);
+
+    const timer = setTimeout(async () => {
+      try {
+        const results = await searchFtsDocuments({ query: q, limit: 30 });
+        if (!cancelled) {
+          setFtsResults(results);
+        }
+      } catch (err) {
+        console.warn("[FileGrid] Error buscando FTS:", err);
+      } finally {
+        if (!cancelled) {
+          setIsSearchingFts(false);
+        }
+      }
+    }, 200);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [searchQuery]);
 
   const childFolders = isSearching
     ? []
@@ -223,6 +353,23 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
     for (const file of Array.from(fileList)) {
       const mimeType =
         file.type || (file.name.toLowerCase().endsWith(".pdf") ? "application/pdf" : "application/octet-stream");
+
+      let diskPath: string | undefined = undefined;
+      let hash: string | undefined = undefined;
+
+      if (isDesktop()) {
+        try {
+          const buffer = await file.arrayBuffer();
+          const meta = await saveBufferToLibrary(file.name, buffer);
+          if (meta) {
+            diskPath = meta.path;
+            hash = meta.hash;
+          }
+        } catch (err) {
+          console.warn("No se pudo persistir copia física en disco, usando fallback:", err);
+        }
+      }
+
       await db.files.add({
         id: generateId(),
         folderId,
@@ -230,6 +377,8 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
         mimeType,
         size: file.size,
         blob: file,
+        diskPath,
+        hash,
         ocrStatus: isPdf(mimeType, file.name) ? "pending" : "not_applicable",
         createdAt: now,
       });
@@ -237,7 +386,9 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
   }
 
   const canUploadHere = folderId !== null && !isSearching;
-  const hasItems = childFolders.length > 0 || rawFiles.length > 0;
+  const hasItems = isSearching
+    ? sortedFiles.length > 0 || ftsResults.length > 0
+    : childFolders.length > 0 || rawFiles.length > 0;
 
   return (
     <div
@@ -262,54 +413,104 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
       {hasItems && (
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-subtle pb-3">
           <div className="flex items-center gap-3">
-            <span className="text-xs font-medium text-text-secondary">
-              {childFolders.length > 0 && `${childFolders.length} carpeta${childFolders.length === 1 ? "" : "s"} · `}
-              {sortedFiles.length} {sortedFiles.length === 1 ? "documento" : "documentos"}
-            </span>
-
-            {rawFiles.length > 0 && (
-              <div className="flex items-center gap-0.5 rounded-md border border-border-subtle bg-bg-surface-2 p-0.5 text-xs">
-                <button
-                  type="button"
-                  onClick={() => setFilterStatus("all")}
-                  className={clsx(
-                    "rounded px-2 py-0.5 transition-colors text-[11px] cursor-pointer",
-                    filterStatus === "all"
-                      ? "bg-bg-elevated font-medium text-text-primary shadow-2xs"
-                      : "text-text-muted hover:text-text-primary",
+            {isSearching ? (
+              <div className="flex items-center gap-1">
+                <div className="flex items-center gap-0.5 rounded-md border border-border-subtle bg-bg-surface-2 p-0.5 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setSearchTab("all")}
+                    className={clsx(
+                      "rounded px-2.5 py-0.5 transition-colors text-[11px] cursor-pointer",
+                      searchTab === "all"
+                        ? "bg-bg-elevated font-medium text-text-primary shadow-2xs"
+                        : "text-text-muted hover:text-text-primary",
+                    )}
+                  >
+                    Todo ({sortedFiles.length + ftsResults.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSearchTab("files")}
+                    className={clsx(
+                      "rounded px-2.5 py-0.5 transition-colors text-[11px] cursor-pointer",
+                      searchTab === "files"
+                        ? "bg-bg-elevated font-medium text-text-primary shadow-2xs"
+                        : "text-text-muted hover:text-text-primary",
+                    )}
+                  >
+                    Por nombre ({sortedFiles.length})
+                  </button>
+                  {isDesktop() && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchTab("content")}
+                      className={clsx(
+                        "flex items-center gap-1 rounded px-2.5 py-0.5 transition-colors text-[11px] cursor-pointer",
+                        searchTab === "content"
+                          ? "bg-bg-elevated font-medium text-accent-primary shadow-2xs"
+                          : "text-text-muted hover:text-text-primary",
+                      )}
+                    >
+                      <span>En contenido ({ftsResults.length})</span>
+                      {isSearchingFts && (
+                        <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent-primary animate-pulse" />
+                      )}
+                    </button>
                   )}
-                >
-                  Todos
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFilterStatus("pending")}
-                  className={clsx(
-                    "rounded px-2 py-0.5 transition-colors text-[11px] cursor-pointer",
-                    filterStatus === "pending"
-                      ? "bg-bg-elevated font-medium text-text-primary shadow-2xs"
-                      : "text-text-muted hover:text-text-primary",
-                  )}
-                >
-                  Pendientes
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFilterStatus("completed")}
-                  className={clsx(
-                    "rounded px-2 py-0.5 transition-colors text-[11px] cursor-pointer",
-                    filterStatus === "completed"
-                      ? "bg-bg-elevated font-medium text-text-primary shadow-2xs"
-                      : "text-text-muted hover:text-text-primary",
-                  )}
-                >
-                  Leídos
-                </button>
+                </div>
               </div>
+            ) : (
+              <>
+                <span className="text-xs font-medium text-text-secondary">
+                  {childFolders.length > 0 && `${childFolders.length} carpeta${childFolders.length === 1 ? "" : "s"} · `}
+                  {sortedFiles.length} {sortedFiles.length === 1 ? "documento" : "documentos"}
+                </span>
+
+                {rawFiles.length > 0 && (
+                  <div className="flex items-center gap-0.5 rounded-md border border-border-subtle bg-bg-surface-2 p-0.5 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => setFilterStatus("all")}
+                      className={clsx(
+                        "rounded px-2 py-0.5 transition-colors text-[11px] cursor-pointer",
+                        filterStatus === "all"
+                          ? "bg-bg-elevated font-medium text-text-primary shadow-2xs"
+                          : "text-text-muted hover:text-text-primary",
+                      )}
+                    >
+                      Todos
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFilterStatus("pending")}
+                      className={clsx(
+                        "rounded px-2 py-0.5 transition-colors text-[11px] cursor-pointer",
+                        filterStatus === "pending"
+                          ? "bg-bg-elevated font-medium text-text-primary shadow-2xs"
+                          : "text-text-muted hover:text-text-primary",
+                      )}
+                    >
+                      Pendientes
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFilterStatus("completed")}
+                      className={clsx(
+                        "rounded px-2 py-0.5 transition-colors text-[11px] cursor-pointer",
+                        filterStatus === "completed"
+                          ? "bg-bg-elevated font-medium text-text-primary shadow-2xs"
+                          : "text-text-muted hover:text-text-primary",
+                      )}
+                    >
+                      Leídos
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
-          {rawFiles.length > 0 && (
+          {!isSearching && rawFiles.length > 0 && (
             <div className="flex items-center gap-2">
               <span className="text-xs text-text-muted">Ordenar:</span>
               <div className="flex items-center gap-1.5">
@@ -355,7 +556,7 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
           <Upload size={22} strokeWidth={1.75} className="text-accent" />
           <p className="text-sm font-medium text-text-primary">
             {isSearching
-              ? "No encontramos archivos con ese nombre"
+              ? "No encontramos archivos ni fragmentos de texto coincidentes"
               : folderId === null
                 ? "Elegí o creá una carpeta para subir archivos"
                 : "Arrastrá un archivo acá o subilo manualmente"}
@@ -368,6 +569,59 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
             >
               Elegir archivo del dispositivo
             </button>
+          )}
+        </div>
+      ) : isSearching ? (
+        <div className="flex flex-col gap-6">
+          {/* Sección de archivos coincidentes */}
+          {(searchTab === "all" || searchTab === "files") && sortedFiles.length > 0 && (
+            <div className="flex flex-col gap-3">
+              {searchTab === "all" && (
+                <span className="font-mono text-xs font-medium text-text-secondary uppercase tracking-wider">
+                  Archivos coincidentes ({sortedFiles.length})
+                </span>
+              )}
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                {sortedFiles.map((file) => (
+                  <FileCard
+                    key={file.id}
+                    file={file}
+                    onClick={() => onOpenFile(file.id)}
+                    onDelete={() => {
+                      if (window.confirm(`¿Eliminar el archivo "${file.name}" y sus notas?`)) {
+                        void deleteFileCascade(file.id);
+                      }
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Sección de fragmentos FTS coincidentes */}
+          {(searchTab === "all" || searchTab === "content") && ftsResults.length > 0 && (
+            <div className="flex flex-col gap-3">
+              {searchTab === "all" && (
+                <span className="font-mono text-xs font-medium text-text-secondary uppercase tracking-wider">
+                  Fragmentos en contenido de documentos ({ftsResults.length})
+                </span>
+              )}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {ftsResults.map((res, idx) => {
+                  const matchingFile = allFiles.find(
+                    (f) => f.id === res.document_id || f.name === res.file_name
+                  );
+                  return (
+                    <FtsResultCard
+                      key={`${res.document_id}-${res.page_number}-${idx}`}
+                      result={res}
+                      file={matchingFile}
+                      onClick={() => onOpenFile(matchingFile ? matchingFile.id : res.document_id, res.page_number)}
+                    />
+                  );
+                })}
+              </div>
+            </div>
           )}
         </div>
       ) : (

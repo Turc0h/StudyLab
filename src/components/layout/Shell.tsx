@@ -3,8 +3,12 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 import { GuideStatusBar } from "../guide/GuideStatusBar";
+import { OrganizationDrawer } from "../organization/OrganizationDrawer";
+import { NotificationCenter } from "../notifications/NotificationCenter";
 import { useThemeStore } from "../../stores/useThemeStore";
 import { useFocusModeStore } from "../../stores/useFocusModeStore";
+import { useOrganizationStore } from "../../stores/useOrganizationStore";
+import { useNotificationStore } from "../../stores/useNotificationStore";
 import { Minimize2 } from "lucide-react";
 import { clsx } from "clsx";
 
@@ -13,6 +17,15 @@ export const Shell: React.FC = () => {
   const toggleTheme = useThemeStore((s) => s.toggleTheme);
   const isFocusMode = useFocusModeStore((s) => s.isFocusMode);
   const exitFocusMode = useFocusModeStore((s) => s.exitFocusMode);
+  const animationsEnabled = useThemeStore((s) => s.animationsEnabled);
+  const reducedMotion = useThemeStore((s) => s.reducedMotion);
+  const toggleSidebar = useThemeStore((s) => s.toggleSidebar);
+  const isOrgOpen = useOrganizationStore((s) => s.isOpen);
+  const closeOrg = useOrganizationStore((s) => s.closeOrganization);
+  const toggleOrg = useOrganizationStore((s) => s.toggleOrganization);
+  const isNotifOpen = useNotificationStore((s) => s.isOpen);
+  const setIsNotifOpen = useNotificationStore((s) => s.setIsOpen);
+  const toggleNotif = useNotificationStore((s) => s.toggleOpen);
   const location = useLocation();
 
   useEffect(() => {
@@ -23,16 +36,49 @@ export const Shell: React.FC = () => {
     }
   }, [theme]);
 
-  // Manejo de tecla Escape para salir de Modo Enfoque
+  // Sincronizar clases de preferencias de movimiento y animaciones
+  useEffect(() => {
+    if (!animationsEnabled) {
+      document.documentElement.classList.add("no-animations");
+    } else {
+      document.documentElement.classList.remove("no-animations");
+    }
+
+    if (reducedMotion) {
+      document.documentElement.classList.add("reduced-motion");
+    } else {
+      document.documentElement.classList.remove("reduced-motion");
+    }
+  }, [animationsEnabled, reducedMotion]);
+
+  // Manejo de atajos globales: Esc para Modo Enfoque / Drawers, Ctrl+B para Sidebar, Ctrl+O para Org, Ctrl+N para Notificaciones
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isFocusMode) {
-        exitFocusMode();
+      // Ignorar eventos generados por mantener pulsada la tecla repetidamente
+      if (e.repeat) return;
+
+      if (e.key === "Escape") {
+        if (isNotifOpen) {
+          setIsNotifOpen(false);
+        } else if (isOrgOpen) {
+          closeOrg();
+        } else if (isFocusMode) {
+          exitFocusMode();
+        }
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b") {
+        e.preventDefault();
+        toggleSidebar();
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "o") {
+        e.preventDefault();
+        toggleOrg();
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "n") {
+        e.preventDefault();
+        toggleNotif();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isFocusMode, exitFocusMode]);
+  }, [isFocusMode, exitFocusMode, toggleSidebar, isOrgOpen, closeOrg, toggleOrg, isNotifOpen, setIsNotifOpen, toggleNotif]);
 
   const getPageMeta = () => {
     const path = location.pathname;
@@ -115,6 +161,12 @@ export const Shell: React.FC = () => {
           </div>
         </main>
       </div>
+
+      {/* Panel Lateral de Organización Discreto */}
+      <OrganizationDrawer />
+
+      {/* Bandeja de Notificaciones Interna */}
+      <NotificationCenter />
 
       <GuideStatusBar />
     </div>

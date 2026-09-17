@@ -39,6 +39,13 @@ export async function deleteFileCascade(fileId: string) {
   await db.ocrPages.where({ fileId }).delete();
   await db.reviewSchedule.where({ fileId }).delete();
   await db.files.delete(fileId);
+
+  try {
+    const { removeDocumentPagesFts } = await import("../../platform");
+    await removeDocumentPagesFts(fileId);
+  } catch (err) {
+    console.warn("Error limpiando índice FTS para documento:", err);
+  }
 }
 
 /** Elimina una carpeta, sus subcarpetas y todos sus archivos asociados recursivamente. */

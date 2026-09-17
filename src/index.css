@@ -115,3 +115,61 @@ h1, h2, h3, h4 {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
+
+/* Animaciones fluidas (Smooth Desktop Transitions) */
+@keyframes drawerSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0.7;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-drawer-slide {
+  animation: drawerSlideIn 320ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.animate-overlay-fade {
+  animation: overlayFadeIn 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity;
+}
+
+/* Paneles deslizables acelerados por hardware (Smooth Desktop Transitions - 60Hz / 120Hz / 144Hz+) */
+.desktop-drawer-panel {
+  will-change: transform, opacity, right;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
+              right 300ms cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 220ms ease-out;
+}
+
+/* Soporte para prefers-reduced-motion y configuración de animaciones */
+@media (prefers-reduced-motion: reduce) {
+  .reduced-motion *, .no-animations * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.reduced-motion *, .no-animations * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}

@@ -15,7 +15,7 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseStyles =
-    "inline-flex items-center justify-center font-sans font-medium rounded-md border transition-colors duration-150 focus:outline-hidden disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-2xs";
+    "inline-flex items-center justify-center font-sans font-medium rounded-md border transition-colors duration-150 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-2xs";
 
   const sizeStyles = {
     sm: "px-2.5 py-1.5 text-xs",
@@ -25,15 +25,15 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variantStyles = {
     primary:
-      "bg-accent-primary text-bg-elevated border-transparent hover:bg-accent-hover focus:ring-1 focus:ring-accent-primary",
+      "bg-accent-primary text-bg-elevated border-transparent hover:bg-accent-hover focus-visible:ring-accent-primary",
     secondary:
-      "bg-accent-secondary text-bg-elevated border-transparent hover:opacity-90 focus:ring-1 focus:ring-accent-secondary",
+      "bg-accent-secondary text-bg-elevated border-transparent hover:opacity-90 focus-visible:ring-accent-secondary",
     outline:
-      "bg-bg-elevated text-text-primary border-border-subtle hover:bg-bg-secondary focus:ring-1 focus:ring-border-subtle",
+      "bg-bg-elevated text-text-primary border-border-subtle hover:bg-bg-secondary focus-visible:ring-accent-primary",
     ghost:
-      "bg-transparent text-text-secondary border-transparent hover:bg-bg-secondary hover:text-text-primary shadow-none",
+      "bg-transparent text-text-secondary border-transparent hover:bg-bg-secondary hover:text-text-primary focus-visible:ring-accent-primary shadow-none",
     danger:
-      "bg-error text-bg-elevated border-transparent hover:opacity-90 focus:ring-1 focus:ring-error",
+      "bg-error text-bg-elevated border-transparent hover:opacity-90 focus-visible:ring-error",
   }[variant];
 
   return (

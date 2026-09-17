@@ -1,5 +1,6 @@
 import { db, type AcademicChunkRecord, type AcademicSourceRecord, type AcademicBoundingBox } from "../../db/db";
 import { computeEmbeddingVector } from "./embeddings/embeddingManager";
+import { isDesktop, searchFtsAcademicChunks } from "../../platform";
 
 export interface SearchResult {
   chunk: AcademicChunkRecord;
@@ -167,6 +168,23 @@ export async function searchAcademicKnowledgeWithEvidence(params: {
   const sourceMap = new Map(sources.map((s) => [s.id, s.title]));
   const conceptNames = new Set(concepts.map((c) => c.name.toLowerCase()));
 
+  // 3.1 Consultar SQLite FTS5 si corre en Desktop (bajo consumo de RAM)
+  const ftsMap = new Map<string, { bm25_score: number; snippet: string }>();
+  if (isDesktop()) {
+    try {
+      const ftsHits = await searchFtsAcademicChunks({
+        query: trimmed,
+        subjectId: subjectFilter || undefined,
+        limit: 100,
+      });
+      for (const hit of ftsHits) {
+        ftsMap.set(hit.chunk_id, { bm25_score: hit.bm25_score, snippet: hit.snippet });
+      }
+    } catch (e) {
+      console.warn("[HybridSearch] Fallback a BM25 en memoria:", e);
+    }
+  }
+
   // 4. Calculate Raw Dense and Sparse Scores for each chunk
   interface ScoredCandidate {
     chunk: AcademicChunkRecord;
@@ -186,8 +204,11 @@ export async function searchAcademicKnowledgeWithEvidence(params: {
       ? cosineSimilarity(queryDense, chunk.denseVector)
       : 0;
 
-    // BM25 sparse score
-    const bm25Score = computeBM25Score(queryTerms, chunk.sparseTokens);
+    // BM25 sparse score (con boost nativo SQLite FTS5 si aplica)
+    const baseBm25 = computeBM25Score(queryTerms, chunk.sparseTokens);
+    const ftsHit = ftsMap.get(chunk.id);
+    const ftsBoost = ftsHit ? Math.max(0, 5.0 - Math.abs(ftsHit.bm25_score) * 0.1) : 0;
+    const bm25Score = baseBm25 + ftsBoost;
 
     // Exact pattern matching (equation numbers, norms, theorems)
     let exactMatchBoost = 0;

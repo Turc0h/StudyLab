@@ -12,9 +12,12 @@ import type { JumpTarget } from "./PdfViewer";
 import { PdfViewer } from "./PdfViewer";
 import { PostItMarks } from "./PostItMarks";
 import { PanelGuide } from "../../components/guide/PanelGuide";
+import { getFileBlob } from "../storage/fileStorage";
 
 interface DocumentAnnotatorProps {
   fileId: string;
+  /** Página inicial a la que saltar al abrir el documento */
+  initialPage?: number;
   /** Si se pasa, muestra el botón de cerrar (uso en panel a pantalla completa). */
   onClose?: () => void;
   /** Oculta el panel de notas lateral — útil cuando el método ya tiene su propio panel. */
@@ -25,7 +28,7 @@ interface DocumentAnnotatorProps {
  * Documento + subrayado + post-its + OCR + notas en vivo. Es el núcleo compartido entre el
  * panel a pantalla completa de Archivos (`DocumentPanel`) y el panel embebido de Sesión.
  */
-export function DocumentAnnotator({ fileId, onClose, hideNotesPanel }: DocumentAnnotatorProps) {
+export function DocumentAnnotator({ fileId, initialPage, onClose, hideNotesPanel }: DocumentAnnotatorProps) {
   const file = useLiveQuery(() => db.files.get(fileId), [fileId]);
   const highlights = useLiveQuery(() => db.highlights.where({ fileId }).toArray(), [fileId]) ?? [];
   const postits = useLiveQuery(() => db.postits.where({ fileId }).toArray(), [fileId]) ?? [];
@@ -35,7 +38,9 @@ export function DocumentAnnotator({ fileId, onClose, hideNotesPanel }: DocumentA
   const [hasTextLayer, setHasTextLayer] = useState<boolean | null>(null);
   const [highlightMode, setHighlightMode] = useState(false);
   const [postItArmed, setPostItArmed] = useState(false);
-  const [jumpTo, setJumpTo] = useState<JumpTarget | null>(null);
+  const [jumpTo, setJumpTo] = useState<JumpTarget | null>(() =>
+    initialPage ? { page: initialPage, token: Date.now() } : null
+  );
   const [ocrRunning, setOcrRunning] = useState(false);
   const [ocrProgress, setOcrProgress] = useState(0);
 
@@ -53,7 +58,11 @@ export function DocumentAnnotator({ fileId, onClose, hideNotesPanel }: DocumentA
     setOcrError(null);
     await db.files.update(fileId, { ocrStatus: "processing" });
     try {
-      const results = await runOcrOnFile(file!.blob, setOcrProgress);
+      const blobToProcess = file?.blob || (await getFileBlob(fileId));
+      if (!blobToProcess) {
+        throw new Error("No se dispone del contenido del archivo para ejecutar OCR.");
+      }
+      const results = await runOcrOnFile(blobToProcess, setOcrProgress);
       await db.ocrPages.where({ fileId }).delete();
       const records = results.map((r) => ({
         id: generateId(),
@@ -191,6 +200,7 @@ export function DocumentAnnotator({ fileId, onClose, hideNotesPanel }: DocumentA
           {isPdf(file.mimeType) ? (
             <PdfViewer
               blob={file.blob}
+              filePath={file.diskPath}
               scale={scale}
               onScaleChange={setScale}
               onLoaded={({ hasTextLayer: h }) => {
