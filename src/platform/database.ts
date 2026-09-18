@@ -40,6 +40,23 @@ export async function getSqliteDb(): Promise<Database> {
     await db.execute("PRAGMA temp_store = MEMORY;");
     // - 5000: tiempo de espera antes de arrojar error por contención
     await db.execute("PRAGMA busy_timeout = 5000;");
+    // - wal_autocheckpoint: evita crecimiento indefinido del log WAL
+    await db.execute("PRAGMA wal_autocheckpoint = 1000;");
+
+    // - mmap_size adaptativo según medio de almacenamiento:
+    //   SSD/NVMe: 256MB para lecturas ultra-rápidas zero-copy en memoria virtual
+    //   HDD: 0 (desactivado) para evitar page faults y contención aleatoria de cabezal
+    try {
+      const { invoke } = await import("@tauri-apps/api/core");
+      const storageInfo = await invoke<{ is_ssd: boolean; mmap_recommended_size: number }>("get_storage_info");
+      if (storageInfo && storageInfo.is_ssd) {
+        await db.execute(`PRAGMA mmap_size = ${storageInfo.mmap_recommended_size};`);
+      } else {
+        await db.execute("PRAGMA mmap_size = 0;");
+      }
+    } catch {
+      await db.execute("PRAGMA mmap_size = 0;");
+    }
 
     // 2. Inicialización de esquema DDL si no existe
     await initializeSchema(db);

@@ -174,17 +174,43 @@ export async function indexDocumentPageFts(page: {
   pageNumber: number;
   content: string;
 }): Promise<void> {
-  if (!isDesktop()) return;
+  return indexDocumentPagesBatchFts([page]);
+}
+
+/**
+ * Indexa un lote de páginas agrupadas en una única transacción SQLite atómica.
+ * Reduce drásticamente las operaciones I/O y llamadas fsync en disco (HDD y SSD).
+ */
+export async function indexDocumentPagesBatchFts(
+  pages: Array<{
+    documentId: string;
+    filePath: string;
+    fileName: string;
+    pageNumber: number;
+    content: string;
+  }>,
+): Promise<void> {
+  if (!isDesktop() || pages.length === 0) return;
 
   try {
     const db = await getSqliteDb();
-    await db.execute(
-      `INSERT INTO fts_documents (document_id, file_path, file_name, page_number, content)
-       VALUES (?, ?, ?, ?, ?);`,
-      [page.documentId, page.filePath, page.fileName, page.pageNumber, page.content]
-    );
+    await db.execute("BEGIN TRANSACTION;");
+    for (const page of pages) {
+      await db.execute(
+        `INSERT INTO fts_documents (document_id, file_path, file_name, page_number, content)
+         VALUES (?, ?, ?, ?, ?);`,
+        [page.documentId, page.filePath, page.fileName, page.pageNumber, page.content],
+      );
+    }
+    await db.execute("COMMIT;");
   } catch (err) {
-    console.error("[FTS5] Error indexando página en fts_documents:", err);
+    console.error("[FTS5] Error indexando lote de páginas en fts_documents:", err);
+    try {
+      const db = await getSqliteDb();
+      await db.execute("ROLLBACK;");
+    } catch {
+      // Ignorar rollback secundario
+    }
   }
 }
 

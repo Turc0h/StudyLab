@@ -57,6 +57,7 @@ pub fn run() {
     })
     .invoke_handler(tauri::generate_handler![
       filesystem::get_library_dir,
+      filesystem::get_storage_info,
       filesystem::calculate_file_hash,
       filesystem::import_file_to_library,
       filesystem::save_buffer_to_library,

@@ -36,8 +36,87 @@ pub fn get_library_dir() -> Result<String, String> {
     resolve_library_path().map(|p| p.to_string_lossy().to_string())
 }
 
-/// Comando Tauri: Calcular hash SHA-256 de un archivo en disco mediante streaming
-/// Utiliza un buffer de 64 KB, asegurando consumo de RAM constante e ínfimo (independiente del tamaño del archivo)
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum StorageType {
+    Ssd,
+    Hdd,
+    Unknown,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct StorageInfo {
+    pub storage_type: StorageType,
+    pub is_ssd: bool,
+    pub recommended_buffer_size: usize,
+    pub mmap_recommended_size: usize,
+}
+
+#[cfg(target_os = "windows")]
+fn detect_storage_type_internal() -> StorageType {
+    use std::process::Command;
+    if let Ok(output) = Command::new("powershell")
+        .args(["-NoProfile", "-NonInteractive", "-Command", "(Get-CimInstance -ClassName MSFT_PhysicalDisk -Namespace root\\Microsoft\\Windows\\Storage).MediaType"])
+        .output() 
+    {
+        let text = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        if text.contains('4') || text.to_lowercase().contains("ssd") {
+            return StorageType::Ssd;
+        } else if text.contains('3') || text.to_lowercase().contains("hdd") {
+            return StorageType::Hdd;
+        }
+    }
+    StorageType::Ssd
+}
+
+#[cfg(target_os = "linux")]
+fn detect_storage_type_internal() -> StorageType {
+    if let Ok(entries) = std::fs::read_dir("/sys/block") {
+        for entry in entries.flatten() {
+            let rotational_path = entry.path().join("queue/rotational");
+            if let Ok(val) = std::fs::read_to_string(rotational_path) {
+                if val.trim() == "0" {
+                    return StorageType::Ssd;
+                } else if val.trim() == "1" {
+                    return StorageType::Hdd;
+                }
+            }
+        }
+    }
+    StorageType::Ssd
+}
+
+#[cfg(target_os = "macos")]
+fn detect_storage_type_internal() -> StorageType {
+    StorageType::Ssd
+}
+
+#[cfg(not(any(target_os = "windows", target_os = "linux", target_os = "macos")))]
+fn detect_storage_type_internal() -> StorageType {
+    StorageType::Unknown
+}
+
+lazy_static::lazy_static! {
+    pub static ref DETECTED_STORAGE: StorageInfo = {
+        let st = detect_storage_type_internal();
+        let is_ssd = matches!(st, StorageType::Ssd);
+        StorageInfo {
+            storage_type: st,
+            is_ssd,
+            recommended_buffer_size: if is_ssd { 64 * 1024 } else { 256 * 1024 },
+            mmap_recommended_size: if is_ssd { 268_435_456 } else { 0 },
+        }
+    };
+}
+
+/// Comando Tauri: Obtener información del almacenamiento subyacente y buffers recomendados
+#[tauri::command]
+pub fn get_storage_info() -> StorageInfo {
+    DETECTED_STORAGE.clone()
+}
+
+/// Comando Tauri: Calcular hash SHA-256 de un archivo en disco mediante streaming.
+/// Adapta el tamaño del buffer al tipo de medio (256 KB para HDD, 64 KB para SSD).
 #[tauri::command]
 pub fn calculate_file_hash(file_path: String) -> Result<String, String> {
     let path = Path::new(&file_path);
@@ -46,9 +125,10 @@ pub fn calculate_file_hash(file_path: String) -> Result<String, String> {
     }
 
     let file = File::open(path).map_err(|e| format!("No se pudo abrir el archivo: {}", e))?;
-    let mut reader = BufReader::with_capacity(64 * 1024, file);
+    let buf_size = DETECTED_STORAGE.recommended_buffer_size;
+    let mut reader = BufReader::with_capacity(buf_size, file);
     let mut hasher = Sha256::new();
-    let mut buffer = [0u8; 64 * 1024];
+    let mut buffer = vec![0u8; buf_size];
 
     loop {
         let bytes_read = reader

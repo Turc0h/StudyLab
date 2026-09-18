@@ -9,7 +9,7 @@
 
 import { pdfjsLib } from "../../lib/pdf";
 import { convertFileSrc, isDesktop } from "../../platform";
-import { indexDocumentPageFts, removeDocumentPagesFts } from "../../platform/ftsSearch";
+import { indexDocumentPagesBatchFts, removeDocumentPagesFts } from "../../platform/ftsSearch";
 
 export interface OcrJobOptions {
   maxScale?: number;
@@ -74,6 +74,14 @@ export async function runDocumentOcrJob(
     pdfDoc = await loadingTask.promise;
     const totalPages = pdfDoc.numPages;
 
+    const pendingFtsBatch: Array<{
+      documentId: string;
+      filePath: string;
+      fileName: string;
+      pageNumber: number;
+      content: string;
+    }> = [];
+
     for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
       // 3. Verificación de cancelación cooperativa
       if (options?.isCancelled && options.isCancelled()) {
@@ -97,14 +105,13 @@ export async function runDocumentOcrJob(
         if (nativeStrings.length > 50) {
           // Bypass inteligente: usar texto digital existente sin ejecutar Tesseract
           nativePagesCount++;
-          await indexDocumentPageFts({
+          pendingFtsBatch.push({
             documentId,
             filePath,
             fileName,
             pageNumber: pageNum,
             content: nativeStrings,
           });
-          indexedPagesCount++;
         } else {
           // 5. Página escaneada: Requiere OCR con Tesseract
           ocrPagesCount++;
@@ -135,16 +142,22 @@ export async function runDocumentOcrJob(
             const extractedText = ret.data.text.trim();
 
             if (extractedText.length > 0) {
-              await indexDocumentPageFts({
+              pendingFtsBatch.push({
                 documentId,
                 filePath,
                 fileName,
                 pageNumber: pageNum,
                 content: extractedText,
               });
-              indexedPagesCount++;
             }
           }
+        }
+
+        // Si acumulamos 10 páginas, vaciar lote en una única transacción SQLite
+        if (pendingFtsBatch.length >= 10) {
+          await indexDocumentPagesBatchFts(pendingFtsBatch);
+          indexedPagesCount += pendingFtsBatch.length;
+          pendingFtsBatch.length = 0;
         }
       } catch (pageErr) {
         console.warn(`[OcrJobRunner] Advertencia en pág ${pageNum} de ${fileName}:`, pageErr);
@@ -169,6 +182,13 @@ export async function runDocumentOcrJob(
 
       // 8. Yield cooperativo al loop de eventos (15ms)
       await new Promise((r) => setTimeout(r, 15));
+    }
+
+    // Vaciar páginas restantes en lote final
+    if (pendingFtsBatch.length > 0) {
+      await indexDocumentPagesBatchFts(pendingFtsBatch);
+      indexedPagesCount += pendingFtsBatch.length;
+      pendingFtsBatch.length = 0;
     }
 
     return {
