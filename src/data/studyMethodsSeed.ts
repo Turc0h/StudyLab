@@ -144,7 +144,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Enfoca tu siguiente sesión de repaso exclusivamente en las lagunas descubiertas.",
     ],
     scientificBasis: "Karpicke & Blunt (2011) • Retrieval Practice Produces More Learning than Elaborative Studying with Concept Mapping.",
-    implemented: false,
+    integratesWith: ["session-engine", "fsrs"],
+    implemented: true,
   },
 
   // 8. Mapas Mentales
@@ -508,8 +509,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Navega la red de notas para detectar patrones y redactar artículos a partir de las agrupaciones naturales.",
     ],
     scientificBasis: "Niklas Luhmann / Sönke Ahrens (2017) • How to Take Smart Notes: One Simple Technique to Boost Your Writing.",
-    integratesWith: ["knowledge-graph"],
-    implemented: false,
+    integratesWith: ["knowledge-graph", "session-engine"],
+    implemented: true,
   },
 
   // 26. Método PQ4R

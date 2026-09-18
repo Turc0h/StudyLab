@@ -1,23 +1,147 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { db } from "../../db/db";
 import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
 import { Badge } from "../../components/ui/Badge";
-import { Check, AlertCircle, Sparkles } from "lucide-react";
+import { Check, AlertCircle, Sparkles, Mic, MicOff, Cpu, Loader2 } from "lucide-react";
 import type { TextIntakeDraft } from "./types";
 import { parseTextIntakeRules } from "./textIntakeParser";
+import { checkOllamaStatus, generateOllamaCompletion, type OllamaStatus } from "../../platform/ai/ollamaClient";
 
 export const UnifiedTextIntake: React.FC = () => {
   const [inputText, setInputText] = useState("");
   const [draft, setDraft] = useState<TextIntakeDraft | null>(null);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
-  const handleProcessInput = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Fase 4: Estado del asistente local de Ollama
+  const [ollamaStatus, setOllamaStatus] = useState<OllamaStatus | null>(null);
+  const [isProcessingAI, setIsProcessingAI] = useState(false);
+
+  // Fase 3: Dictado de voz en cliente
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  // Verificar en segundo plano disponibilidad de Ollama sin bloquear
+  useEffect(() => {
+    void checkOllamaStatus().then(setOllamaStatus);
+  }, []);
+
+  // Inicializar motor de reconocimiento de voz del navegador si está soportado
+  useEffect(() => {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = "es-ES";
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0]?.[0]?.transcript;
+        if (transcript) {
+          setInputText((prev) => (prev ? `${prev} ${transcript}` : transcript));
+        }
+        setIsListening(false);
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch {
+          // ignore
+        }
+      }
+    };
+  }, []);
+
+  const handleToggleVoice = () => {
+    if (!recognitionRef.current) {
+      alert("El reconocimiento de voz no está soportado en este entorno de navegador o WebView.");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      try {
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch (e) {
+        console.warn("Error al iniciar reconocimiento de voz:", e);
+        setIsListening(false);
+      }
+    }
+  };
+
+  // Procesamiento por reglas deterministas (estándar v5.1)
+  const handleProcessInput = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!inputText.trim()) return;
 
     const parsed = parseTextIntakeRules(inputText.trim());
     setDraft(parsed);
+  };
+
+  // Procesamiento con IA Local Ollama (Fase 4 v5.3)
+  const handleProcessWithOllama = async () => {
+    if (!inputText.trim()) return;
+    setIsProcessingAI(true);
+
+    try {
+      const prompt = `Analiza la siguiente entrada de estudio libre y clasifícala. Devuelve EXCLUSIVAMENTE un JSON válido (sin explicaciones ni formato markdown adicional) con este esquema exacto:
+{
+  "title": "título conciso y claro de la tarea, examen o apunte",
+  "detectedType": "task" | "calendar_event" | "quick_note",
+  "suggestedDate": "YYYY-MM-DD o null si no se menciona fecha"
+}
+Texto del estudiante: "${inputText.trim()}"`;
+
+      const activeModel = ollamaStatus?.models[0]?.name || "llama3.2";
+      const rawResponse = await generateOllamaCompletion(prompt, {
+        model: activeModel,
+        temperature: 0.2,
+      });
+
+      // Intentar extraer JSON de la respuesta del modelo
+      const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsedJson = JSON.parse(jsonMatch[0]);
+        setDraft({
+          id: `draft_${Date.now()}`,
+          rawText: inputText.trim(),
+          title: parsedJson.title || inputText.trim().slice(0, 50),
+          detectedType: ["task", "calendar_event", "quick_note"].includes(parsedJson.detectedType)
+            ? parsedJson.detectedType
+            : "task",
+          suggestedDate: parsedJson.suggestedDate && parsedJson.suggestedDate !== "null"
+            ? parsedJson.suggestedDate
+            : undefined,
+          isConfirmed: false,
+        });
+      } else {
+        // Fallback a reglas si el modelo no devolvió JSON puro
+        handleProcessInput();
+      }
+    } catch (err) {
+      console.warn("Fallo en inferencia Ollama, recurriendo a analizador por reglas:", err);
+      handleProcessInput();
+    } finally {
+      setIsProcessingAI(false);
+    }
   };
 
   const handleConfirmAndSave = async () => {
@@ -43,27 +167,76 @@ export const UnifiedTextIntake: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h3 className="font-serif text-base font-semibold text-text-primary">
-          Entrada Unificada de Texto (Embudo Rápido)
-        </h3>
-        <p className="text-xs text-text-secondary">
-          Escribí libremente una idea, entrega o evento; el sistema sugerirá la clasificación para que la confirmes antes de guardar.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="font-serif text-base font-semibold text-text-primary">
+            Entrada Unificada de Texto (Embudo Rápido)
+          </h3>
+          <p className="text-xs text-text-secondary">
+            Escribí o dictá libremente una idea, entrega o evento; el sistema sugerirá la clasificación para que la confirmes antes de guardar.
+          </p>
+        </div>
+        {ollamaStatus?.isRunning && (
+          <Badge variant="success">Ollama Local Activo</Badge>
+        )}
       </div>
 
-      <form onSubmit={handleProcessInput} className="flex gap-2">
-        <input
-          type="text"
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          placeholder="ej: Entregar informe de Química el viernes a las 18hs o Repasar Parcial de Álgebra"
-          className="flex-1 rounded border border-border-subtle bg-bg-primary px-3 py-2 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary"
-        />
-        <Button variant="primary" size="sm" type="submit" disabled={!inputText.trim()} className="text-xs flex items-center gap-1.5">
-          <Sparkles className="h-3.5 w-3.5" />
-          <span>Analizar</span>
-        </Button>
+      <form onSubmit={(e) => handleProcessInput(e)} className="flex flex-col sm:flex-row gap-2">
+        <div className="relative flex-1">
+          <input
+            type="text"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder="ej: Entregar informe de Química el viernes a las 18hs o Repasar Parcial de Álgebra"
+            className="w-full rounded border border-border-subtle bg-bg-primary pl-3 pr-9 py-2 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary"
+          />
+          {/* Botón de Dictado de Voz (Fase 3) */}
+          <button
+            type="button"
+            onClick={handleToggleVoice}
+            title={isListening ? "Detener dictado de voz" : "Dictar por voz"}
+            className={`absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded transition-colors ${
+              isListening
+                ? "text-red-500 animate-pulse bg-red-500/10"
+                : "text-text-muted hover:text-accent-primary"
+            }`}
+          >
+            {isListening ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
+          </button>
+        </div>
+
+        <div className="flex gap-2">
+          {/* Analizador por Reglas (Determinista) */}
+          <Button
+            variant="primary"
+            size="sm"
+            type="submit"
+            disabled={!inputText.trim() || isProcessingAI}
+            className="text-xs flex items-center gap-1.5"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>Analizar (Reglas)</span>
+          </Button>
+
+          {/* Analizador con IA Local Ollama (Fase 4) */}
+          {ollamaStatus?.isRunning && (
+            <Button
+              variant="outline"
+              size="sm"
+              type="button"
+              onClick={handleProcessWithOllama}
+              disabled={!inputText.trim() || isProcessingAI}
+              className="text-xs flex items-center gap-1.5 border-accent-primary/30 text-accent-primary hover:bg-accent-primary/10"
+            >
+              {isProcessingAI ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Cpu className="h-3.5 w-3.5" />
+              )}
+              <span>{isProcessingAI ? "Pensando..." : "IA Local"}</span>
+            </Button>
+          )}
+        </div>
       </form>
 
       {savedSuccess && (

@@ -51,6 +51,12 @@ const CornellMethod = lazy(() =>
 const MockExamMethod = lazy(() =>
   import("../components/study-methods/MockExamMethod").then((m) => ({ default: m.MockExamMethod })),
 );
+const ZettelkastenMethod = lazy(() =>
+  import("../components/study-methods/ZettelkastenMethod").then((m) => ({ default: m.ZettelkastenMethod })),
+);
+const BlurtingMethod = lazy(() =>
+  import("../components/study-methods/BlurtingMethod").then((m) => ({ default: m.BlurtingMethod })),
+);
 
 const CATEGORIES = [
   { id: "all", label: "Todas las Categorías" },
@@ -156,6 +162,10 @@ export const MethodsPage: React.FC = () => {
         case "practice-testing":
         case "mock-tests":
           return <MockExamMethod onSessionFinished={handleBackToCatalog} />;
+        case "zettelkasten":
+          return <ZettelkastenMethod onSessionFinished={handleBackToCatalog} />;
+        case "blurting":
+          return <BlurtingMethod onSessionFinished={handleBackToCatalog} />;
         default:
           return (
             <div className="p-8 text-center space-y-4">

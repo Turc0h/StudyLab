@@ -768,6 +768,45 @@ Transformación de StudyLab en un motor de conocimiento universitario de alta pr
 
 ---
 
+## Expansión StudyLab v5.3 — Cognición con Ollama, Dictado de Voz y Runners de Zettelkasten y Blurting
+
+Esta versión completa las Fases 3 y 4 del Context Engine y expande el catálogo de métodos interactivos a 9 herramientas prácticas funcionales.
+
+### 1. Context Engine Fase 4: Asistente Cognitivo Local con Ollama
+- **Inferencia LLM Segura (`UnifiedTextIntake.tsx`)**:
+  - Si el demonio local Ollama está activo (`http://localhost:11434`), procesa el texto ingresado usando `llama3.2` mediante un prompt que extrae un objeto JSON estricto (`title`, `type`: task/event/note, `urgency`, `targetDate`, `tags`).
+  - **Degradación Elegante**: Si Ollama no está corriendo, recurre de forma transparente al motor de reglas regex (`parseTextIntakeRules`), garantizando cero bloqueos o errores de red.
+  - **Cero Automatizaciones Silenciosas**: Siempre genera un borrador no confirmado (`isConfirmed: false`) en una tarjeta de previsualización interactiva donde el usuario puede editar los campos antes de guardar.
+
+### 2. Context Engine Fase 3: Dictado por Voz Offline en Cliente
+- **Speech Recognition Nativo**:
+  - Implementado con la Web Speech API del navegador (`webkitSpeechRecognition` / `SpeechRecognition`) en modo `lang: "es-ES"`.
+  - Transcripción reactiva en tiempo real con botón de micrófono animado e indicador visual de escucha.
+  - No requiere API keys ni servidores en la nube de terceros.
+
+### 3. Nuevos Runners Interactivos de Métodos de Estudio
+- **Zettelkasten Académico (`ZettelkastenMethod.tsx`)**:
+  - **Identificador atómico**: Genera códigos de tiempo canónicos (ej. `202609182005`).
+  - **Enlaces wiki bidireccionales**: Detección automática en vivo de sintaxis `[[título]]` y tags `#etiqueta`.
+  - **Panel de red asociativa**: Muestra visualmente las conexiones salientes y sugerencias de vinculación con el grafo de conocimiento.
+  - Persistencia directa en Dexie (`studySessions`).
+- **Blurting / Vaciado Mental (`BlurtingMethod.tsx`)**:
+  - **Fase 1 (Lectura/Carga)**: Estudio enfocado del material con cronómetro de preparación.
+  - **Fase 2 (Vaciado a Ciegas)**: Ocultamiento total del apunte original y escritura de memoria libre bajo presión de tiempo.
+  - **Fase 3 (Auditoría de Lagunas)**: Vista comparativa lado a lado entre el texto original y la evocación, con categorización de conceptos recordados vs olvidados y derivación directa al algoritmo FSRS.
+
+### 4. Estado Global de Métodos (30 Métodos Totales)
+- **9 Runners Interactivos Funcionales**: Feynman, SQ3R, Pomodoro, Recuerdo Activo, Interleaving, Cornell, Simulacros de Examen, Zettelkasten y Blurting.
+- **21 Fichas Científicas Prácticas**: Con fundamentación cognitiva, fases paso a paso y conexiones de navegación hacia FSRS y Knowledge Graph.
+
+### 5. Suite de Verificación Automatizada (16 Suites)
+- `scripts/test-phase3-cognition.mjs`: 20/20 pruebas aprobadas (Ollama intake, dictado, contratos Zettelkasten y Blurting).
+- `scripts/test-study-methods-catalog.mjs`: 18/18 pruebas aprobadas (9 runners activos + 21 teóricos).
+- `npm test`: 16 suites ejecutadas en 6.8s con 100% de éxito.
+- `npm run build`: compilación limpia en 4.41s.
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

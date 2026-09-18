@@ -9,7 +9,9 @@ export type StudyMethodId =
   | "elaborative-interrogation"
   | "cornell"
   | "mock-tests"
-  | "practice-testing";
+  | "practice-testing"
+  | "zettelkasten"
+  | "blurting";
 
 export interface StudyMethodInfo {
   id: StudyMethodId;
