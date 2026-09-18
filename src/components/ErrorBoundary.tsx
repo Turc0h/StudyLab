@@ -84,3 +84,37 @@ export class ErrorBoundary extends Component<Props, State> {
     return this.props.children;
   }
 }
+
+export function RouteErrorBoundary() {
+  return (
+    <div className="flex flex-col items-center justify-center p-8 text-center min-h-[360px] my-auto">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 mb-3">
+        <AlertTriangle size={24} strokeWidth={1.75} />
+      </div>
+      <h2 className="font-serif text-lg font-semibold text-text-primary mb-1">
+        No se pudo cargar este módulo
+      </h2>
+      <p className="text-xs text-text-muted max-w-md mb-4">
+        Ocurrió un detalle al inicializar los datos de esta vista. Podés reintentar la carga o volver al inicio.
+      </p>
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-md border border-border-subtle bg-bg-elevated text-xs font-sans text-text-primary hover:border-accent-primary transition-colors cursor-pointer"
+        >
+          <RefreshCw size={13} />
+          <span>Reintentar</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => { window.location.href = "/"; }}
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-accent-primary text-white text-xs font-sans hover:bg-accent-hover transition-colors cursor-pointer"
+        >
+          <Home size={13} />
+          <span>Ir al Inicio</span>
+        </button>
+      </div>
+    </div>
+  );
+}

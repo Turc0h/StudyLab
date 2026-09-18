@@ -7,6 +7,8 @@
   ],
   "permissions": [
     "core:default",
-    "sql:default"
+    "sql:default",
+    "dialog:default",
+    "dialog:allow-open"
   ]
 }

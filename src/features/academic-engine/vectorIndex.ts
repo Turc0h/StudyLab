@@ -1,5 +1,6 @@
-import { db, type AcademicChunkRecord, type AcademicSourceRecord, type AcademicBoundingBox } from "../../db/db";
-import { computeEmbeddingVector } from "./embeddings/embeddingManager";
+import { db, type AcademicChunkRecord, type AcademicSourceRecord, type AcademicBoundingBox, type CardFsrsRecord } from "../../db/db";
+import { computeEmbeddingVector, computeFallbackProjection } from "./embeddings/embeddingManager";
+import { extractSparseTokens } from "./academicChunker";
 import { isDesktop, searchFtsAcademicChunks } from "../../platform";
 
 export interface SearchResult {
@@ -352,25 +353,114 @@ export async function searchAcademicKnowledgeWithEvidence(params: {
  * Seeds sample university textbook and lecture notes if none exist in IndexedDB.
  */
 export async function seedAcademicSources(): Promise<void> {
-  const existing = await db.academicSources.count();
-  if (existing > 0) return;
-
   const now = Date.now();
+  const sourceId = "src-penrose-quantum-physics";
 
-  const source1: AcademicSourceRecord = {
-    id: "src-penrose-quantum-physics",
-    subjectId: "fisica-3",
-    professorId: "Dr. Roger Penrose",
-    career: "Lic. en Física / Ingeniería",
-    year: 2026,
-    semester: "1C",
-    title: "Física III: Fundamentos de Electrodinámica y Mecánica Cuántica",
-    documentType: "textbook",
-    pageCount: 68,
-    ocrProcessed: true,
-    chunkCount: 8,
-    createdAt: now,
-  };
+  const existing = await db.academicSources.get(sourceId);
+  const existingChunks = await db.academicChunks.where("sourceId").equals(sourceId).count();
 
-  await db.academicSources.put(source1);
+  if (!existing) {
+    const source1: AcademicSourceRecord = {
+      id: sourceId,
+      subjectId: "fisica-3",
+      professorId: "Dr. Roger Penrose",
+      career: "Lic. en Física / Ingeniería",
+      year: 2026,
+      semester: "1C",
+      title: "Física III: Fundamentos de Electrodinámica y Mecánica Cuántica",
+      documentType: "textbook",
+      pageCount: 3,
+      ocrProcessed: true,
+      chunkCount: 3,
+      createdAt: now,
+    };
+    await db.academicSources.put(source1);
+  }
+
+  // Populate chunks if missing
+  if (existingChunks === 0) {
+    const sampleChunks: AcademicChunkRecord[] = [
+      {
+        id: `chk_${sourceId}_p1_0`,
+        sourceId,
+        subjectId: "fisica-3",
+        chunkType: "definition",
+        title: "Definición 1.1 — Campo Electromagnético Clásico",
+        hierarchyPath: "Física III > Capítulo 1: Electrodinámica > Campo Electromagnético",
+        pageNumber: 1,
+        paragraphIndex: 1,
+        rawContent: "Definición 1.1 (Campo Electromagnético Clásico):\nSe define el tensor de campo electromagnético $F^{\\mu\\nu} = \\partial^\\mu A^\\nu - \\partial^\\nu A^\\mu$ en términos del cuatro-potencial $A^\\mu = (\\phi/c, \\mathbf{A})$. Las ecuaciones homogéneas de Maxwell se expresan como $\\partial_\\lambda F_{\\mu\\nu} + \\partial_\\mu F_{\\nu\\lambda} + \\partial_\\nu F_{\\lambda\\mu} = 0$.",
+        latexFormulas: [
+          "F^{\\mu\\nu} = \\partial^\\mu A^\\nu - \\partial^\\nu A^\\mu",
+          "\\partial_\\lambda F_{\\mu\\nu} + \\partial_\\mu F_{\\nu\\lambda} + \\partial_\\nu F_{\\lambda\\mu} = 0",
+        ],
+        boundingBox: { x: 0.1, y: 0.15, width: 0.8, height: 0.2 },
+        denseVector: computeFallbackProjection("Definición Campo Electromagnetico Clasico Maxwell", 64),
+        sparseTokens: extractSparseTokens("definicion campo electromagnetico clasico maxwell tensor"),
+        createdAt: now,
+      },
+      {
+        id: `chk_${sourceId}_p1_1`,
+        sourceId,
+        subjectId: "fisica-3",
+        chunkType: "theorem",
+        title: "Teorema 1.2 — Conservación de la Carga y Continuidad",
+        hierarchyPath: "Física III > Capítulo 1: Electrodinámica > Ecuación de Continuidad",
+        pageNumber: 1,
+        paragraphIndex: 2,
+        rawContent: "Teorema 1.2 (Ecuación de Continuidad Local):\nLa conservación local de la carga eléctrica exige que la cuatro-divergencia de la densidad de corriente se anule idénticamente: $\\partial_\\mu J^\\mu = 0$, lo que en forma tridimensional equivale a $\\nabla \\cdot \\mathbf{J} + \\frac{\\partial \\rho}{\\partial t} = 0$.",
+        latexFormulas: [
+          "\\partial_\\mu J^\\mu = 0",
+          "\\nabla \\cdot \\mathbf{J} + \\frac{\\partial \\rho}{\\partial t} = 0",
+        ],
+        boundingBox: { x: 0.1, y: 0.4, width: 0.8, height: 0.25 },
+        denseVector: computeFallbackProjection("Teorema Ecuacion Continuidad Local Carga Electrica", 64),
+        sparseTokens: extractSparseTokens("teorema ecuacion continuidad local carga electrica divergencia"),
+        createdAt: now,
+      },
+      {
+        id: `chk_${sourceId}_p1_2`,
+        sourceId,
+        subjectId: "fisica-3",
+        chunkType: "proof",
+        title: "Demostración — Deducción a partir de la Invarianza Gauge",
+        hierarchyPath: "Física III > Capítulo 1: Electrodinámica > Deducción de Continuidad",
+        pageNumber: 1,
+        paragraphIndex: 3,
+        rawContent: "Demostración:\nAplicando la divergencia a la ley de Maxwell no homogénea $\\partial_\\nu F^{\\nu\\mu} = \\mu_0 J^\\mu$, y notando que $\\partial_\\mu \\partial_\\nu$ es un operador simétrico contra el tensor antisimétrico $F^{\\nu\\mu}$, se concluye inmediatamente que $\\partial_\\mu J^\\mu = \\frac{1}{\\mu_0} \\partial_\\mu \\partial_\\nu F^{\\nu\\mu} = 0$. Q.E.D.",
+        latexFormulas: [
+          "\\partial_\\nu F^{\\nu\\mu} = \\mu_0 J^\\mu",
+          "\\partial_\\mu J^\\mu = \\frac{1}{\\mu_0} \\partial_\\mu \\partial_\\nu F^{\\nu\\mu} = 0",
+        ],
+        boundingBox: { x: 0.1, y: 0.7, width: 0.8, height: 0.2 },
+        denseVector: computeFallbackProjection("Demostración Deduccion Continuidad Invarianza Gauge", 64),
+        sparseTokens: extractSparseTokens("demostracion deduccion continuidad invarianza gauge maxwell"),
+        createdAt: now,
+      },
+    ];
+
+    await db.academicChunks.bulkPut(sampleChunks);
+  }
+
+  // Seed sample FSRS flashcard for cognitive repetition
+  const cardCount = await db.cardsFsrs.count();
+  if (cardCount === 0) {
+    const sampleCard: CardFsrsRecord = {
+      id: "card_seed_penrose_1",
+      deckId: `deck_${sourceId}`,
+      conceptId: "fisica-3",
+      front: "¿Cuál es la formulación covariante cuatridimensional de la ecuación de continuidad para la corriente eléctrica?",
+      back: "$\\partial_\\mu J^\\mu = 0$, que en coordenadas espaciotemporales equivale a $\\nabla \\cdot \\mathbf{J} + \\frac{\\partial \\rho}{\\partial t} = 0$.",
+      state: "review",
+      stability: 4.2,
+      difficulty: 4.8,
+      reps: 2,
+      lapses: 0,
+      lastReview: now - 86400000,
+      dueDate: now,
+      halfLife: 4.2,
+      createdAt: now,
+    };
+    await db.cardsFsrs.put(sampleCard);
+  }
 }

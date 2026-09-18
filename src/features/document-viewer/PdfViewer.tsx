@@ -155,12 +155,16 @@ function PdfPage({
             );
 
             if (hasRealText) {
-              const textLayer = new pdfjsLib.TextLayer({
-                textContentSource: textContent,
-                container: textLayerDiv,
-                viewport,
-              });
-              await textLayer.render();
+              try {
+                const textLayer = new pdfjsLib.TextLayer({
+                  textContentSource: textContent,
+                  container: textLayerDiv,
+                  viewport,
+                });
+                await textLayer.render();
+              } catch (textLayerErr) {
+                console.warn("No se pudo renderizar la capa de texto:", textLayerErr);
+              }
             } else if (ocrLines && ocrLines.length > 0) {
               for (const line of ocrLines) {
                 const span = document.createElement("span");
@@ -252,7 +256,7 @@ function PdfPage({
   );
 }
 
-import { convertFileSrc, isDesktop } from "../../platform";
+import { convertFileSrc, isDesktop, readFileBytes } from "../../platform";
 
 interface PdfViewerProps {
   blob?: Blob;
@@ -304,20 +308,33 @@ export function PdfViewer({
 
     (async () => {
       try {
-        if (filePath && isDesktop()) {
-          const assetUrl = convertFileSrc(filePath);
-          loadingTask = pdfjsLib.getDocument({
-            url: assetUrl,
-            rangeChunkSize: 65536,
-            disableAutoFetch: true,
-          });
-        } else if (blob) {
-          const arrayBuffer = await blob.arrayBuffer();
-          loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-        } else {
-          return;
+        let arrayBuffer: ArrayBuffer | null = null;
+        if (blob) {
+          arrayBuffer = await blob.arrayBuffer();
+        } else if (filePath && isDesktop()) {
+          try {
+            const bytes = await readFileBytes(filePath);
+            if (bytes) {
+              arrayBuffer = (bytes.buffer as ArrayBuffer).slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+            }
+          } catch (readErr) {
+            console.warn("Lectura nativa falló, intentando convertFileSrc:", readErr);
+          }
+
+          if (!arrayBuffer) {
+            const assetUrl = convertFileSrc(filePath);
+            const resp = await fetch(assetUrl);
+            if (!resp.ok) throw new Error(`HTTP error ${resp.status}`);
+            arrayBuffer = await resp.arrayBuffer();
+          }
+        } else if (filePath) {
+          const resp = await fetch(filePath);
+          if (!resp.ok) throw new Error(`HTTP error ${resp.status}`);
+          arrayBuffer = await resp.arrayBuffer();
         }
 
+        if (!arrayBuffer || cancelled) return;
+        loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
         const doc = await loadingTask.promise;
         if (cancelled) {
           void doc.cleanup();

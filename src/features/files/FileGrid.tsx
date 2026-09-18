@@ -15,11 +15,13 @@ import {
 } from "./fileHelpers";
 import {
   isDesktop,
+  readFileBytes,
   revealInExplorer,
   saveBufferToLibrary,
   searchFtsDocuments,
   type FtsDocumentResult,
 } from "../../platform";
+import { Skeleton } from "../../components/ui/Skeleton";
 
 function FolderCard({
   folder,
@@ -244,6 +246,26 @@ function FtsResultCard({
   );
 }
 
+function FileGridSkeleton() {
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 motion-layer">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div
+          key={i}
+          className="rounded-lg border border-border-subtle bg-bg-elevated p-4 flex flex-col gap-3 shadow-2xs"
+        >
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-8 w-8 rounded-md" />
+            <Skeleton className="h-4 w-12 rounded-full" />
+          </div>
+          <Skeleton className="h-4 w-3/4 mt-1" />
+          <Skeleton className="h-3 w-1/2" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export type FileSortBy = "name" | "createdAt" | "size" | "status";
 export type FileSortOrder = "asc" | "desc";
 export type FileFilterStatus = "all" | "pending" | "completed";
@@ -271,8 +293,11 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
   const [isSearchingFts, setIsSearchingFts] = useState(false);
   const [searchTab, setSearchTab] = useState<"all" | "files" | "content">("all");
 
-  const allFolders = useLiveQuery(() => db.folders.toArray(), []) ?? [];
-  const allFiles = useLiveQuery(() => db.files.toArray(), []) ?? [];
+  const foldersLoaded = useLiveQuery(() => db.folders.toArray(), []);
+  const filesLoaded = useLiveQuery(() => db.files.toArray(), []);
+  const allFolders = foldersLoaded ?? [];
+  const allFiles = filesLoaded ?? [];
+  const isInitialLoading = foldersLoaded === undefined && filesLoaded === undefined;
 
   const query = searchQuery.trim().toLowerCase();
   const isSearching = query.length > 0;
@@ -347,7 +372,7 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
     });
   }, [rawFiles, sortBy, sortOrder, filterStatus]);
 
-  async function handleUpload(fileList: FileList | null) {
+  async function handleUpload(fileList: FileList | null | File[]) {
     if (!fileList || fileList.length === 0 || folderId === null) return;
     const now = Date.now();
     for (const file of Array.from(fileList)) {
@@ -385,10 +410,114 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
     }
   }
 
+  // Disparar selector nativo en Desktop o input tradicional en Web
+  async function handleOpenFilePicker() {
+    if (isDesktop()) {
+      try {
+        const { open } = await import("@tauri-apps/plugin-dialog");
+        const selected = await open({
+          title: "Seleccionar archivos para la biblioteca",
+          multiple: true,
+          directory: false,
+        });
+
+        if (!selected) return;
+
+        const paths = Array.isArray(selected) ? selected : [selected];
+        const files: File[] = [];
+
+        for (const filePath of paths) {
+          const name = filePath.split(/[/\\]/).pop() || "documento";
+          try {
+            const bytes = await readFileBytes(filePath);
+            let blob: Blob;
+            if (bytes) {
+              blob = new Blob([bytes.buffer as ArrayBuffer], {
+                type: name.toLowerCase().endsWith(".pdf") ? "application/pdf" : "application/octet-stream",
+              });
+            } else {
+              const { convertFileSrc } = await import("@tauri-apps/api/core");
+              const assetUrl = convertFileSrc(filePath);
+              const resp = await fetch(assetUrl);
+              blob = await resp.blob();
+            }
+            files.push(new File([blob], name, { type: blob.type }));
+          } catch (err) {
+            console.error("Error al leer archivo en FileGrid:", err);
+          }
+        }
+
+        if (files.length > 0) {
+          void handleUpload(files);
+        }
+      } catch (err) {
+        console.error("Error al abrir diálogo nativo en FileGrid:", err);
+        inputRef.current?.click();
+      }
+    } else {
+      inputRef.current?.click();
+    }
+  }
+
+  // Handle native Tauri OS drag & drop events (Windows Explorer)
+  useEffect(() => {
+    if (!isDesktop() || folderId === null) return;
+    let unlisten: (() => void) | undefined;
+    (async () => {
+      try {
+        const { getCurrentWebview } = await import("@tauri-apps/api/webview");
+        unlisten = await getCurrentWebview().onDragDropEvent(async (event) => {
+          if (event.payload.type === "over" || event.payload.type === "enter") {
+            setDragOver(true);
+          } else if (event.payload.type === "leave") {
+            setDragOver(false);
+          } else if (event.payload.type === "drop") {
+            setDragOver(false);
+            if (event.payload.paths && event.payload.paths.length > 0) {
+              const files: File[] = [];
+              for (const filePath of event.payload.paths) {
+                const name = filePath.split(/[/\\]/).pop() || "documento.pdf";
+                try {
+                  const bytes = await readFileBytes(filePath);
+                  let blob: Blob;
+                  if (bytes) {
+                    blob = new Blob([bytes.buffer as ArrayBuffer], {
+                      type: name.toLowerCase().endsWith(".pdf") ? "application/pdf" : "application/octet-stream",
+                    });
+                  } else {
+                    const { convertFileSrc } = await import("@tauri-apps/api/core");
+                    const assetUrl = convertFileSrc(filePath);
+                    const resp = await fetch(assetUrl);
+                    blob = await resp.blob();
+                  }
+                  files.push(new File([blob], name, { type: blob.type }));
+                } catch (err) {
+                  console.error("Error al leer archivo arrastrado en FileGrid:", err);
+                }
+              }
+              if (files.length > 0) {
+                void handleUpload(files);
+              }
+            }
+          }
+        });
+      } catch (err) {
+        console.warn("Tauri drag-drop listener no pudo registrarse en FileGrid:", err);
+      }
+    })();
+    return () => {
+      unlisten?.();
+    };
+  }, [folderId]);
+
   const canUploadHere = folderId !== null && !isSearching;
   const hasItems = isSearching
     ? sortedFiles.length > 0 || ftsResults.length > 0
     : childFolders.length > 0 || rawFiles.length > 0;
+
+  if (isInitialLoading) {
+    return <FileGridSkeleton />;
+  }
 
   return (
     <div
@@ -564,7 +693,7 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
           {canUploadHere && (
             <button
               type="button"
-              onClick={() => inputRef.current?.click()}
+              onClick={() => void handleOpenFilePicker()}
               className="text-sm font-medium text-accent hover:text-accent-hover"
             >
               Elegir archivo del dispositivo
@@ -581,7 +710,7 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
                   Archivos coincidentes ({sortedFiles.length})
                 </span>
               )}
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 virtual-content-list">
                 {sortedFiles.map((file) => (
                   <FileCard
                     key={file.id}
@@ -606,7 +735,7 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
                   Fragmentos en contenido de documentos ({ftsResults.length})
                 </span>
               )}
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 virtual-content-list">
                 {ftsResults.map((res, idx) => {
                   const matchingFile = allFiles.find(
                     (f) => f.id === res.document_id || f.name === res.file_name
@@ -625,7 +754,7 @@ export function FileGrid({ folderId, searchQuery, onOpenFolder, onOpenFile }: Fi
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 virtual-content-list">
           {filterStatus === "all" &&
             childFolders.map((folder) => (
               <FolderCard

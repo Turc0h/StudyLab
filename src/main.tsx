@@ -1,6 +1,10 @@
-import "@fontsource-variable/space-grotesk";
 import "@fontsource-variable/inter";
+import "@fontsource-variable/space-grotesk";
 import "@fontsource-variable/jetbrains-mono";
+import "@fontsource/source-serif-4/400.css";
+import "@fontsource/source-serif-4/600.css";
+import "@fontsource/lora/400.css";
+import "@fontsource/lora/600.css";
 import "./index.css";
 
 import { StrictMode } from "react";

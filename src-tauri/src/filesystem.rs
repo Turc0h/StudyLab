@@ -179,6 +179,18 @@ pub fn file_exists(path: String) -> bool {
     Path::new(&path).exists()
 }
 
+/// Comando Tauri: Leer archivo completo de disco como bytes binarios
+#[tauri::command]
+pub fn read_file_bytes(path: String) -> Result<Vec<u8>, String> {
+    let thread_name = std::thread::current().name().unwrap_or("unnamed").to_string();
+    tracing::info!(thread = %thread_name, path = %path, "read_file_bytes invocado");
+    let p = Path::new(&path);
+    if !p.exists() {
+        return Err(format!("El archivo no existe: {}", path));
+    }
+    fs::read(p).map_err(|e| format!("Error al leer archivo {}: {}", path, e))
+}
+
 /// Comando Tauri: Revelar archivo en el Explorador de archivos de Windows
 #[tauri::command]
 pub fn show_in_folder(path: String) -> Result<(), String> {

@@ -1,7 +1,9 @@
 import React, { useEffect } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { motion } from "motion/react";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
+import { AnimatedOutlet } from "./AnimatedOutlet";
 import { GuideStatusBar } from "../guide/GuideStatusBar";
 import { OrganizationDrawer } from "../organization/OrganizationDrawer";
 import { NotificationCenter } from "../notifications/NotificationCenter";
@@ -9,8 +11,33 @@ import { useThemeStore } from "../../stores/useThemeStore";
 import { useFocusModeStore } from "../../stores/useFocusModeStore";
 import { useOrganizationStore } from "../../stores/useOrganizationStore";
 import { useNotificationStore } from "../../stores/useNotificationStore";
+import { EASE_EXPO_OUT, DURATION, STAGGER } from "../../lib/motion-tokens";
 import { Minimize2 } from "lucide-react";
 import { clsx } from "clsx";
+
+const shellVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: STAGGER.base,
+      delayChildren: 0.05,
+    },
+  },
+};
+
+const blockVariants = {
+  hidden: { opacity: 0, y: 8 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: DURATION.slow,
+      ease: EASE_EXPO_OUT,
+    },
+  },
+};
+
+let hasBooted = false;
 
 export const Shell: React.FC = () => {
   const theme = useThemeStore((s) => s.theme);
@@ -118,10 +145,21 @@ export const Shell: React.FC = () => {
     return { title: "Panel Principal", subtitle: "Registro de estudio, métricas cognitivas y progreso personal" };
   };
 
+  const isColdBoot = !hasBooted;
+  useEffect(() => {
+    hasBooted = true;
+  }, []);
+
   const meta = getPageMeta();
+  const shouldAnimate = animationsEnabled && !reducedMotion;
 
   return (
-    <div className="flex h-screen w-full bg-bg-primary text-text-primary overflow-hidden relative">
+    <motion.div
+      initial={isColdBoot && shouldAnimate ? "hidden" : false}
+      animate={shouldAnimate ? "visible" : false}
+      variants={shellVariants}
+      className="flex h-screen w-full bg-bg-primary text-text-primary overflow-hidden relative"
+    >
       {/* Botón flotante para salir del Modo Enfoque */}
       {isFocusMode && (
         <button
@@ -136,29 +174,36 @@ export const Shell: React.FC = () => {
       )}
 
       {/* Sidebar (oculto en Modo Enfoque) */}
-      {!isFocusMode && <Sidebar />}
+      {!isFocusMode && (
+        <motion.div variants={blockVariants} className="shrink-0 flex h-screen">
+          <Sidebar />
+        </motion.div>
+      )}
 
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Header (oculto en Modo Enfoque) */}
         {!isFocusMode && (
-          <Header
-            title={meta.title}
-            subtitle={meta.subtitle}
-            isDark={theme === "dark"}
-            onToggleTheme={toggleTheme}
-          />
+          <motion.div variants={blockVariants} className="shrink-0">
+            <Header
+              title={meta.title}
+              subtitle={meta.subtitle}
+              isDark={theme === "dark"}
+              onToggleTheme={toggleTheme}
+            />
+          </motion.div>
         )}
 
         {/* Contenido Principal con Fluid Layout Responsivo */}
         <main className={clsx("flex-1 overflow-y-auto transition-all", isFocusMode ? "p-4 md:p-8" : "p-4 md:p-6 lg:p-8")}>
-          <div
+          <motion.div
+            variants={blockVariants}
             className={clsx(
               "mx-auto w-full transition-all",
               isFocusMode ? "max-w-4xl" : "max-w-[1600px]",
             )}
           >
-            <Outlet />
-          </div>
+            <AnimatedOutlet />
+          </motion.div>
         </main>
       </div>
 
@@ -169,6 +214,6 @@ export const Shell: React.FC = () => {
       <NotificationCenter />
 
       <GuideStatusBar />
-    </div>
+    </motion.div>
   );
 };

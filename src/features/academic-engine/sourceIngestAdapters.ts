@@ -48,10 +48,18 @@ export async function pdfAdapter(params: {
       .map((item) => ("str" in item ? item.str : ""))
       .join(" ");
 
-    const paragraphs = pageString
+    let paragraphs = pageString
       .split(/\n{2,}|\.\s{2,}/)
       .map((p) => p.trim())
       .filter((p) => p.length >= 20);
+
+    if (paragraphs.length === 0) {
+      if (pageString.trim().length > 0) {
+        paragraphs = [pageString.trim()];
+      } else {
+        paragraphs = [`[Página ${pageNum} — Contenido gráfico o escaneado]`];
+      }
+    }
 
     paragraphs.forEach((pText, pIndex) => {
       const chunkId = `chk_${sourceId}_p${pageNum}_${pIndex}`;
@@ -84,10 +92,19 @@ export async function pdfAdapter(params: {
       });
     });
 
+    page.cleanup();
+
     if (onProgress) {
       onProgress(15 + Math.round((pageNum / pageCount) * 65));
     }
+
+    // Cooperative yielding to prevent UI thread lockup on large documents
+    if (pageNum % 2 === 0) {
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
   }
+
+  void pdfDoc.cleanup();
 
   const source: AcademicSourceRecord = {
     id: sourceId,

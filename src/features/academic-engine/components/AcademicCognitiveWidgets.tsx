@@ -22,19 +22,34 @@ import { AcademicKnowledgeGraphPanel } from "./AcademicKnowledgeGraphPanel";
 import { parseOcclusionCard } from "../../image-occlusion/occlusionEngine";
 import { ImageOcclusionViewer } from "../../image-occlusion/ImageOcclusionViewer";
 import {
-  Brain,
   CheckCircle,
   RotateCw,
   Sparkles,
-  Zap,
-  TrendingUp,
-  Clock,
   ShieldAlert,
   ArrowRight,
-  Target,
-  Share2,
   AlertTriangle,
 } from "lucide-react";
+
+interface MetricBarProps {
+  label: string;
+  value: string;
+  percent: number;
+}
+
+const MetricBar: React.FC<MetricBarProps> = ({ label, value, percent }) => (
+  <div className="space-y-1">
+    <div className="flex items-center justify-between text-[11px] font-mono">
+      <span className="text-[--text-secondary]">{label}</span>
+      <span className="text-[--text-primary] font-medium">{value}</span>
+    </div>
+    <div className="w-full bg-[--bg-panel] h-1.5 rounded-full overflow-hidden">
+      <div
+        className="h-full bg-[--accent-ink] rounded-full transition-all duration-300"
+        style={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
+      />
+    </div>
+  </div>
+);
 
 interface AcademicCognitiveWidgetsProps {
   activeSource: AcademicSourceRecord | null;
@@ -210,46 +225,46 @@ export const AcademicCognitiveWidgets: React.FC<AcademicCognitiveWidgetsProps> =
   return (
     <aside
       data-tour="cognitive-widgets"
-      className="w-full h-full flex flex-col bg-slate-950/80 backdrop-blur-xl border-l border-slate-800/80 shadow-2xl text-slate-100 overflow-hidden"
+      className="w-full h-full flex flex-col bg-[--bg-panel] border-l border-[--border-hairline] text-[--text-primary] overflow-hidden"
     >
-      {/* Header & Tabs */}
-      <div className="p-3 border-b border-slate-800/80 bg-slate-900/60 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Brain className="w-4 h-4 text-cyan-400 animate-pulse" />
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200 font-mono">
-            Cognitive Hub
-          </h3>
-        </div>
-        <div className="flex items-center gap-1 bg-slate-950/70 p-0.5 rounded-lg border border-slate-800">
+      {/* Header & Underline Tabs */}
+      <div className="p-3 border-b border-[--border-hairline] flex items-center justify-between">
+        <h3 className="text-xs font-serif font-semibold text-[--text-primary]">
+          Cognitive Hub
+        </h3>
+        <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={() => setActiveTab("fsrs")}
-            className={`px-2 py-1 text-[10px] font-mono rounded flex items-center gap-1 transition-all ${
+            className={`pb-1 text-xs font-sans transition-colors cursor-pointer border-b-2 ${
               activeTab === "fsrs"
-                ? "bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/40"
-                : "text-slate-400 hover:text-slate-200"
+                ? "border-[--accent-ink] text-[--text-primary] font-medium"
+                : "border-transparent text-[--text-secondary] hover:text-[--text-primary]"
             }`}
           >
-            <Zap className="w-3 h-3" /> FSRS
+            FSRS
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab("simulator")}
-            className={`px-2 py-1 text-[10px] font-mono rounded flex items-center gap-1 transition-all ${
+            className={`pb-1 text-xs font-sans transition-colors cursor-pointer border-b-2 ${
               activeTab === "simulator"
-                ? "bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40"
-                : "text-slate-400 hover:text-slate-200"
+                ? "border-[--accent-ink] text-[--text-primary] font-medium"
+                : "border-transparent text-[--text-secondary] hover:text-[--text-primary]"
             }`}
           >
-            <Target className="w-3 h-3" /> Sim
+            Sim
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab("graph")}
-            className={`px-2 py-1 text-[10px] font-mono rounded flex items-center gap-1 transition-all ${
+            className={`pb-1 text-xs font-sans transition-colors cursor-pointer border-b-2 ${
               activeTab === "graph"
-                ? "bg-purple-500/20 text-purple-300 font-bold border border-purple-500/40"
-                : "text-slate-400 hover:text-slate-200"
+                ? "border-[--accent-ink] text-[--text-primary] font-medium"
+                : "border-transparent text-[--text-secondary] hover:text-[--text-primary]"
             }`}
           >
-            <Share2 className="w-3 h-3" /> Graph
+            Graph
           </button>
         </div>
       </div>
@@ -259,199 +274,206 @@ export const AcademicCognitiveWidgets: React.FC<AcademicCognitiveWidgetsProps> =
         {/* TAB 1: FSRS COGNITIVE REPETITION */}
         {activeTab === "fsrs" && (
           <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-2 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
-              <div className="text-center">
-                <div className="text-[10px] font-mono text-slate-400 flex items-center justify-center gap-0.5">
-                  <TrendingUp className="w-2.5 h-2.5 text-cyan-400" /> R(t)
-                </div>
-                <div className="text-xs font-bold font-mono text-cyan-300 mt-0.5">
-                  {currentCard ? `${Math.round(currentR * 100)}%` : "--"}
-                </div>
-              </div>
-              <div className="text-center border-x border-slate-800">
-                <div className="text-[10px] font-mono text-slate-400 flex items-center justify-center gap-0.5">
-                  <Clock className="w-2.5 h-2.5 text-amber-400" /> Estabilidad
-                </div>
-                <div className="text-xs font-bold font-mono text-amber-300 mt-0.5">
-                  {currentCard ? `${currentCard.stability.toFixed(1)}d` : "--"}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-[10px] font-mono text-slate-400 flex items-center justify-center gap-0.5">
-                  <ShieldAlert className="w-2.5 h-2.5 text-rose-400" /> Dificultad
-                </div>
-                <div className="text-xs font-bold font-mono text-rose-300 mt-0.5">
-                  {currentCard ? `${currentCard.difficulty.toFixed(1)}/10` : "--"}
-                </div>
-              </div>
-            </div>
-
-            {currentCard ? (
-              <div className="bg-slate-900/90 rounded-xl border border-slate-800/90 p-3.5 shadow-lg relative flex flex-col min-h-[260px] justify-between">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-800/60 text-[10px] font-mono text-slate-400">
-                  <span className="flex items-center gap-1 text-cyan-400">
-                    <Sparkles className="w-3 h-3" />
-                    FSRS v4.5 Active
-                  </span>
-                  <span>
-                    Card {currentCardIndex + 1} of {cards.length}
-                  </span>
-                </div>
-
-                {(() => {
-                  const leech = detectCardLeech(currentCard.lapses || 0);
-                  if (!leech.isLeech) return null;
-                  return (
-                    <div className="my-2 p-2.5 rounded-lg border border-rose-500/40 bg-rose-950/30 text-rose-200 text-[11px] flex flex-col gap-1">
-                      <div className="flex items-center gap-1.5 font-bold text-rose-300">
-                        <AlertTriangle className="w-3.5 h-3.5" />
-                        <span>Tarjeta Dificultosa (Leech · {leech.lapses} fallos)</span>
-                      </div>
-                      <p className="text-[10px] text-rose-300/80 leading-snug">
-                        {leech.message}
-                      </p>
-                      <div className="flex items-center gap-1.5 mt-1 pt-1 border-t border-rose-500/20 text-[9px]">
-                        <span className="font-mono text-rose-400">Acción pedagógica:</span>
-                        <span className="font-bold uppercase tracking-wider text-rose-200">
-                          {leech.actionRecommendation === "split"
-                            ? "Dividir en dos más chicas"
-                            : leech.actionRecommendation === "audit"
-                            ? "Auditar con Cátedra"
-                            : "Reformular"}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })()}
-
-                {(() => {
-                  const occlusionPayload = parseOcclusionCard(currentCard);
-                  if (occlusionPayload) {
-                    return (
-                      <div className="my-2">
-                        <ImageOcclusionViewer
-                          payload={occlusionPayload}
-                          isFlipped={isFlipped}
-                          onReveal={() => setIsFlipped(true)}
-                        />
-                      </div>
-                    );
-                  }
-                  return (
-                    <div className="my-3 text-xs leading-relaxed text-slate-200 font-sans">
-                      <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1">
-                        Pregunta / Estímulo:
-                      </div>
-                      {renderMathText(currentCard.front)}
-                    </div>
-                  );
-                })()}
-
-                {isFlipped ? (
-                  <div className="mt-2 pt-3 border-t border-cyan-500/20 bg-cyan-950/10 rounded-lg p-2.5 text-xs text-cyan-100 animate-in fade-in duration-200">
-                    <div className="text-[10px] font-mono uppercase tracking-wider text-cyan-400 mb-1 flex items-center gap-1">
-                      <CheckCircle className="w-3 h-3 text-cyan-400" />
-                      Respuesta Verificada:
-                    </div>
-                    {renderMathText(currentCard.back)}
-
-                    {activeChunk && (
-                      <div className="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between">
-                        <span className="text-[9px] font-mono text-slate-400">
-                          Fuente: Pág {activeChunk.pageNumber}
-                        </span>
-                        <button
-                          onClick={() =>
-                            onNavigateToCitation?.(activeChunk.pageNumber, activeChunk.boundingBox)
-                          }
-                          className="text-[9px] font-mono text-cyan-400 hover:underline flex items-center gap-0.5"
-                        >
-                          Auditar Fuente <ArrowRight className="w-2.5 h-2.5" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="py-4 text-center">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => setIsFlipped(true)}
-                      className="w-full text-xs font-mono border-slate-700 bg-slate-800/40 hover:bg-slate-800 text-slate-300 hover:text-white"
-                    >
-                      <RotateCw className="w-3 h-3 mr-1.5 text-cyan-400" />
-                      Revelar Demostración / Solución
-                    </Button>
-                  </div>
-                )}
-
-                {isFlipped && predictions && (
-                  <div className="grid grid-cols-4 gap-1.5 mt-3 pt-2 border-t border-slate-800">
-                    <button
-                      onClick={() => void handleFsrsAnswer(1)}
-                      className="flex flex-col items-center justify-center p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 transition-all text-center group"
-                    >
-                      <span className="text-[10px] font-bold">Again</span>
-                      <span className="text-[8px] font-mono text-rose-400/80">
-                        {predictions[1].intervalDays}d
-                      </span>
-                    </button>
-
-                    <button
-                      onClick={() => void handleFsrsAnswer(2)}
-                      className="flex flex-col items-center justify-center p-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 transition-all text-center group"
-                    >
-                      <span className="text-[10px] font-bold">Hard</span>
-                      <span className="text-[8px] font-mono text-amber-400/80">
-                        {predictions[2].intervalDays}d
-                      </span>
-                    </button>
-
-                    <button
-                      onClick={() => void handleFsrsAnswer(3)}
-                      className="flex flex-col items-center justify-center p-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 transition-all text-center group"
-                    >
-                      <span className="text-[10px] font-bold">Good</span>
-                      <span className="text-[8px] font-mono text-emerald-400/80">
-                        {predictions[3].intervalDays}d
-                      </span>
-                    </button>
-
-                    <button
-                      onClick={() => void handleFsrsAnswer(4)}
-                      className="flex flex-col items-center justify-center p-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 transition-all text-center group"
-                    >
-                      <span className="text-[10px] font-bold">Easy</span>
-                      <span className="text-[8px] font-mono text-cyan-400/80">
-                        {predictions[4].intervalDays}d
-                      </span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="p-4 rounded-xl border border-dashed border-slate-800 text-center space-y-2">
-                <Brain className="w-8 h-8 text-slate-600 mx-auto" />
-                <p className="text-xs text-slate-400">
-                  No hay tarjetas FSRS sintetizadas para este texto.
+            {!currentCard || cards.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 px-4 text-center border border-dashed border-[--border-hairline] rounded-xl">
+                <p className="text-[--text-primary] text-sm font-medium mb-1">
+                  Todavía no hay tarjetas para este documento
+                </p>
+                <p className="text-[--text-secondary] text-xs mb-4 max-w-[260px] leading-relaxed">
+                  Subí una fuente y generá tarjetas FSRS desde el Lienzo de Estudio para empezar a ver tu curva de retención acá.
                 </p>
                 {activeChunk && (
                   <Button
                     size="sm"
                     onClick={() => void handleGenerateCardsForActiveChunk()}
                     disabled={generatingCards}
-                    className="text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/30"
+                    className="text-xs bg-[--accent-ink] hover:bg-[--accent-ink-muted] text-white border-0 cursor-pointer"
                   >
-                    <Sparkles className="w-3 h-3 mr-1" />
-                    {generatingCards ? "Sintetizando..." : "Sintetizar desde Teorema"}
+                    <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+                    {generatingCards ? "Generando tarjetas..." : "Generar tarjetas desde el texto actual →"}
                   </Button>
                 )}
               </div>
+            ) : (
+              <>
+                <div className="bg-[--bg-panel-raised] p-3 rounded-xl border border-[--border-hairline] space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-[--text-secondary] font-mono">Retención estimada R(t)</span>
+                    <span className="text-sm font-bold font-mono text-[--text-primary]">
+                      {Math.round(currentR * 100)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-[--bg-panel] h-1.5 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[--accent-ink] rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min(100, Math.max(0, currentR * 100))}%` }}
+                    />
+                  </div>
+                  <div className="pt-2 border-t border-[--border-hairline] space-y-1.5">
+                    <MetricBar
+                      label="Estabilidad"
+                      value={`${currentCard.stability.toFixed(1)}d`}
+                      percent={Math.min(100, (currentCard.stability / 30) * 100)}
+                    />
+                    <MetricBar
+                      label="Dificultad"
+                      value={`${currentCard.difficulty.toFixed(1)}/10`}
+                      percent={Math.min(100, (currentCard.difficulty / 10) * 100)}
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-[--bg-panel-raised] rounded-xl border border-[--border-hairline] p-3.5 shadow-sm relative flex flex-col min-h-[260px] justify-between">
+                  <div className="flex items-center justify-between pb-2 border-b border-[--border-hairline] text-[10px] font-mono text-[--text-secondary]">
+                    <span className="flex items-center gap-1 text-[--accent-ink]">
+                      <Sparkles className="w-3 h-3" />
+                      FSRS v4.5 Active
+                    </span>
+                    <span>
+                      Card {currentCardIndex + 1} of {cards.length}
+                    </span>
+                  </div>
+
+                  {(() => {
+                    const leech = detectCardLeech(currentCard.lapses || 0);
+                    if (!leech.isLeech) return null;
+                    return (
+                      <div className="my-2 p-2.5 rounded-lg border border-rose-500/30 bg-rose-950/20 text-rose-200 text-[11px] flex flex-col gap-1">
+                        <div className="flex items-center gap-1.5 font-bold text-rose-300">
+                          <AlertTriangle className="w-3.5 h-3.5" />
+                          <span>Tarjeta Dificultosa (Leech · {leech.lapses} fallos)</span>
+                        </div>
+                        <p className="text-[10px] text-rose-300/80 leading-snug">
+                          {leech.message}
+                        </p>
+                        <div className="flex items-center gap-1.5 mt-1 pt-1 border-t border-rose-500/20 text-[9px]">
+                          <span className="font-mono text-rose-400">Acción pedagógica:</span>
+                          <span className="font-bold uppercase tracking-wider text-rose-200">
+                            {leech.actionRecommendation === "split"
+                              ? "Dividir en dos más chicas"
+                              : leech.actionRecommendation === "audit"
+                              ? "Auditar con Cátedra"
+                              : "Reformular"}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {(() => {
+                    const occlusionPayload = parseOcclusionCard(currentCard);
+                    if (occlusionPayload) {
+                      return (
+                        <div className="my-2">
+                          <ImageOcclusionViewer
+                            payload={occlusionPayload}
+                            isFlipped={isFlipped}
+                            onReveal={() => setIsFlipped(true)}
+                          />
+                        </div>
+                      );
+                    }
+                    return (
+                      <div className="my-3 text-xs leading-relaxed text-[--text-primary] font-serif">
+                        <div className="text-[10px] font-mono uppercase tracking-wider text-[--text-secondary] mb-1 font-sans">
+                          Pregunta / Estímulo:
+                        </div>
+                        {renderMathText(currentCard.front)}
+                      </div>
+                    );
+                  })()}
+
+                  {isFlipped ? (
+                    <div className="mt-2 pt-3 border-t border-[--border-hairline] bg-[--bg-panel] rounded-lg p-2.5 text-xs text-[--text-primary] animate-in fade-in duration-200 font-sans">
+                      <div className="text-[10px] font-mono uppercase tracking-wider text-[--accent-ink] mb-1 flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3 text-[--accent-ink]" />
+                        Respuesta Verificada:
+                      </div>
+                      {renderMathText(currentCard.back)}
+
+                      {activeChunk && (
+                        <div className="mt-2 pt-2 border-t border-[--border-hairline] flex items-center justify-between">
+                          <span className="text-[9px] font-mono text-[--text-secondary]">
+                            Fuente: Pág {activeChunk.pageNumber}
+                          </span>
+                          <button
+                            onClick={() =>
+                              onNavigateToCitation?.(activeChunk.pageNumber, activeChunk.boundingBox)
+                            }
+                            className="text-[9px] font-mono text-[--accent-ink] hover:underline flex items-center gap-0.5 cursor-pointer"
+                          >
+                            Auditar Fuente <ArrowRight className="w-2.5 h-2.5" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="py-4 text-center">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setIsFlipped(true)}
+                        className="w-full text-xs font-mono border-[--border-hairline] bg-[--bg-panel] hover:bg-[--bg-base] text-[--text-primary] cursor-pointer"
+                      >
+                        <RotateCw className="w-3 h-3 mr-1.5 text-[--accent-ink]" />
+                        Revelar Demostración / Solución
+                      </Button>
+                    </div>
+                  )}
+
+                  {isFlipped && predictions && (
+                    <div className="grid grid-cols-4 gap-1.5 mt-3 pt-2 border-t border-[--border-hairline]">
+                      <button
+                        onClick={() => void handleFsrsAnswer(1)}
+                        className="flex flex-col items-center justify-center p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 transition-all text-center group cursor-pointer"
+                      >
+                        <span className="text-[10px] font-bold">Again</span>
+                        <span className="text-[8px] font-mono text-rose-400/80">
+                          {predictions[1].intervalDays}d
+                        </span>
+                      </button>
+
+                      <button
+                        onClick={() => void handleFsrsAnswer(2)}
+                        className="flex flex-col items-center justify-center p-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 transition-all text-center group cursor-pointer"
+                      >
+                        <span className="text-[10px] font-bold">Hard</span>
+                        <span className="text-[8px] font-mono text-amber-400/80">
+                          {predictions[2].intervalDays}d
+                        </span>
+                      </button>
+
+                      <button
+                        onClick={() => void handleFsrsAnswer(3)}
+                        className="flex flex-col items-center justify-center p-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 transition-all text-center group cursor-pointer"
+                      >
+                        <span className="text-[10px] font-bold">Good</span>
+                        <span className="text-[8px] font-mono text-emerald-400/80">
+                          {predictions[3].intervalDays}d
+                        </span>
+                      </button>
+
+                      <button
+                        onClick={() => void handleFsrsAnswer(4)}
+                        className="flex flex-col items-center justify-center p-1.5 rounded-lg bg-[--accent-ink]/15 hover:bg-[--accent-ink]/25 border border-[--accent-ink]/40 text-[--text-primary] transition-all text-center group cursor-pointer"
+                      >
+                        <span className="text-[10px] font-bold">Easy</span>
+                        <span className="text-[8px] font-mono text-[--accent-ink]">
+                          {predictions[4].intervalDays}d
+                        </span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
             )}
 
-            <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 pt-1">
+            <div className="flex items-center justify-between text-[10px] font-mono text-[--text-secondary] pt-1 border-t border-[--border-hairline]">
               <span>Repasos hoy: {reviewCountToday}</span>
-              <span>Local-First Sync OK</span>
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[--signal-ok]" />
+                Sincronizado localmente
+              </span>
             </div>
           </div>
         )}

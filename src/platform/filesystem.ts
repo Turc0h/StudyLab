@@ -107,6 +107,21 @@ export async function checkFileExists(path: string): Promise<boolean> {
 }
 
 /**
+ * Lee un archivo completo de disco en binario nativo (Desktop).
+ * Devuelve un Uint8Array para evitar cuelgues de range requests HTTP o protocolos custom.
+ */
+export async function readFileBytes(path: string): Promise<Uint8Array | null> {
+  if (!isDesktop()) return null;
+  try {
+    const raw = await invoke<number[]>("read_file_bytes", { path });
+    return new Uint8Array(raw);
+  } catch (err) {
+    console.error("Error leyendo bytes de archivo nativo:", err);
+    return null;
+  }
+}
+
+/**
  * Abre la ubicación del archivo en el Explorador de Windows.
  */
 export async function revealInExplorer(path: string): Promise<void> {

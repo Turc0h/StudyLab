@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   UploadCloud,
   FileText,
@@ -10,6 +10,7 @@ import {
   Edit3,
 } from "lucide-react";
 import { db, type AcademicSourceRecord } from "../../../db/db";
+import { isDesktop } from "../../../platform";
 import {
   pdfAdapter,
   pastedTextAdapter,
@@ -47,8 +48,66 @@ export const AcademicFileUploader: React.FC<AcademicFileUploaderProps> = ({
   const [transcriptTitle, setTranscriptTitle] = useState("");
   const [transcriptContent, setTranscriptContent] = useState("");
 
+  // Listen to native Tauri OS drag & drop events (Windows Explorer)
+  useEffect(() => {
+    if (!isDesktop()) return;
+    let unlisten: (() => void) | undefined;
+    (async () => {
+      try {
+        const { getCurrentWebview } = await import("@tauri-apps/api/webview");
+        unlisten = await getCurrentWebview().onDragDropEvent(async (event) => {
+          if (event.payload.type === "over" || event.payload.type === "enter") {
+            setIsDragging(true);
+          } else if (event.payload.type === "leave") {
+            setIsDragging(false);
+          } else if (event.payload.type === "drop") {
+            setIsDragging(false);
+            if (event.payload.paths && event.payload.paths.length > 0) {
+              const filePath = event.payload.paths[0];
+              const name = filePath.split(/[/\\]/).pop() || "documento.pdf";
+              try {
+                const { readFileBytes } = await import("../../../platform");
+                const bytes = await readFileBytes(filePath);
+                let blob: Blob;
+                if (bytes) {
+                  blob = new Blob([bytes.buffer as ArrayBuffer], {
+                    type: name.toLowerCase().endsWith(".pdf") ? "application/pdf" : "application/octet-stream",
+                  });
+                } else {
+                  const { convertFileSrc } = await import("@tauri-apps/api/core");
+                  const assetUrl = convertFileSrc(filePath);
+                  const resp = await fetch(assetUrl);
+                  blob = await resp.blob();
+                }
+                const file = new File([blob], name, {
+                  type: name.toLowerCase().endsWith(".pdf") ? "application/pdf" : blob.type,
+                });
+                void processFile(file);
+              } catch (err) {
+                console.error("Error al leer archivo arrastrado en Tauri:", err);
+                setStep("error");
+                setErrorMessage("No se pudo leer el archivo arrastrado.");
+              }
+            }
+          }
+        });
+      } catch (err) {
+        console.warn("Tauri drag-drop listener no pudo registrarse:", err);
+      }
+    })();
+    return () => {
+      unlisten?.();
+    };
+  }, []);
+
   // 1. Process File (PDF, MD, TXT)
   const processFile = async (file: File) => {
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (file.size === 0) {
+      setStep("error");
+      setErrorMessage("El archivo seleccionado está vacío (0 bytes).");
+      return;
+    }
     setCurrentFilename(file.name);
     setErrorMessage(null);
     setStep("reading");
@@ -123,6 +182,60 @@ export const AcademicFileUploader: React.FC<AcademicFileUploaderProps> = ({
       console.error("Error al procesar archivo:", err);
       setStep("error");
       setErrorMessage(err instanceof Error ? err.message : "Error al procesar el documento");
+    }
+  };
+
+  // Disparar selector de archivos (Nativo en Desktop vía plugin-dialog, HTML5 en Web)
+  const handleOpenFilePicker = async () => {
+    if (isDesktop()) {
+      try {
+        const { open } = await import("@tauri-apps/plugin-dialog");
+        const selected = await open({
+          title: "Seleccionar documento académico",
+          multiple: false,
+          directory: false,
+          filters: [
+            {
+              name: "Documentos Académicos (*.pdf, *.md, *.txt, *.docx)",
+              extensions: ["pdf", "md", "txt", "docx"],
+            },
+            {
+              name: "Todos los archivos",
+              extensions: ["*"],
+            },
+          ],
+        });
+
+        if (!selected) {
+          // Usuario canceló el diálogo — retorno limpio sin bloquear UI
+          return;
+        }
+
+        const filePath = typeof selected === "string" ? selected : selected[0];
+        if (!filePath) return;
+
+        const name = filePath.split(/[/\\]/).pop() || "documento.pdf";
+        const { readFileBytes } = await import("../../../platform");
+        const bytes = await readFileBytes(filePath);
+        let blob: Blob;
+        if (bytes) {
+          blob = new Blob([bytes.buffer as ArrayBuffer], {
+            type: name.toLowerCase().endsWith(".pdf") ? "application/pdf" : "application/octet-stream",
+          });
+        } else {
+          const { convertFileSrc } = await import("@tauri-apps/api/core");
+          const assetUrl = convertFileSrc(filePath);
+          const resp = await fetch(assetUrl);
+          blob = await resp.blob();
+        }
+        const file = new File([blob], name, { type: blob.type });
+        void processFile(file);
+      } catch (err) {
+        console.error("Error abriendo diálogo nativo de Tauri:", err);
+        fileInputRef.current?.click();
+      }
+    } else {
+      fileInputRef.current?.click();
     }
   };
 
@@ -339,7 +452,7 @@ export const AcademicFileUploader: React.FC<AcademicFileUploaderProps> = ({
               const files = e.dataTransfer.files;
               if (files && files.length > 0) void processFile(files[0]);
             }}
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => void handleOpenFilePicker()}
             className={`group relative flex flex-col items-center justify-center p-4 border-2 border-dashed rounded-xl transition-all duration-200 cursor-pointer ${
               isDragging
                 ? "border-accent-primary bg-accent-primary/10 scale-[0.99]"

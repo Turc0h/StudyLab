@@ -1,46 +1,54 @@
 @import "tailwindcss";
 
 :root {
-  /* Fondo sobrio académico - Paleta de descanso visual */
+  /* Identidad académica de biblioteca / archivo (Tokens canónicos) */
+  --bg-base: #15171B;
+  --bg-panel: #1A1D22;
+  --bg-panel-raised: #20242A;
+  --border-hairline: rgba(255, 255, 255, 0.07);
+  --text-primary: #E9E6E0;
+  --text-secondary: #96938C;
+  --accent-ink: #5B7FA6;
+  --accent-ink-muted: #3E5470;
+  --signal-ok: #6B8F71;
+
+  /* Aliases de descanso visual y compatibilidad */
   --bg-primary: #FAFAF8;
   --bg-secondary: #F4F3EF;
   --bg-elevated: #FFFFFF;
-
-  /* Aliases de compatibilidad */
-  --bg-base: #FAFAF8;
   --bg-base-alt: #F4F3EF;
 
-  /* Tipografía legible */
-  --text-primary: #242426;
-  --text-secondary: #525256;
   --text-muted: #84848A;
   --text-tertiary: #84848A;
 
-  /* Acento académico apagado */
-  --accent-primary: #3B5169;   /* Azul pizarra */
-  --accent-secondary: #4A5D45; /* Verde oliva académico */
+  --accent-primary: #3B5169;
+  --accent-secondary: #4A5D45;
   --accent-hover: #2B3D50;
 
-  /* Bordes limpios definidos */
   --border-subtle: #E2E0D8;
 
-  /* Estados desaturados sin estridencia */
   --success: #4E7350;
   --warning: #9E7448;
   --error: #9E4E4E;
 }
 
-/* Modo oscuro sobrio — grafito mate, nunca negro puro */
+/* Modo oscuro sobrio — grafito mate y biblioteca */
 .dark, [data-theme="dark"] {
+  --bg-base: #15171B;
+  --bg-panel: #1A1D22;
+  --bg-panel-raised: #20242A;
+  --border-hairline: rgba(255, 255, 255, 0.07);
+  --text-primary: #E9E6E0;
+  --text-secondary: #96938C;
+  --accent-ink: #5B7FA6;
+  --accent-ink-muted: #3E5470;
+  --signal-ok: #6B8F71;
+
   --bg-primary: #18181A;
   --bg-secondary: #202023;
   --bg-elevated: #28282C;
-
-  --bg-base: #18181A;
   --bg-base-alt: #202023;
 
-  --text-primary: #ECEAE5;
-  --text-secondary: #A8A6A0;
   --text-muted: #72706B;
   --text-tertiary: #72706B;
 
@@ -54,10 +62,17 @@
 }
 
 @theme {
+  --color-bg-base: var(--bg-base);
+  --color-bg-panel: var(--bg-panel);
+  --color-bg-panel-raised: var(--bg-panel-raised);
+  --color-border-hairline: var(--border-hairline);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-ink-muted: var(--accent-ink-muted);
+  --color-signal-ok: var(--signal-ok);
+
   --color-bg-primary: var(--bg-primary);
   --color-bg-secondary: var(--bg-secondary);
   --color-bg-elevated: var(--bg-elevated);
-  --color-bg-base: var(--bg-base);
   --color-bg-base-alt: var(--bg-base-alt);
 
   --color-text-primary: var(--text-primary);
@@ -90,6 +105,12 @@ html, body {
 /* Transiciones sobrias y suaves */
 button, a, input, textarea, select {
   transition: color 150ms ease-in-out, background-color 150ms ease-in-out, border-color 150ms ease-in-out, opacity 150ms ease-in-out;
+}
+
+/* Foco de teclado accesible con acento institucional */
+:focus-visible {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 2px;
 }
 
 /* Reglas tipográficas académicas */
@@ -155,6 +176,19 @@ h1, h2, h3, h4 {
   transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
               right 300ms cubic-bezier(0.16, 1, 0.3, 1),
               opacity 220ms ease-out;
+}
+
+/* Capa de composición acelerada por hardware GPU para elementos animados */
+.motion-layer {
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+
+/* Optimización para listas largas de alta densidad */
+.virtual-content-list {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 80px;
 }
 
 /* Soporte para prefers-reduced-motion y configuración de animaciones */

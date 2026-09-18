@@ -124,3 +124,5 @@ export function Files() {
     </div>
   );
 }
+
+export default Files;

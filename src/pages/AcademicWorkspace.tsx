@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
   db,
   type AcademicBoundingBox,
@@ -11,8 +11,20 @@ import { AcademicCanvas } from "../features/academic-engine/components/AcademicC
 import { AcademicCognitiveWidgets } from "../features/academic-engine/components/AcademicCognitiveWidgets";
 import { AcademicTutorialOverlay } from "../features/academic-engine/components/AcademicTutorialOverlay";
 import { AudioOverviewModal } from "../features/academic-engine/components/AudioOverviewModal";
-import { BrainCircuit, BookOpen, HelpCircle, Compass, Eye, EyeOff, ArrowLeftRight, Headphones } from "lucide-react";
+import {
+  BrainCircuit,
+  BookOpen,
+  HelpCircle,
+  Compass,
+  ArrowLeftRight,
+  Headphones,
+  MoreHorizontal,
+  UploadCloud,
+  Loader2,
+} from "lucide-react";
 import { useTutorialStore } from "../stores/useTutorialStore";
+import { pdfAdapter, pastedTextAdapter } from "../features/academic-engine/sourceIngestAdapters";
+import { isDesktop, readFileBytes } from "../platform";
 
 export const AcademicWorkspace: React.FC = () => {
   const openGlobalTutorial = useTutorialStore((s) => s.openTutorial);
@@ -21,6 +33,7 @@ export const AcademicWorkspace: React.FC = () => {
   const [chunks, setChunks] = useState<AcademicChunkRecord[]>([]);
   const [activeChunk, setActiveChunk] = useState<AcademicChunkRecord | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Audio Overview modal state
   const [isAudioOverviewOpen, setIsAudioOverviewOpen] = useState(false);
@@ -155,6 +168,114 @@ export const AcademicWorkspace: React.FC = () => {
     });
   };
 
+  // Window-level Drag & Drop states
+  const [isWindowDragging, setIsWindowDragging] = useState(false);
+  const [isProcessingFile, setIsProcessingFile] = useState(false);
+  const [processingStatus, setProcessingStatus] = useState<string | null>(null);
+  const dragCounterRef = useRef(0);
+
+  const handleProcessFile = useCallback(async (file: File) => {
+    setIsProcessingFile(true);
+    setProcessingStatus(`Leyendo ${file.name}...`);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "";
+      if (ext === "pdf" || file.type === "application/pdf") {
+        setProcessingStatus("Extrayendo texto y fórmulas LaTeX...");
+        const res = await pdfAdapter({
+          file,
+          career: "Ingeniería / Ciencias",
+          onProgress: (pct) => setProcessingStatus(`Extrayendo texto y fórmulas (${pct}%)...`),
+        });
+
+        if (res.source.fileId) {
+          await db.files.put({
+            id: res.source.fileId,
+            folderId: "academic_sources",
+            name: file.name,
+            mimeType: "application/pdf",
+            size: file.size,
+            blob: file,
+            ocrStatus: "done",
+            createdAt: Date.now(),
+          });
+        }
+
+        if (res.chunks.length > 0) {
+          await db.academicChunks.bulkPut(res.chunks);
+        }
+        await db.academicSources.put(res.source);
+        await loadWorkspace();
+        await handleSelectSource(res.source);
+      } else {
+        setProcessingStatus("Procesando apunte en texto...");
+        const text = await file.text();
+        const res = await pastedTextAdapter({
+          title: file.name.replace(/\.[^/.]+$/, ""),
+          text,
+        });
+        if (res.chunks.length > 0) {
+          await db.academicChunks.bulkPut(res.chunks);
+        }
+        await db.academicSources.put(res.source);
+        await loadWorkspace();
+        await handleSelectSource(res.source);
+      }
+    } catch (err) {
+      console.error("Error al procesar archivo en ventana principal:", err);
+      alert(err instanceof Error ? err.message : "Error al procesar el archivo");
+    } finally {
+      setIsProcessingFile(false);
+      setProcessingStatus(null);
+    }
+  }, [loadWorkspace]);
+
+  // Handle native Tauri OS drag & drop events (Windows Explorer)
+  useEffect(() => {
+    if (!isDesktop()) return;
+    let unlisten: (() => void) | undefined;
+    (async () => {
+      try {
+        const { getCurrentWebview } = await import("@tauri-apps/api/webview");
+        unlisten = await getCurrentWebview().onDragDropEvent(async (event) => {
+          if (event.payload.type === "over" || event.payload.type === "enter") {
+            setIsWindowDragging(true);
+          } else if (event.payload.type === "leave") {
+            setIsWindowDragging(false);
+          } else if (event.payload.type === "drop") {
+            setIsWindowDragging(false);
+            if (event.payload.paths && event.payload.paths.length > 0) {
+              const filePath = event.payload.paths[0];
+              const name = filePath.split(/[/\\]/).pop() || "documento.pdf";
+              try {
+                const bytes = await readFileBytes(filePath);
+                let blob: Blob;
+                if (bytes) {
+                  blob = new Blob([bytes.buffer as ArrayBuffer], {
+                    type: name.toLowerCase().endsWith(".pdf") ? "application/pdf" : "application/octet-stream",
+                  });
+                } else {
+                  const { convertFileSrc } = await import("@tauri-apps/api/core");
+                  const assetUrl = convertFileSrc(filePath);
+                  const resp = await fetch(assetUrl);
+                  blob = await resp.blob();
+                }
+                const file = new File([blob], name, { type: blob.type });
+                void handleProcessFile(file);
+              } catch (err) {
+                console.error("Error al leer archivo arrastrado en Tauri:", err);
+              }
+            }
+          }
+        });
+      } catch (err) {
+        console.warn("Tauri drag-drop listener no pudo registrarse en workspace:", err);
+      }
+    })();
+    return () => {
+      unlisten?.();
+    };
+  }, [handleProcessFile]);
+
   const activeSource = sources.find((s) => s.id === activeSourceId) || null;
 
   if (loading) {
@@ -171,101 +292,176 @@ export const AcademicWorkspace: React.FC = () => {
   }
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col bg-slate-950 overflow-hidden font-sans relative">
-      {/* Top Banner Navigation Context */}
-      <header className="h-10 border-b border-slate-800/80 bg-slate-900/90 px-4 flex items-center justify-between z-10">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-cyan-400">
+    <div
+      onDragEnter={(e) => {
+        e.preventDefault();
+        dragCounterRef.current++;
+        if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+          setIsWindowDragging(true);
+        }
+      }}
+      onDragOver={(e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "copy";
+      }}
+      onDragLeave={(e) => {
+        e.preventDefault();
+        dragCounterRef.current--;
+        if (dragCounterRef.current <= 0) {
+          dragCounterRef.current = 0;
+          setIsWindowDragging(false);
+        }
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        dragCounterRef.current = 0;
+        setIsWindowDragging(false);
+        const files = e.dataTransfer.files;
+        if (files && files.length > 0) {
+          void handleProcessFile(files[0]);
+        }
+      }}
+      className="h-[calc(100vh-4rem)] flex flex-col bg-[--bg-base] text-[--text-primary] overflow-hidden font-sans relative"
+    >
+      {/* Visual Window Drag & Drop Overlay */}
+      {(isWindowDragging || isProcessingFile) && (
+        <div className="absolute inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex flex-col items-center justify-center p-8 border-2 border-dashed border-cyan-400 animate-in fade-in duration-150">
+          {isProcessingFile ? (
+            <div className="flex flex-col items-center gap-3 text-cyan-300">
+              <Loader2 className="w-10 h-10 animate-spin text-cyan-400" />
+              <span className="font-mono text-sm font-semibold tracking-wider">
+                {processingStatus || "PROCESANDO DOCUMENTO..."}
+              </span>
+              <span className="text-xs text-slate-400 font-sans">
+                Extrayendo teoremas, fórmulas y generando embeddings locales...
+              </span>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-3 text-center pointer-events-none">
+              <UploadCloud className="w-14 h-14 text-cyan-400 animate-bounce" />
+              <h2 className="font-display font-bold text-lg text-white">
+                Soltá tu archivo PDF o apunte aquí
+              </h2>
+              <p className="text-xs text-slate-300 max-w-md font-sans">
+                StudyLab procesará automáticamente el texto, fórmulas LaTeX y teoremas de forma 100% local en tu dispositivo.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+      {/* Top Academic Context Header */}
+      <header className="h-11 border-b border-[--border-hairline] bg-[--bg-panel] px-4 flex items-center justify-between z-20">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center gap-2 text-[--accent-ink] shrink-0">
             <BookOpen className="w-4 h-4" />
-            <h1 className="text-xs font-mono font-bold tracking-wider uppercase text-slate-200">
-              Personal Academic Knowledge Engine (v4.1)
+            <h1 className="text-xs font-serif font-semibold tracking-normal text-[--text-primary]">
+              Personal Academic Knowledge Engine
             </h1>
           </div>
-          <span className="text-slate-700">|</span>
-          <span className="text-[11px] font-mono text-slate-400">
+          <span className="text-[--border-hairline] hidden sm:inline">|</span>
+          <span className="text-xs font-mono text-[--text-secondary] truncate hidden sm:inline">
             {activeSource
-              ? `${activeSource.title} • ${activeSource.career ?? "Universidad"} • ${activeSource.documentType.toUpperCase()}`
+              ? `${activeSource.title} • ${activeSource.career ?? "Universidad"}`
               : "Seleccione una fuente"}
           </span>
         </div>
 
-        <div className="flex items-center gap-3 text-[11px] font-mono">
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            GraphRAG Conectado
-          </span>
-
-          <span className="text-slate-500 hidden sm:inline">Local-First (Dexie v4)</span>
-
+        <div className="flex items-center gap-4 text-xs">
           {/* Audio Overview (NotebookLM bridge) */}
-          <div className="flex items-center gap-1.5 border-l border-slate-800 pl-2">
+          <button
+            type="button"
+            onClick={() => setIsAudioOverviewOpen(true)}
+            disabled={sources.length === 0}
+            className="flex items-center gap-1.5 text-xs text-[--text-secondary] hover:text-[--text-primary] transition-colors cursor-pointer disabled:opacity-40"
+            title="Generar Resumen Narrado de Cátedra"
+          >
+            <Headphones className="w-3.5 h-3.5 text-[--accent-ink]" />
+            <span>Resumen Narrado</span>
+          </button>
+
+          {/* Cognitive Hub Underline Toggle */}
+          <button
+            type="button"
+            onClick={() => setIsCognitivePanelVisible((v) => !v)}
+            className={`pb-0.5 text-xs transition-colors cursor-pointer border-b-2 ${
+              isCognitivePanelVisible
+                ? "border-[--accent-ink] text-[--text-primary] font-medium"
+                : "border-transparent text-[--text-secondary] hover:text-[--text-primary]"
+            }`}
+            title="Mostrar u ocultar Cognitive Hub"
+          >
+            Cognitive Hub
+          </button>
+
+          {/* Menú Desplegable "⋯" para Opciones Secundarias */}
+          <div className="relative">
             <button
               type="button"
-              onClick={() => setIsAudioOverviewOpen(true)}
-              disabled={sources.length === 0}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-950/60 border border-amber-500/40 text-amber-300 hover:bg-amber-500/20 text-xs font-mono transition-all cursor-pointer shadow-xs disabled:opacity-40"
-              title="Generar Resumen Narrado de Cátedra (Audio Overview)"
+              onClick={() => setIsMenuOpen((prev) => !prev)}
+              className="p-1 rounded text-[--text-secondary] hover:text-[--text-primary] hover:bg-[--bg-panel-raised] transition-colors cursor-pointer"
+              title="Más opciones de espacio de trabajo"
+              aria-label="Opciones adicionales"
             >
-              <Headphones className="w-3.5 h-3.5 text-amber-400" />
-              <span>Resumen Narrado</span>
+              <MoreHorizontal className="w-4 h-4" />
             </button>
+
+            {isMenuOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-30"
+                  onClick={() => setIsMenuOpen(false)}
+                />
+                <div className="absolute right-0 top-full mt-1 w-48 rounded-md border border-[--border-hairline] bg-[--bg-panel-raised] p-1.5 shadow-lg z-40 flex flex-col gap-1 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsRagSwapped((s) => !s);
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded hover:bg-[--bg-panel] text-left text-[--text-secondary] hover:text-[--text-primary] transition-colors cursor-pointer"
+                  >
+                    <ArrowLeftRight className="w-3.5 h-3.5 text-[--accent-ink]" />
+                    <span>{isRagSwapped ? "RAG en Lateral" : "Invertir Paneles"}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleStartTour();
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded hover:bg-[--bg-panel] text-left text-[--text-secondary] hover:text-[--text-primary] transition-colors cursor-pointer"
+                  >
+                    <HelpCircle className="w-3.5 h-3.5 text-[--accent-ink]" />
+                    <span>Tour de Pantalla</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      openGlobalTutorial(1, "tour");
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded hover:bg-[--bg-panel] text-left text-[--text-secondary] hover:text-[--text-primary] transition-colors cursor-pointer"
+                  >
+                    <Compass className="w-3.5 h-3.5 text-[--accent-ink]" />
+                    <span>Guía Global (8 Módulos)</span>
+                  </button>
+                </div>
+              </>
+            )}
           </div>
 
-          {/* Cognitive Hub & Layout Controls */}
-          <div className="flex items-center gap-1.5 border-l border-slate-800 pl-2">
-            <button
-              type="button"
-              onClick={() => setIsCognitivePanelVisible((v) => !v)}
-              className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-mono border transition-all cursor-pointer ${
-                isCognitivePanelVisible
-                  ? "bg-emerald-950/60 border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/20"
-                  : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
-              }`}
-              title="Activar o desactivar el panel Cognitive Hub"
-            >
-              {isCognitivePanelVisible ? <Eye className="w-3 h-3 text-emerald-400" /> : <EyeOff className="w-3 h-3 text-slate-400" />}
-              <span>Cognitive Hub {isCognitivePanelVisible ? "ON" : "OFF"}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsRagSwapped((s) => !s)}
-              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/20 text-xs font-mono transition-all cursor-pointer"
-              title="Intercambiar ubicación entre RAG y Cognitive Hub"
-            >
-              <ArrowLeftRight className="w-3 h-3 text-cyan-400" />
-              <span>{isRagSwapped ? "RAG en Lateral" : "Invertir Paneles"}</span>
-            </button>
-          </div>
-
-          {/* On-Demand Interactive Tutorial Triggers */}
-          <div className="flex items-center gap-1.5 border-l border-slate-800 pl-2">
-            <button
-              type="button"
-              onClick={handleStartTour}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/20 text-xs font-mono transition-all shadow-sm"
-              title="Recorrido guiado de este espacio de trabajo"
-            >
-              <HelpCircle className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Tour Pantalla</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => openGlobalTutorial(1, "tour")}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-950/60 border border-purple-500/40 text-purple-300 hover:bg-purple-500/20 text-xs font-mono transition-all shadow-sm"
-              title="Abrir la guía maestra de todos los módulos de StudyLab"
-            >
-              <Compass className="w-3.5 h-3.5 text-purple-400" />
-              <span>Guía Global (8 Módulos)</span>
-            </button>
+          {/* Status Bar Indicator tipo Editor de Código */}
+          <div className="flex items-center gap-1.5 text-[11px] font-mono text-[--text-secondary] pl-2 border-l border-[--border-hairline]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[--signal-ok]" />
+            <span className="hidden md:inline">Biblioteca sincronizada · Local-First</span>
           </div>
         </div>
       </header>
 
-      {/* Tri-Panel Layout (Contextual Academic Workspace) */}
+      {/* Tri-Panel Layout con Separación Hairline */}
       <div className="flex-1 flex overflow-hidden">
         {/* PANEL 1: Academic Source Manager (~22% width) */}
-        <div className="w-72 lg:w-80 flex-shrink-0 h-full border-r border-slate-800/80 bg-slate-950/90">
+        <div className="w-72 lg:w-80 flex-shrink-0 h-full border-r border-[--border-hairline] bg-[--bg-panel]">
           <AcademicSourceManager
             sources={sources}
             activeSourceId={activeSourceId}
@@ -277,7 +473,7 @@ export const AcademicWorkspace: React.FC = () => {
         </div>
 
         {/* PANEL 2: Hybrid Canvas Split Markdown/LaTeX + PDF Viewer + RAG Chat */}
-        <div className="flex-1 h-full min-w-0 bg-slate-950 flex flex-col overflow-hidden">
+        <div className="flex-1 h-full min-w-0 bg-[--bg-base] flex flex-col overflow-hidden">
           <AcademicCanvas
             activeSource={activeSource}
             chunks={chunks}
@@ -292,7 +488,7 @@ export const AcademicWorkspace: React.FC = () => {
 
         {/* PANEL 3: Cognitive Execution & Retention Widgets (Collapsible / Dynamic Swap) */}
         {isCognitivePanelVisible && (
-          <div className="w-80 lg:w-96 flex-shrink-0 h-full border-l border-slate-800/80 bg-slate-950/90 transition-all duration-300">
+          <div className="w-80 lg:w-96 flex-shrink-0 h-full border-l border-[--border-hairline] bg-[--bg-panel] transition-all duration-300">
             <AcademicCognitiveWidgets
               activeSource={activeSource}
               activeChunk={activeChunk}

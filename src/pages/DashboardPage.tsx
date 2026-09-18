@@ -23,6 +23,9 @@ import { StudyTipsWidget } from "../components/study-tips/StudyTipsWidget";
 import { CourseProgressCard } from "../components/progress/CourseProgressCard";
 import { DailyStudyRecommendationCard } from "../features/study-engine/components/DailyStudyRecommendationCard";
 import { PanelGuide } from "../components/guide/PanelGuide";
+import { Skeleton, SkeletonText } from "../components/ui/Skeleton";
+import { motion, AnimatePresence } from "motion/react";
+import { DURATION, EASE_EXPO_OUT } from "../lib/motion-tokens";
 
 interface MethodPreview {
   id: StudyMethodId;
@@ -63,13 +66,77 @@ const FEATURED_METHODS: MethodPreview[] = [
   },
 ];
 
+function DashboardSkeleton() {
+  return (
+    <div className="flex flex-col gap-6 pb-12 w-full motion-layer">
+      {/* Header Ejecutivo Skeleton */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border-subtle pb-5">
+        <div className="flex flex-col gap-2 max-w-xl">
+          <Skeleton className="h-3.5 w-48" />
+          <Skeleton className="h-8 w-80" />
+          <Skeleton className="h-4 w-full" />
+        </div>
+        <div className="flex items-center gap-2.5 shrink-0">
+          <Skeleton className="h-9 w-44 rounded-md" />
+        </div>
+      </div>
+
+      {/* Métricas Header Skeleton */}
+      <div className="flex items-center justify-between px-1">
+        <Skeleton className="h-3 w-36" />
+      </div>
+
+      {/* Métricas Grid Skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="rounded-lg border border-border-subtle bg-bg-elevated p-5 flex flex-col gap-3 shadow-2xs">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-9 w-24" />
+          <Skeleton className="h-2 w-full rounded-full" />
+        </div>
+        <div className="rounded-lg border border-border-subtle bg-bg-elevated p-5 flex flex-col gap-3 shadow-2xs">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-9 w-24" />
+          <Skeleton className="h-2 w-full rounded-full" />
+        </div>
+      </div>
+
+      {/* Main Grid Skeleton */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 flex flex-col gap-6">
+          <div className="rounded-lg border border-border-subtle bg-bg-elevated p-5 flex flex-col gap-4 shadow-2xs">
+            <Skeleton className="h-6 w-48" />
+            <SkeletonText lines={3} />
+          </div>
+          <div className="rounded-lg border border-border-subtle bg-bg-elevated p-5 flex flex-col gap-4 shadow-2xs">
+            <Skeleton className="h-6 w-48" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Skeleton className="h-24 rounded-lg" />
+              <Skeleton className="h-24 rounded-lg" />
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col gap-6">
+          <div className="rounded-lg border border-border-subtle bg-bg-elevated p-5 flex flex-col gap-4 shadow-2xs">
+            <Skeleton className="h-6 w-36" />
+            <SkeletonText lines={4} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export const DashboardPage: React.FC = () => {
   const [sessions, setSessions] = useState<StudySession[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
     getStudySessions().then((data) => {
-      if (!cancelled) setSessions(data);
+      if (!cancelled) {
+        setSessions(data);
+        setIsLoading(false);
+      }
     });
     return () => {
       cancelled = true;
@@ -88,7 +155,25 @@ export const DashboardPage: React.FC = () => {
   });
 
   return (
-    <div className="flex flex-col gap-6 pb-12 w-full">
+    <AnimatePresence mode="wait">
+      {isLoading ? (
+        <motion.div
+          key="skeleton"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: DURATION.fast, ease: EASE_EXPO_OUT }}
+        >
+          <DashboardSkeleton />
+        </motion.div>
+      ) : (
+        <motion.div
+          key="content"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: DURATION.fast, ease: EASE_EXPO_OUT }}
+          className="flex flex-col gap-6 pb-12 w-full motion-layer"
+        >
       {/* Header Ejecutivo del HUB */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border-subtle pb-5">
         <div>
@@ -393,6 +478,8 @@ export const DashboardPage: React.FC = () => {
           </Card>
         </div>
       </div>
-    </div>
+    </motion.div>
+  )}
+</AnimatePresence>
   );
 };

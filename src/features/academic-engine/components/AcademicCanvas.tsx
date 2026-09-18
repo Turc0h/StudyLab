@@ -731,8 +731,22 @@ export function AcademicCanvas({
                       </div>
                     ))
                   ) : (
-                    <div className="text-center py-16 text-text-tertiary font-mono">
-                      Página {activeViewerPage}: Sin chunks indexados directamente en esta coordenada.
+                    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                      <p className="text-text-secondary text-xs font-mono mb-2">
+                        Página {activeViewerPage}: Sin fragmentos indexados directamente en esta coordenada.
+                      </p>
+                      {chunks.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const firstAvailable = chunks[0]?.pageNumber || 1;
+                            setActiveViewerPage(firstAvailable);
+                          }}
+                          className="px-3 py-1.5 rounded-lg text-xs font-mono bg-accent-primary/10 text-accent-primary border border-accent-primary/30 hover:bg-accent-primary/20 transition-all cursor-pointer"
+                        >
+                          Ir a página con contenido (Pág. {chunks[0]?.pageNumber || 1})
+                        </button>
+                      )}
                     </div>
                   )}
 
