@@ -7,7 +7,6 @@
  * - Cancelación cooperativa con tokens atómicos.
  */
 
-import { createWorker } from "tesseract.js";
 import { pdfjsLib } from "../../lib/pdf";
 import { convertFileSrc, isDesktop } from "../../platform";
 import { indexDocumentPageFts, removeDocumentPagesFts } from "../../platform/ftsSearch";
@@ -112,6 +111,7 @@ export async function runDocumentOcrJob(
 
           // Inicializar worker de Tesseract de forma diferida (lazy load)
           if (!worker) {
+            const { createWorker } = await import("tesseract.js");
             worker = await createWorker("spa");
           }
 

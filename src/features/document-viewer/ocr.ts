@@ -1,4 +1,3 @@
-import { createWorker } from "tesseract.js";
 import { pdfjsLib } from "../../lib/pdf";
 import type { OcrLine } from "../../db/db";
 
@@ -19,6 +18,7 @@ export async function runOcrOnFile(
 ): Promise<OcrPageResult[]> {
   const arrayBuffer = await blob.arrayBuffer();
   const doc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  const { createWorker } = await import("tesseract.js");
   const worker = await createWorker("spa");
 
   const results: OcrPageResult[] = [];

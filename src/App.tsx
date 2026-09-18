@@ -1,22 +1,25 @@
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Shell } from "./components/layout/Shell";
 import { RouteErrorBoundary } from "./components/ErrorBoundary";
 
+// DashboardPage se mantiene precargada para render inmediato del inicio
 import { DashboardPage } from "./pages/DashboardPage";
-import { MethodsPage } from "./pages/MethodsPage";
-import { PdfPage } from "./pages/PdfPage";
-import { OcrPage } from "./pages/OcrPage";
-import { AmbientPage } from "./pages/AmbientPage";
-import Files from "./pages/Files";
-import { Session } from "./pages/Session";
-import { Settings } from "./pages/Settings";
-import { Workspace } from "./pages/Workspace";
-import { KnowledgeGraph } from "./pages/KnowledgeGraph";
-import AcademicWorkspace from "./pages/AcademicWorkspace";
-import { BookScannerPage } from "./pages/BookScannerPage";
-import { QaHubPage } from "./pages/QaHubPage";
-import { StyleKit } from "./pages/style-kit/StyleKit";
+
+// Módulos secundarios con carga diferida (lazy code splitting) para optimizar cold start
+const MethodsPage = lazy(() => import("./pages/MethodsPage").then((m) => ({ default: m.MethodsPage })));
+const PdfPage = lazy(() => import("./pages/PdfPage").then((m) => ({ default: m.PdfPage })));
+const OcrPage = lazy(() => import("./pages/OcrPage").then((m) => ({ default: m.OcrPage })));
+const BookScannerPage = lazy(() => import("./pages/BookScannerPage").then((m) => ({ default: m.BookScannerPage })));
+const AmbientPage = lazy(() => import("./pages/AmbientPage").then((m) => ({ default: m.AmbientPage })));
+const AcademicWorkspace = lazy(() => import("./pages/AcademicWorkspace"));
+const Workspace = lazy(() => import("./pages/Workspace").then((m) => ({ default: m.Workspace })));
+const KnowledgeGraph = lazy(() => import("./pages/KnowledgeGraph").then((m) => ({ default: m.KnowledgeGraph })));
+const Files = lazy(() => import("./pages/Files"));
+const Session = lazy(() => import("./pages/Session").then((m) => ({ default: m.Session })));
+const Settings = lazy(() => import("./pages/Settings").then((m) => ({ default: m.Settings })));
+const QaHubPage = lazy(() => import("./pages/QaHubPage").then((m) => ({ default: m.QaHubPage })));
+const StyleKit = lazy(() => import("./pages/style-kit/StyleKit").then((m) => ({ default: m.StyleKit })));
 
 function PageFallback() {
   return (

@@ -1,8 +1,14 @@
-import { pipeline, env } from "@xenova/transformers";
+// Lazy loader for @xenova/transformers so ONNX Runtime is not bundled or evaluated during cold start
+let transformersModule: typeof import("@xenova/transformers") | null = null;
 
-// Configure transformers for browser caching in Cache API / IndexedDB
-env.allowLocalModels = false;
-env.useBrowserCache = true;
+async function getTransformers() {
+  if (!transformersModule) {
+    transformersModule = await import("@xenova/transformers");
+    transformersModule.env.allowLocalModels = false;
+    transformersModule.env.useBrowserCache = true;
+  }
+  return transformersModule;
+}
 
 export type EmbeddingEngineStatus = "unloaded" | "loading" | "ready" | "fallback_keyword" | "error";
 
@@ -78,6 +84,7 @@ export async function initEmbeddingModel(
   updateState({ status: "loading", progress: 0, error: undefined });
 
   try {
+    const { pipeline } = await getTransformers();
     const pipe = await pipeline("feature-extraction", modelId, {
       progress_callback: (item: any) => {
         if (item.status === "progress" && item.progress !== undefined) {

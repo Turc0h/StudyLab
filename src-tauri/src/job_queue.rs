@@ -419,6 +419,8 @@ impl JobSystem {
             }
 
             // Simulación de paso de trabajo (lectura por streaming o verificación)
+            // Ceder tiempo cooperativamente para no ahogar el hilo de UI ni el scheduler del SO
+            std::thread::yield_now();
             thread::sleep(Duration::from_millis(50));
             self.update_progress(&job.id, (step * 10) as u8);
         }
@@ -483,7 +485,17 @@ impl JobSystem {
     }
 }
 
-// Instancia global del Job System configurada con 2 workers (óptimo para 4GB-8GB RAM)
+/// Calcula la cantidad óptima de workers basándose en el paralelismo de hardware disponible.
+/// Reserva al menos 1 núcleo para la interfaz de usuario / WebView2 y acota el rango entre 1 y 4
+/// para proteger el consumo de memoria RAM en portátiles y equipos con recursos moderados.
+pub fn calculate_optimal_worker_count() -> usize {
+    let available = std::thread::available_parallelism()
+        .map(|n| n.get())
+        .unwrap_or(2);
+    (available.saturating_sub(1)).clamp(1, 4)
+}
+
+// Instancia global del Job System configurada con pool de workers dinámico
 lazy_static::lazy_static! {
-    pub static ref GLOBAL_JOB_SYSTEM: Arc<JobSystem> = JobSystem::new(2);
+    pub static ref GLOBAL_JOB_SYSTEM: Arc<JobSystem> = JobSystem::new(calculate_optimal_worker_count());
 }

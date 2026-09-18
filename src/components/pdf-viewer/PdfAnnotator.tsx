@@ -24,7 +24,6 @@ import {
 } from "lucide-react";
 import { useSpeechReader } from "../../hooks/useSpeechReader";
 import { VoiceReaderControls } from "../speech/VoiceReaderControls";
-import { createWorker } from "tesseract.js";
 import { renderLatexToHtml, autoFormatMathToLatex } from "../../lib/latexHelper";
 import { LatexMathViewer } from "../latex/LatexMathViewer";
 
@@ -139,6 +138,7 @@ export const PdfAnnotator: React.FC = () => {
     setOcrProgress(15);
 
     try {
+      const { createWorker } = await import("tesseract.js");
       const worker = await createWorker("spa");
       setOcrProgress(40);
       const ret = await worker.recognize(canvasRef.current);

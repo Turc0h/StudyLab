@@ -1,6 +1,10 @@
-import { createWorker } from "tesseract.js";
 import { pdfjsLib } from "../../lib/pdf";
 import { renderLatexToHtml } from "../../lib/latexHelper";
+
+async function getTesseractWorker(lang = "spa") {
+  const { createWorker } = await import("tesseract.js");
+  return createWorker(lang);
+}
 
 /* ── Tipos para el layout estructurado ── */
 
@@ -137,7 +141,7 @@ async function processImageFile(
   onProgress?.("Inicializando motor OCR para imagen...", 10);
 
   const previewUrl = URL.createObjectURL(file);
-  const worker = await createWorker("spa");
+  const worker = await getTesseractWorker("spa");
 
   try {
     onProgress?.("Reconociendo caracteres y estructura de la imagen...", 40);
@@ -198,7 +202,7 @@ async function processPdfFile(
   const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
   const numPages = pdfDoc.numPages;
 
-  let worker: Awaited<ReturnType<typeof createWorker>> | null = null;
+  let worker: any = null;
   const pagesResult: PageOcrResult[] = [];
   let totalConfidence = 0;
   let ocrPagesCount = 0;
@@ -253,7 +257,7 @@ async function processPdfFile(
         );
 
         if (!worker) {
-          worker = await createWorker("spa");
+          worker = await getTesseractWorker("spa");
         }
 
         const ret = await worker.recognize(canvas, {}, { blocks: true });
