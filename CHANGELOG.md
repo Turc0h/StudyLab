@@ -968,6 +968,48 @@ El catálogo de StudyLab alcanza el 73.3% de interactividad práctica:
 
 ---
 
+## Fase v5.8 — Metacognición Estratégica y Transferencia: Efecto Protegido, Método del Relato y Método PQ4R
+
+Esta fase expande el Methods Hub alcanzando **25 runners interactivos** de un total de 30 métodos (**83.3% de cobertura funcional interactiva**), incorporando herramientas para la enseñanza reflexiva a aprendices, la memorización serial por drama visual y la lectura crítica con búsqueda de contraejemplos.
+
+### 1. Runner Interactivo de Enseñar a Otros / Efecto Protegido (`ProtegeEffectMethod.tsx`)
+- **Acceso:** Desde `/methods?run=protege-effect`.
+- **Fundamentación:** Chase, Chin, Oppezzo & Schwartz (2009, Stanford AAA Lab / Teachable Agents) — La preparación intencional para instruir a un tercero obliga a organizar esquemas mentales más profundos y elimina la falsa ilusión de competencia.
+- **Espacio de Instrucción de Pares:**
+  - **Perfil del Protegido:** Definición del interlocutor y nivel de partida (alumnos ingresantes, pares o legos).
+  - **Puntos Clave y Analogías Cotidianas:** Exigencia obligatoria de traducir conceptos técnicos a metáforas sin jerga inaccesible.
+  - **Simulador de Desafíos e Interrupciones:** Desafíos inquisitivos del aprendiz (*"¿Por qué no ocurre lo mismo si la temperatura baja?"*) con opción de marcar dudas no resueltas para consulta de cátedra.
+
+### 2. Runner Interactivo del Método del Relato / Cadena Narrativa (`StoryMethod.tsx`)
+- **Acceso:** Desde `/methods?run=story-method`.
+- **Fundamentación:** Gordon Bower & Michal Clark (1969, Stanford) — Demostraron una tasa de retención del 93% en el recuerdo serial de listas mediante encadenamiento narrativo frente a solo un 13% en controles no narrativos.
+- **Flujo de Trabajo Dual (Composición & Drill):**
+  - **Modo Composición:** Carga de conceptos o etapas secuenciales con asignación de escenas visuales dramáticas, absurdas o con fuerte carga de movimiento entre el eslabón $n$ y el eslabón $n+1$.
+  - **Modo Drill de Evocación Activa:** Ocultamiento de términos técnicos para forzar la reconstrucción serial de la secuencia completa a partir de la trama del relato, con cálculo de aciertos.
+
+### 3. Runner Interactivo del Método PQ4R (`Pq4rMethod.tsx`)
+- **Acceso:** Desde `/methods?run=pq4r`.
+- **Fundamentación:** Thomas & Robinson (1972) — Evolución avanzada del protocolo SQ3R orientada a capítulos científicos y doctrinales densos.
+- **Protocolo de 6 Etapas con Fase Nuclear "Reflect":**
+  - **1. Preview:** Ojeada estructural de la arquitectura del texto.
+  - **2. Question:** Conversión de encabezados en interrogantes directrices.
+  - **3. Read:** Lectura focalizada buscando las respuestas a los interrogantes.
+  - **4. Reflect (Fase Nuclear):** Conexión con conocimientos previos, formulación de contraejemplos que desafían la regla y análisis de condiciones límite antes del recitado.
+  - **5. Recite:** Paráfrasis oral o escrita a libro cerrado sin mirar apuntes.
+  - **6. Review:** Contraste con el texto para auditar lagunas y derivar tarjetas a repaso espaciado.
+
+### 4. Estado Global de Métodos: 25 Runners Activos + 5 Fichas Guiadas
+El catálogo de StudyLab alcanza el 83.3% de cobertura interactiva:
+- **25 Runners Funcionales:** Feynman, SQ3R, Pomodoro, Recuerdo Activo, Interleaving, Cornell, Simulacros de Examen, Zettelkasten, Blurting, Mapas Mentales, Leitner, Interrogación Elaborativa, Palacio de la Memoria, Mnemotecnias, KWL, Autoexplicación, Codificación Dual, Bloques de Trabajo Profundo, Mapas Conceptuales Novakianos, Chunking, Aprendizaje Basado en Problemas, Enseñar a Otros (Efecto Protegido), Método del Relato, Método PQ4R y Repaso Espaciado (FSRS).
+- **5 Fichas Prácticas Guiadas:** Práctica Distribuida, Dificultades Deseables, Principio de Segmentación, Estudio Multisensorial y Consolidación por Sueño.
+
+### 5. Suite de Verificación Automatizada (21 Suites)
+- `scripts/test-phase8-metacognition-runners.mjs`: 52/52 pruebas aprobadas al 100%.
+- `npm test`: **21 suites de tests ejecutadas con 100% de éxito**.
+- `npm run build`: compilación limpia en 4.63s con 0 errores TypeScript (`tsc -b && vite build`).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

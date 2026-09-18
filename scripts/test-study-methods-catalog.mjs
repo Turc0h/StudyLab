@@ -68,14 +68,17 @@ const CORE_IMPLEMENTED_IDS = [
   "concept-maps",
   "chunking",
   "problem-based-learning",
+  "protege-effect",
+  "story-method",
+  "pq4r",
 ];
 const implementedCore = STUDY_METHODS_30_SEEDS.filter(m => CORE_IMPLEMENTED_IDS.includes(m.id) && m.implemented === true);
-assert(implementedCore.length === 22, `Los métodos con runner interactivo conservan implemented: true (actual: ${implementedCore.length})`);
+assert(implementedCore.length === 25, `Los métodos con runner interactivo conservan implemented: true (actual: ${implementedCore.length})`);
 
 // Test 5: Los restantes métodos informativos tienen implemented: false
 const nonCoreMethods = STUDY_METHODS_30_SEEDS.filter(m => !CORE_IMPLEMENTED_IDS.includes(m.id));
 const allNonCoreFalse = nonCoreMethods.every(m => m.implemented === false);
-assert(allNonCoreFalse, `Los 8 métodos restantes tienen implemented: false (fichas informativas)`);
+assert(allNonCoreFalse, `Los 5 métodos restantes tienen implemented: false (fichas informativas)`);
 
 // Test 6: Calidad de contenido (description 2-4 líneas y howTo con 3 a 5 pasos)
 const validStepsAndDesc = STUDY_METHODS_30_SEEDS.every(m => {

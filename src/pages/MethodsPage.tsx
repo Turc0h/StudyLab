@@ -87,6 +87,15 @@ const ChunkingMethod = lazy(() =>
 const ProblemBasedLearningMethod = lazy(() =>
   import("../components/study-methods/ProblemBasedLearningMethod").then((m) => ({ default: m.ProblemBasedLearningMethod })),
 );
+const ProtegeEffectMethod = lazy(() =>
+  import("../components/study-methods/ProtegeEffectMethod").then((m) => ({ default: m.ProtegeEffectMethod })),
+);
+const StoryMethod = lazy(() =>
+  import("../components/study-methods/StoryMethod").then((m) => ({ default: m.StoryMethod })),
+);
+const Pq4rMethod = lazy(() =>
+  import("../components/study-methods/Pq4rMethod").then((m) => ({ default: m.Pq4rMethod })),
+);
 
 const CATEGORIES = [
   { id: "all", label: "Todas las Categorías" },
@@ -216,6 +225,12 @@ export const MethodsPage: React.FC = () => {
           return <ChunkingMethod onSessionFinished={handleBackToCatalog} />;
         case "problem-based-learning":
           return <ProblemBasedLearningMethod onSessionFinished={handleBackToCatalog} />;
+        case "protege-effect":
+          return <ProtegeEffectMethod onSessionFinished={handleBackToCatalog} />;
+        case "story-method":
+          return <StoryMethod onSessionFinished={handleBackToCatalog} />;
+        case "pq4r":
+          return <Pq4rMethod onSessionFinished={handleBackToCatalog} />;
         default:
           return (
             <div className="p-8 text-center space-y-4">

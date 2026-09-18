@@ -21,7 +21,10 @@ export type StudyMethodId =
   | "deep-work"
   | "concept-maps"
   | "chunking"
-  | "problem-based-learning";
+  | "problem-based-learning"
+  | "protege-effect"
+  | "story-method"
+  | "pq4r";
 
 export interface StudyMethodInfo {
   id: StudyMethodId;

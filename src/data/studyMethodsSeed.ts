@@ -374,7 +374,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Visualiza la historia de principio a fin dos veces y luego traduce las escenas a los conceptos técnicos.",
     ],
     scientificBasis: "Bower & Clark (1969) • Narrative Stories as Mediators for Serial Learning.",
-    implemented: false,
+    integratesWith: ["session-engine"],
+    implemented: true,
   },
 
   // 19. Enseñar a Otros
@@ -394,7 +395,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Revisa la bibliografía en conjunto para resolver las dudas mutuas planteadas.",
     ],
     scientificBasis: "Chase, Chin, Oppezzo & Schwartz (2009) • Teachable Agents and the Protégé Effect.",
-    implemented: false,
+    integratesWith: ["session-engine"],
+    implemented: true,
   },
 
   // 20. Estudio Multisensorial
@@ -538,7 +540,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Recite & Review: Parafrasea de memoria los conceptos clave y repasa la totalidad del capítulo para subsanar lagunas.",
     ],
     scientificBasis: "Thomas & Robinson (1972) • Improving Reading in Every Class: A Sourcebook for Teachers.",
-    implemented: false,
+    integratesWith: ["session-engine"],
+    implemented: true,
   },
 
   // 27. Método KWL
