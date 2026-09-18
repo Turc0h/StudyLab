@@ -57,6 +57,9 @@ const ZettelkastenMethod = lazy(() =>
 const BlurtingMethod = lazy(() =>
   import("../components/study-methods/BlurtingMethod").then((m) => ({ default: m.BlurtingMethod })),
 );
+const LeitnerMethod = lazy(() =>
+  import("../components/study-methods/LeitnerMethod").then((m) => ({ default: m.LeitnerMethod })),
+);
 
 const CATEGORIES = [
   { id: "all", label: "Todas las Categorías" },
@@ -166,6 +169,8 @@ export const MethodsPage: React.FC = () => {
           return <ZettelkastenMethod onSessionFinished={handleBackToCatalog} />;
         case "blurting":
           return <BlurtingMethod onSessionFinished={handleBackToCatalog} />;
+        case "leitner":
+          return <LeitnerMethod onSessionFinished={handleBackToCatalog} />;
         default:
           return (
             <div className="p-8 text-center space-y-4">

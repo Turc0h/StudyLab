@@ -4,16 +4,17 @@ import { ProjectKnowledgeLinker } from "./ProjectKnowledgeLinker";
 import { WeeklyCalendarTimeBlocker } from "./WeeklyCalendarTimeBlocker";
 import { PostSessionEnergyCheck } from "./PostSessionEnergyCheck";
 import { UnifiedTextIntake } from "./UnifiedTextIntake";
+import { CognitiveProfileSelector } from "./CognitiveProfileSelector";
 import { PanelGuide } from "../../components/guide/PanelGuide";
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
-import { Compass, Calendar, Battery, Sparkles, Settings } from "lucide-react";
+import { Compass, Calendar, Battery, Sparkles, Settings, Brain } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export const ContextEngineDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { contextEngineEnabled } = useContextEngineStore();
-  const [activeTab, setActiveTab] = useState<"projects" | "calendar" | "energy" | "intake">("projects");
+  const [activeTab, setActiveTab] = useState<"projects" | "calendar" | "energy" | "intake" | "profiles">("projects");
 
   if (!contextEngineEnabled) {
     return (
@@ -78,6 +79,7 @@ export const ContextEngineDashboard: React.FC = () => {
           { id: "calendar", label: "Calendario & Horarios", icon: Calendar },
           { id: "energy", label: "Energía & Ritmo Circadiano", icon: Battery },
           { id: "intake", label: "Embudo Rápido de Texto", icon: Sparkles },
+          { id: "profiles", label: "Perfiles Cognitivos", icon: Brain },
         ].map((tab) => {
           const Icon = tab.icon;
           return (
@@ -104,6 +106,7 @@ export const ContextEngineDashboard: React.FC = () => {
         {activeTab === "calendar" && <WeeklyCalendarTimeBlocker />}
         {activeTab === "energy" && <PostSessionEnergyCheck />}
         {activeTab === "intake" && <UnifiedTextIntake />}
+        {activeTab === "profiles" && <CognitiveProfileSelector />}
       </div>
     </div>
   );

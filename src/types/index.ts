@@ -11,7 +11,8 @@ export type StudyMethodId =
   | "mock-tests"
   | "practice-testing"
   | "zettelkasten"
-  | "blurting";
+  | "blurting"
+  | "leitner";
 
 export interface StudyMethodInfo {
   id: StudyMethodId;

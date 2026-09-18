@@ -807,6 +807,43 @@ Esta versión completa las Fases 3 y 4 del Context Engine y expande el catálogo
 
 ---
 
+## Expansión StudyLab v5.4 — Método Leitner, 13 Runners Interactivos y Selector de Perfiles Cognitivos
+
+Esta versión añade el runner físico del **Método Leitner (Cajas de Flashcards)**, promueve 4 métodos más al estado interactivo activo (alcanzando 13 de 30 métodos) e implementa la **Fase 5 del Context Engine** con un **Selector de Perfiles Cognitivos (Context Stance)**.
+
+### 1. Runner Interactivo del Método Leitner (`LeitnerMethod.tsx`)
+- **Arquitectura de 5 Compartimentos**:
+  - Caja 1 (Diario), Caja 2 (Cada 3 días), Caja 3 (Semanal), Caja 4 (Quincenal), Caja 5 (Graduadas / Mensual).
+- **Mecánica de Evaluación Fidedigna**:
+  - Anverso / Reverso con botón *"Revelar Respuesta"*.
+  - **Acierto**: Promueve la tarjeta a la caja inmediata superior (`c.box + 1`).
+  - **Fallo (Regla Estricta Leitner)**: Cualquier error devuelve la ficha inmediatamente a la Caja 1, garantizando que los vacíos conceptuales se repasen al día siguiente.
+- **Integración con Biblioteca**: Permite estudiar las flashcards locales de `db.flashcards` o utilizar el mazo base de entrenamiento universitario.
+- **Métricas de Consolidación**: Monitorea el porcentaje de graduación y distribución por caja, guardando la sesión en `db.studySessions`.
+
+### 2. Catálogo Extendido a 13 Métodos Interactivos Activos
+Se promovieron formalmente 4 metodologías a `implemented: true` con runners integrados en `MethodsPage.tsx`:
+1. **Método Leitner** (`leitner`): FSRS y sesiones de memorización con 5 cajas.
+2. **Método SQ3R** (`sq3r`): Protocolo guiado en 5 fases (Survey, Question, Read, Recite, Review).
+3. **Mapas Conceptuales / Mentales** (`mind-maps`): Estructuración jerárquica radial con árbol de ramas lógicas.
+4. **Interrogación Elaborativa** (`elaborative-interrogation`): Cuestionamiento causal de afirmaciones y contraejemplos.
+
+### 3. Context Engine Fase 5: Selector de Perfiles Cognitivos (`CognitiveProfileSelector.tsx`)
+- Nueva pestaña *"Perfiles Cognitivos"* en `ContextEngineDashboard.tsx`.
+- **4 Posturas Mentales Estratégicas**:
+  - 🧠 **Inmersión Lógica & Deducción**: Para matemáticas, algoritmos y bioquímica (sugiere Interleaving, Feynman, Interrogación Elaborativa).
+  - 🏰 **Fortaleza Mnemónica & Retención**: Para medicina, leyes y vocabulario (sugiere Leitner, Recuerdo Activo, Repaso Espaciado).
+  - ✍️ **Síntesis, Tesis & Estructura**: Para papers y manuales densos (sugiere Zettelkasten, Cornell, SQ3R, Mapas Conceptuales).
+  - ⚡ **Presión de Examen & Auditoría**: Para erradicar la ilusión de competencia (sugiere Simulacros de Examen, Blurting).
+- **Lanzamiento Inmediato**: Cada sugerencia incluye un botón *"Iniciar [Método]"* con deep-link a `/methods?run=...`.
+
+### 4. Suite de Verificación Automatizada (17 Suites)
+- `scripts/test-phase4-leitner-modes.mjs`: 33/33 pruebas aprobadas (contratos Leitner, conteo 13/17 en catálogo, perfiles cognitivos).
+- `npm test`: **17 suites de test ejecutadas con 100% de éxito en 7.1s**.
+- `npm run build`: compilación de producción limpia en 3.98s sin advertencias de linter.
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

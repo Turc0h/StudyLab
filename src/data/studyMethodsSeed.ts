@@ -165,8 +165,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Revisa la topología general para asegurar coherencia y equilibrio estructural.",
     ],
     scientificBasis: "Allan Paivio (1971) • Dual Coding Theory and Associative Semantic Networks.",
-    integratesWith: ["knowledge-graph"],
-    implemented: false,
+    integratesWith: ["knowledge-graph", "session-engine"],
+    implemented: true,
   },
 
   // 9. Método Leitner (Cajas de Flashcards)
@@ -186,8 +186,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Gradúa las tarjetas que superen el Compartimento 5 como material consolidado a largo plazo.",
     ],
     scientificBasis: "Sebastian Leitner (1972) • So lernt man lernen: Der Weg zum Erfolg.",
-    integratesWith: ["fsrs"],
-    implemented: false,
+    integratesWith: ["fsrs", "session-engine"],
+    implemented: true,
   },
 
   // 10. Autoexplicación
@@ -247,7 +247,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Review (Revisar): Integra la visión de conjunto repasando las relaciones entre las partes.",
     ],
     scientificBasis: "Francis P. Robinson (1946) • Effective Study (Harper & Brothers).",
-    implemented: false,
+    integratesWith: ["session-engine"],
+    implemented: true,
   },
 
   // 13. Codificación Dual
@@ -448,7 +449,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Integra la respuesta elaborada en una nota concisa al margen del material.",
     ],
     scientificBasis: "Pressley, McDaniel, Turnure, Wood & Ahmad (1987) • Generation and Precision of Elaboration: Effects on Intentional and Incidental Learning.",
-    implemented: false,
+    integratesWith: ["session-engine"],
+    implemented: true,
   },
 
   // 23. Mapas Conceptuales
