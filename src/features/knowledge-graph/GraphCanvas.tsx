@@ -453,6 +453,10 @@ export function GraphCanvas({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onWheel={handleWheel}
+        style={{
+          transform: "translateZ(0)",
+          willChange: "transform",
+        }}
         className="w-full h-full cursor-grab active:cursor-grabbing"
       />
 

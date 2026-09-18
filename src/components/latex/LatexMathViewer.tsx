@@ -24,6 +24,10 @@ export const LatexMathViewer: React.FC<LatexMathViewerProps> = ({
 
   return (
     <div
+      style={{
+        contentVisibility: "auto",
+        contain: "layout style",
+      }}
       className={`p-4 rounded border border-border-subtle bg-bg-elevated text-text-primary text-xs font-sans leading-relaxed overflow-y-auto max-h-[420px] ${className}`}
       dangerouslySetInnerHTML={{ __html: html }}
     />

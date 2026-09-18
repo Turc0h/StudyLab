@@ -234,6 +234,7 @@ function PdfPage({
         style={{
           width: `${currentWidth}px`,
           height: `${currentHeight}px`,
+          contain: "strict",
         }}
         className={`relative bg-white dark:bg-zinc-900 rounded border border-border-subtle shadow-xs overflow-hidden ${
           postItArmed ? "cursor-crosshair" : ""
@@ -244,6 +245,10 @@ function PdfPage({
           <>
             <canvas
               ref={canvasRef}
+              style={{
+                transform: "translateZ(0)",
+                willChange: rendered ? "auto" : "opacity",
+              }}
               className={`block transition-opacity duration-150 ${rendered ? "opacity-100" : "opacity-0"}`}
             />
             <div ref={textLayerRef} className="textLayer" />

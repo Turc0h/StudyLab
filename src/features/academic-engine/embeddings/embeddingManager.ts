@@ -1,11 +1,58 @@
+export type HardwareBackend = "webgpu" | "wasm_simd" | "wasm_scalar" | "fallback_keyword";
+
 // Lazy loader for @xenova/transformers so ONNX Runtime is not bundled or evaluated during cold start
 let transformersModule: typeof import("@xenova/transformers") | null = null;
+let cachedBackend: HardwareBackend | null = null;
+
+export async function detectOptimalHardwareBackend(): Promise<HardwareBackend> {
+  if (cachedBackend) return cachedBackend;
+
+  // 1. Probar WebGPU en el WebView
+  if (typeof navigator !== "undefined" && "gpu" in navigator) {
+    try {
+      const adapter = await (navigator as any).gpu?.requestAdapter();
+      if (adapter) {
+        cachedBackend = "webgpu";
+        console.info("[ONNX / WebGPU] Acelerador gráfico nativo detectado y activo.");
+        return "webgpu";
+      }
+    } catch (e) {
+      console.warn("[ONNX] WebGPU no disponible en este WebView, degradando a WASM:", e);
+    }
+  }
+
+  // 2. Probar WebAssembly SIMD
+  try {
+    const simdSupported = WebAssembly.validate(
+      new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0, 1, 5, 1, 96, 0, 1, 123, 3, 2, 1, 0, 10, 10, 1, 8, 0, 65, 0, 253, 15, 26, 11])
+    );
+    if (simdSupported) {
+      cachedBackend = "wasm_simd";
+      return "wasm_simd";
+    }
+  } catch {
+    // fallback a escalar
+  }
+
+  cachedBackend = "wasm_scalar";
+  return "wasm_scalar";
+}
 
 async function getTransformers() {
   if (!transformersModule) {
     transformersModule = await import("@xenova/transformers");
     transformersModule.env.allowLocalModels = false;
     transformersModule.env.useBrowserCache = true;
+
+    // Configurar aceleración SIMD y asignación óptima de hilos
+    const threads = Math.min(
+      4,
+      Math.max(1, typeof navigator !== "undefined" && navigator.hardwareConcurrency ? navigator.hardwareConcurrency - 1 : 2),
+    );
+    if (transformersModule.env.backends?.onnx?.wasm) {
+      transformersModule.env.backends.onnx.wasm.simd = true;
+      transformersModule.env.backends.onnx.wasm.numThreads = threads;
+    }
   }
   return transformersModule;
 }
@@ -16,6 +63,7 @@ export interface EmbeddingEngineState {
   status: EmbeddingEngineStatus;
   progress: number;
   modelId: string;
+  activeBackend?: HardwareBackend;
   error?: string;
 }
 
@@ -71,7 +119,8 @@ export function setEmbeddingModelId(modelId: string) {
 }
 
 /**
- * Initializes the Transformers.js feature-extraction pipeline with real progress tracking.
+ * Initializes the Transformers.js feature-extraction pipeline with real progress tracking
+ * and cascading WebGPU -> WASM SIMD execution fallback.
  */
 export async function initEmbeddingModel(
   onProgress?: (pct: number) => void,
@@ -81,27 +130,54 @@ export async function initEmbeddingModel(
   }
 
   const modelId = currentState.modelId;
-  updateState({ status: "loading", progress: 0, error: undefined });
+  const preferredBackend = await detectOptimalHardwareBackend();
+  updateState({ status: "loading", progress: 0, activeBackend: preferredBackend, error: undefined });
 
   try {
     const { pipeline } = await getTransformers();
-    const pipe = await pipeline("feature-extraction", modelId, {
-      progress_callback: (item: any) => {
-        if (item.status === "progress" && item.progress !== undefined) {
-          const pct = Math.round(item.progress);
-          updateState({ progress: pct });
-          onProgress?.(pct);
-        }
-      },
-    });
+    const progressCallback = (item: any) => {
+      if (item.status === "progress" && item.progress !== undefined) {
+        const pct = Math.round(item.progress);
+        updateState({ progress: pct });
+        onProgress?.(pct);
+      }
+    };
+
+    let pipe: any = null;
+    let finalBackend: HardwareBackend = preferredBackend;
+
+    if (preferredBackend === "webgpu") {
+      try {
+        pipe = await pipeline("feature-extraction", modelId, {
+          device: "webgpu",
+          progress_callback: progressCallback,
+        } as any);
+        finalBackend = "webgpu";
+      } catch (gpuErr) {
+        console.warn("[ONNX] Falló WebGPU en pipeline, cayendo a WASM SIMD:", gpuErr);
+        cachedBackend = "wasm_simd";
+        pipe = await pipeline("feature-extraction", modelId, {
+          device: "wasm",
+          progress_callback: progressCallback,
+        } as any);
+        finalBackend = "wasm_simd";
+      }
+    } else {
+      pipe = await pipeline("feature-extraction", modelId, {
+        device: "wasm",
+        progress_callback: progressCallback,
+      } as any);
+      finalBackend = preferredBackend;
+    }
 
     extractorInstance = pipe;
-    updateState({ status: "ready", progress: 100 });
+    updateState({ status: "ready", progress: 100, activeBackend: finalBackend });
     return pipe;
   } catch (err: any) {
     console.warn("Failed to load on-device embedding model, degrading to keyword search fallback:", err);
     updateState({
       status: "fallback_keyword",
+      activeBackend: "fallback_keyword",
       error: err?.message || "No se pudo cargar el modelo ONNX. Degradando a búsqueda léxica BM25.",
     });
     return null;
