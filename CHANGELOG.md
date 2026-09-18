@@ -886,6 +886,48 @@ El catálogo supera el hito del 50% de interactividad práctica:
 
 ---
 
+## Fase v5.6 — Profundización Cognitiva: Autoexplicación, Codificación Dual y Bloques de Trabajo Profundo
+
+Esta fase expande el Methods Hub alcanzando **19 runners interactivos** de un total de 30 métodos, atacando la comprensión causal paso a paso, la bimodalidad cerebro-visual y la resistencia ejecutiva ante distracciones.
+
+### 1. Runner Interactivo de Autoexplicación (`SelfExplanationMethod.tsx`)
+- **Acceso:** Desde `/methods?run=self-explanation`.
+- **Fundamentación:** Chi et al. (1989) — La justificación explícita paso a paso activa la resolución de lagunas inferenciales y refuerza modelos mentales profundos.
+- **Flujo de Trabajo Guiado:**
+  - **Paso 1: Planteo y Desglose:** Definición del problema, teorema, demostración o procedimiento, dividido en pasos o premisas secuenciales.
+  - **Paso 2: Justificación Causal ("¿Por qué?"):** Para cada paso, el estudiante debe justificar por qué ese paso es lógicamente necesario, qué principio teórico lo gobierna y qué pasaría si se omitiera.
+  - **Paso 3: Análisis de Condiciones Límite:** Reflexión sobre qué condiciones deben cumplirse para que el razonamiento sea válido y qué supuestos romperían la conclusión.
+  - **Paso 4: Árbol Causal y Registro:** Resumen consolidado del razonamiento e integración con `db.studySessions`.
+
+### 2. Runner Interactivo de Codificación Dual (`DualCodingMethod.tsx`)
+- **Acceso:** Desde `/methods?run=dual-coding`.
+- **Fundamentación:** Allan Paivio (1986) — La doble codificación verbal y visual crea dos huellas mnémicas independientes pero asociadas, duplicando las probabilidades de recuperación espontánea.
+- **Espacio de Trabajo Bimodal Sincronizado:**
+  - **Panel Izquierdo (Canal Verbal):** Redacción proposicional estructurada de los conceptos, definiciones e hipótesis.
+  - **Panel Derecho (Canal Visual):** Lienzo interactivo de nodos y flujos diagramáticos con selección de paletas semánticas, conectores lógicos y mapas de relación.
+  - **Sincronización:** Validación de correspondencia 1:1 entre cada proposición textual y su manifestación visual correspondiente.
+
+### 3. Runner Interactivo de Bloques de Trabajo Profundo (`DeepWorkMethod.tsx`)
+- **Acceso:** Desde `/methods?run=deep-work`.
+- **Fundamentación:** Cal Newport (2016) / Ritmo Ultradiano BRAC (Kleitman) — La atención focal sin cambios de contexto permite entrar en estado de flujo y reduce el "residuo atencional" (attention residue).
+- **Ciclo de Ejecución de Alta Intensidad:**
+  - **Fase de Preparación:** Selección del bloque ultradiano (60 min, 90 min estándar o 120 min de alta resistencia). Definición de la "Meta Monumental" única de la sesión.
+  - **Checklist de Aislamiento Cognitivo:** Verificación previa de 4 compuertas (teléfono fuera de la vista, pestañas no relevantes cerradas, entorno acústico blindado, agua/café listo).
+  - **Timer Ultradiano Concentrado:** Cuenta regresiva con barra de progreso reactiva, medidor de pulsaciones de enfoque y botón de rescate de emergencias.
+  - **Auditoría Post-Bloque:** Calificación de profundidad (1 al 5), registro de distracciones intrusivas contenidas y persistencia en el historial de sesiones.
+
+### 4. Estado Global de Métodos: 19 Runners Activos + 11 Fichas Guiadas
+El catálogo de StudyLab alcanza el 63.3% de cobertura funcional interactiva:
+- **19 Runners Funcionales:** Feynman, SQ3R, Pomodoro, Recuerdo Activo, Interleaving, Cornell, Simulacros de Examen, Zettelkasten, Blurting, Mapas Mentales, Leitner, Interrogación Elaborativa, Palacio de la Memoria, Mnemotecnias, KWL, Autoexplicación, Codificación Dual, Bloques de Trabajo Profundo y Repaso Espaciado (FSRS).
+- **11 Fichas Prácticas Guiadas:** Con fundamentación teórica, fases paso a paso y conexiones de navegación hacia FSRS y Knowledge Graph.
+
+### 5. Suite de Verificación Automatizada (19 Suites)
+- `scripts/test-phase6-deep-learning.mjs`: 43/43 pruebas aprobadas (contratos de Autoexplicación, Codificación Dual, Deep Work y catálogo 19/11).
+- `npm test`: **19 suites de tests ejecutadas con 100% de éxito**.
+- `npm run build`: compilación limpia con 0 errores TypeScript (`tsc -b && vite build`).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

@@ -207,7 +207,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Escribe una nota marginal sintetizando el principio subyacente que gobierna el paso.",
     ],
     scientificBasis: "Chi, Bassok, Lewis, Reimann & Glaser (1989) • Self-Explanations: How Students Study and Use Examples in Learning to Solve Problems.",
-    implemented: false,
+    integratesWith: ["session-engine"],
+    implemented: true,
   },
 
   // 11. Práctica Distribuida
@@ -268,7 +269,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Reconstruye el esquema visual de memoria para verificar la solidez del anclaje dual.",
     ],
     scientificBasis: "Allan Paivio (1986) • Mental Representations: A Dual Coding Approach (Oxford University Press).",
-    implemented: false,
+    integratesWith: ["knowledge-graph", "session-engine"],
+    implemented: true,
   },
 
   // 14. Mnemotecnias
@@ -595,8 +597,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Al concluir, tómate una desconexión prolongada de 30 minutos sin consumir contenido digital denso.",
     ],
     scientificBasis: "Cal Newport (2016) / Kleitman (Basic Rest-Activity Cycle) • Deep Work: Rules for Focused Success in a Distracted World.",
-    integratesWith: ["pomodoro-timer"],
-    implemented: false,
+    integratesWith: ["pomodoro-timer", "session-engine"],
+    implemented: true,
   },
 
   // 30. Consolidación por Sueño

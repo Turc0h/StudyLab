@@ -15,7 +15,10 @@ export type StudyMethodId =
   | "leitner"
   | "method-of-loci"
   | "mnemonics"
-  | "kwl-method";
+  | "kwl-method"
+  | "self-explanation"
+  | "dual-coding"
+  | "deep-work";
 
 export interface StudyMethodInfo {
   id: StudyMethodId;

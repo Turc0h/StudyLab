@@ -69,6 +69,15 @@ const MnemonicsMethod = lazy(() =>
 const KwlMethod = lazy(() =>
   import("../components/study-methods/KwlMethod").then((m) => ({ default: m.KwlMethod })),
 );
+const SelfExplanationMethod = lazy(() =>
+  import("../components/study-methods/SelfExplanationMethod").then((m) => ({ default: m.SelfExplanationMethod })),
+);
+const DualCodingMethod = lazy(() =>
+  import("../components/study-methods/DualCodingMethod").then((m) => ({ default: m.DualCodingMethod })),
+);
+const DeepWorkMethod = lazy(() =>
+  import("../components/study-methods/DeepWorkMethod").then((m) => ({ default: m.DeepWorkMethod })),
+);
 
 const CATEGORIES = [
   { id: "all", label: "Todas las Categorías" },
@@ -186,6 +195,12 @@ export const MethodsPage: React.FC = () => {
           return <MnemonicsMethod onSessionFinished={handleBackToCatalog} />;
         case "kwl-method":
           return <KwlMethod onSessionFinished={handleBackToCatalog} />;
+        case "self-explanation":
+          return <SelfExplanationMethod onSessionFinished={handleBackToCatalog} />;
+        case "dual-coding":
+          return <DualCodingMethod onSessionFinished={handleBackToCatalog} />;
+        case "deep-work":
+          return <DeepWorkMethod onSessionFinished={handleBackToCatalog} />;
         default:
           return (
             <div className="p-8 text-center space-y-4">
