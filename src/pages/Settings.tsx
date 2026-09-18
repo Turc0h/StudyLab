@@ -10,7 +10,10 @@ import {
   Upload,
   ShieldCheck,
   AlertTriangle,
+  Cpu,
+  RefreshCw,
 } from "lucide-react";
+import { checkOllamaStatus, type OllamaStatus } from "../platform/ai/ollamaClient";
 import type { ReactNode } from "react";
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
@@ -91,6 +94,15 @@ export function Settings() {
   const [backupStatus, setBackupStatus] = useState<string | null>(null);
   const [backupProgress, setBackupProgress] = useState(0);
   const [purgedCount, setPurgedCount] = useState<number | null>(null);
+  const [ollamaStatus, setOllamaStatus] = useState<OllamaStatus | null>(null);
+  const [isCheckingOllama, setIsCheckingOllama] = useState(false);
+
+  const handleCheckOllama = async () => {
+    setIsCheckingOllama(true);
+    const status = await checkOllamaStatus();
+    setOllamaStatus(status);
+    setIsCheckingOllama(false);
+  };
 
   useEffect(() => {
     void getStorageEstimate().then(setStorageEstimate);
@@ -626,6 +638,85 @@ export function Settings() {
                     <span>Abrir Motor de Contexto (/context)</span>
                   </Button>
                 </div>
+              </div>
+            )}
+          </div>
+        </SettingsSection>
+
+        {/* Sección de Servidor Local de Inteligencia Artificial (Ollama) */}
+        <SettingsSection
+          title="Inteligencia Artificial Local (Ollama - localhost:11434)"
+          description="Conectá modelos libres y locales (Llama 3.2, Mistral, Phi-3) ejecutados en tu propia máquina mediante Ollama. Cero llamadas a APIs externas y 100% privado."
+        >
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <span className="text-sm font-medium text-text-primary flex items-center gap-2">
+                  <Cpu className="h-4 w-4 text-accent-primary" />
+                  Estado del Servidor Ollama
+                </span>
+                <p className="text-xs text-text-secondary mt-0.5">
+                  Verificá si el demonio de Ollama está escuchando peticiones en el puerto estándar 11434.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleCheckOllama}
+                disabled={isCheckingOllama}
+                className="text-xs flex items-center gap-1.5 self-start sm:self-auto"
+              >
+                <RefreshCw className={isCheckingOllama ? "h-3.5 w-3.5 animate-spin" : "h-3.5 w-3.5"} />
+                <span>{isCheckingOllama ? "Comprobando..." : "Comprobar Conexión con Ollama"}</span>
+              </Button>
+            </div>
+
+            {ollamaStatus && (
+              <div className="rounded-xl border border-border-subtle bg-bg-surface-2 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-text-primary">Resultado:</span>
+                    {ollamaStatus.isRunning ? (
+                      <Badge variant="success">Ollama Conectado y Listo</Badge>
+                    ) : (
+                      <Badge variant="neutral">Ollama No Detectado</Badge>
+                    )}
+                  </div>
+                  {ollamaStatus.version && (
+                    <span className="text-xs text-text-muted">v{ollamaStatus.version}</span>
+                  )}
+                </div>
+
+                {ollamaStatus.isRunning ? (
+                  <div className="space-y-2 text-xs">
+                    <p className="text-text-secondary">
+                      Modelos locales disponibles ({ollamaStatus.models.length}):
+                    </p>
+                    {ollamaStatus.models.length > 0 ? (
+                      <div className="flex flex-wrap gap-1.5">
+                        {ollamaStatus.models.map((m) => (
+                          <Badge key={m.digest || m.name} variant="accent">
+                            {m.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-text-muted italic">
+                        No hay modelos descargados aún. Podés instalar uno ejecutando: <code className="text-accent-primary">ollama run llama3.2</code>
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-xs text-text-secondary space-y-1.5">
+                    <p className="text-text-muted">
+                      No se detectó un servidor escuchando en <code className="text-text-primary">http://localhost:11434</code>.
+                    </p>
+                    <div className="rounded bg-bg-primary p-2 text-[11px] font-mono text-text-secondary">
+                      1. Descargá e instalá Ollama desde <span className="text-accent-primary">ollama.com</span>.<br />
+                      2. Abrí una terminal PowerShell y ejecutá: <span className="text-accent-primary font-bold">ollama run llama3.2</span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

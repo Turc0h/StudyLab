@@ -123,7 +123,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Redacta una síntesis integradora de 2 o 3 oraciones en la franja inferior.",
     ],
     scientificBasis: "Walter Pauk (1940s, Cornell University) • Organización Espacial y Procesamiento Profundo en Apuntes.",
-    implemented: false,
+    integratesWith: ["session-engine", "fsrs"],
+    implemented: true,
   },
 
   // 7. Blurting (Vaciado Mental)
@@ -345,8 +346,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Categoriza cada equivocación: ¿error conceptual, omisión de lectura o falta de tiempo?",
     ],
     scientificBasis: "Dunlosky, Rawson, Marsh, Nathan & Willingham (2013) • Improving Students' Learning With Effective Learning Techniques.",
-    integratesWith: ["session-engine"],
-    implemented: false,
+    integratesWith: ["session-engine", "fsrs"],
+    implemented: true,
   },
 
   // 18. Método del Relato (Cadena)

@@ -44,15 +44,15 @@ const VALID_CATEGORIES = new Set([
 const invalidCategories = STUDY_METHODS_30_SEEDS.filter(m => !VALID_CATEGORIES.has(m.category));
 assert(invalidCategories.length === 0, "Todos los 30 métodos pertenecen estrictamente a las 6 categorías canónicas");
 
-// Test 4: Preservación de los 5 métodos ya implementados
-const CORE_IMPLEMENTED_IDS = ["active-recall", "spaced-repetition", "feynman", "pomodoro", "interleaving"];
+// Test 4: Preservación de los métodos ya implementados
+const CORE_IMPLEMENTED_IDS = ["active-recall", "spaced-repetition", "feynman", "pomodoro", "interleaving", "cornell", "practice-testing"];
 const implementedCore = STUDY_METHODS_30_SEEDS.filter(m => CORE_IMPLEMENTED_IDS.includes(m.id) && m.implemented === true);
-assert(implementedCore.length === 5, "Los 5 métodos centrales preexistentes conservan implemented: true");
+assert(implementedCore.length === 7, `Los métodos con runner interactivo conservan implemented: true (actual: ${implementedCore.length})`);
 
-// Test 5: Los nuevos métodos informativos tienen implemented: false
+// Test 5: Los restantes métodos informativos tienen implemented: false
 const nonCoreMethods = STUDY_METHODS_30_SEEDS.filter(m => !CORE_IMPLEMENTED_IDS.includes(m.id));
 const allNonCoreFalse = nonCoreMethods.every(m => m.implemented === false);
-assert(allNonCoreFalse, `Los 25 métodos nuevos tienen implemented: false (fichas informativas)`);
+assert(allNonCoreFalse, `Los 23 métodos restantes tienen implemented: false (fichas informativas)`);
 
 // Test 6: Calidad de contenido (description 2-4 líneas y howTo con 3 a 5 pasos)
 const validStepsAndDesc = STUDY_METHODS_30_SEEDS.every(m => {

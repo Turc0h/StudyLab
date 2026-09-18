@@ -6,7 +6,10 @@ export type StudyMethodId =
   | "interleaving"
   | "mind-maps"
   | "sq3r"
-  | "elaborative-interrogation";
+  | "elaborative-interrogation"
+  | "cornell"
+  | "mock-tests"
+  | "practice-testing";
 
 export interface StudyMethodInfo {
   id: StudyMethodId;

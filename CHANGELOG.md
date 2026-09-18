@@ -733,6 +733,41 @@ Transformación de StudyLab en un motor de conocimiento universitario de alta pr
 
 ---
 
+## Expansión v5.2 — Fase 2 Context Engine, Ollama Local y Runners Cornell & Mock Exams
+
+### 1. Fase 2 Context Engine: Vinculación Semántica Automática (`ProjectKnowledgeLinker.tsx`)
+- **Pipeline de Embeddings Denso Local**:
+  - Reutilización de `computeEmbeddingVector` (`@xenova/transformers` con `all-MiniLM-L6-v2`) y `cosineSimilarity`.
+  - Botón integrado *"Sugerir Documentos por IA Semántica"*: analiza el título y descripción del proyecto y calcula la afinidad con los fragmentos de la biblioteca.
+  - **Confirmación manual obligatoria**: Despliega una tarjeta con los documentos sugeridos, su porcentaje de afinidad semántica y casillas de selección para que el usuario elija exactamente qué vincular antes de confirmar.
+
+### 2. Integración y Monitor de Ollama Local (`localhost:11434`)
+- **Cliente 100% Offline (`src/platform/ai/ollamaClient.ts`)**:
+  - Comunicación exclusiva con `http://localhost:11434` mediante `/api/tags` y `/api/generate`.
+  - Manejo seguro de timeouts y desconexiones sin llamadas a la nube ni dependencias externas.
+- **Sección en Ajustes (`Settings.tsx`)**:
+  - Monitor en vivo del estado del servidor Ollama con botón de comprobación.
+  - Reconocimiento dinámico de modelos descargados (ej: `llama3.2:latest`, `phi3`).
+  - Instrucciones claras en pantalla para iniciar el servicio en Windows con `ollama run llama3.2`.
+
+### 3. Nuevos Runners Interactivos de Métodos de Estudio
+- **Método Cornell (`CornellMethod.tsx`)**:
+  - Lienzo estructurado con 3 regiones canónicas: Columna izquierda de preguntas y cues (30%), Columna derecha de notas principales (70%) y franja inferior de resumen.
+  - **Modo Evocación Activa (Recall Mode)**: Permite velar las notas con un telón traslúcido para forzar al estudiante a responder a las preguntas de memoria antes de destapar las notas.
+- **Simulacros de Examen / Practice Testing (`MockExamMethod.tsx`)**:
+  - Setup personalizable con selector de tiempo (10 a 60 min).
+  - Cronómetro regresivo en tiempo real con alerta visual para los últimos 2 minutos.
+  - Bloqueo estricto de respuestas y feedback durante el examen para combatir la ilusión de competencia.
+  - Pantalla final de rúbrica, porcentaje de aciertos, desglose de preguntas y fundamentación neurocognitiva.
+
+### 4. Suite de Verificación Automatizada (15 Suites)
+- `scripts/test-phase2-advanced.mjs`: 28/28 pruebas aprobadas (cliente Ollama, vinculación semántica, contratos de runner Cornell y Mock Exam).
+- `scripts/test-study-methods-catalog.mjs`: 18/18 pruebas aprobadas con soporte para los nuevos métodos con runner activo (`implemented: true`).
+- `npm test`: 15 suites de test ejecutadas con éxito.
+- `npm run build`: `tsc -b && vite build` completado limpiamente en 4.70 segundos.
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

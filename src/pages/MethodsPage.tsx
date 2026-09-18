@@ -45,6 +45,12 @@ const ElaborativeInterrogationMethod = lazy(() =>
     default: m.ElaborativeInterrogationMethod,
   })),
 );
+const CornellMethod = lazy(() =>
+  import("../components/study-methods/CornellMethod").then((m) => ({ default: m.CornellMethod })),
+);
+const MockExamMethod = lazy(() =>
+  import("../components/study-methods/MockExamMethod").then((m) => ({ default: m.MockExamMethod })),
+);
 
 const CATEGORIES = [
   { id: "all", label: "Todas las Categorías" },
@@ -145,6 +151,11 @@ export const MethodsPage: React.FC = () => {
           return <Sq3rMethod onSessionFinished={handleBackToCatalog} />;
         case "elaborative-interrogation":
           return <ElaborativeInterrogationMethod onSessionFinished={handleBackToCatalog} />;
+        case "cornell":
+          return <CornellMethod onSessionFinished={handleBackToCatalog} />;
+        case "practice-testing":
+        case "mock-tests":
+          return <MockExamMethod onSessionFinished={handleBackToCatalog} />;
         default:
           return (
             <div className="p-8 text-center space-y-4">

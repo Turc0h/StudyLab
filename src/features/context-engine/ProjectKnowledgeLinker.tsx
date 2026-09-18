@@ -5,7 +5,9 @@ import { useContextEngineStore } from "../../stores/useContextEngineStore";
 import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
 import { Badge } from "../../components/ui/Badge";
-import { Folder, FileText, Plus, Check, Clock, Calendar, BookOpen, Trash2 } from "lucide-react";
+import { Folder, FileText, Plus, Check, Clock, Calendar, BookOpen, Trash2, Sparkles } from "lucide-react";
+import { computeEmbeddingVector } from "../academic-engine/embeddings/embeddingManager";
+import { cosineSimilarity } from "../academic-engine/vectorIndex";
 
 export const ProjectKnowledgeLinker: React.FC = () => {
   const { heuristicHoursPerUnit, setHeuristicHoursPerUnit } = useContextEngineStore();
@@ -22,6 +24,15 @@ export const ProjectKnowledgeLinker: React.FC = () => {
   const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
   const [overriddenHours, setOverriddenHours] = useState<string>("");
 
+  // Fase 2: Estado de sugerencias semánticas automáticas
+  const [isSearchingSemantic, setIsSearchingSemantic] = useState(false);
+  const [semanticSuggestions, setSemanticSuggestions] = useState<{
+    fileId: string;
+    fileName: string;
+    score: number;
+    selected: boolean;
+  }[]>([]);
+
   const suggestedHours = Math.round(unitCount * heuristicHoursPerUnit * 10) / 10;
   const effectiveHours = overriddenHours ? parseFloat(overriddenHours) || suggestedHours : suggestedHours;
 
@@ -35,6 +46,67 @@ export const ProjectKnowledgeLinker: React.FC = () => {
     setSelectedFileIds((prev) =>
       prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
     );
+  };
+
+  const handleSemanticSearch = async () => {
+    if (!name.trim()) return;
+    setIsSearchingSemantic(true);
+    try {
+      const query = `${name} ${description}`.trim();
+      const queryVec = await computeEmbeddingVector(query);
+      const allChunks = await db.academicChunks.toArray();
+      const allFiles = await db.files.toArray();
+      const fileMap = new Map(allFiles.map((f) => [f.id, f.name]));
+
+      const scoreByFile = new Map<string, number>();
+
+      // 1. Chunks densos
+      for (const chunk of allChunks) {
+        if (chunk.denseVector && chunk.denseVector.length > 0) {
+          const sim = cosineSimilarity(queryVec, chunk.denseVector);
+          const prev = scoreByFile.get(chunk.sourceId) || 0;
+          if (sim > prev) scoreByFile.set(chunk.sourceId, sim);
+        }
+      }
+
+      // 2. Lexical boost con nombres de archivo
+      const queryWords = query.toLowerCase().split(/\s+/).filter((w) => w.length > 2);
+      for (const file of allFiles) {
+        const nameLower = file.name.toLowerCase();
+        let matches = 0;
+        for (const qw of queryWords) {
+          if (nameLower.includes(qw)) matches++;
+        }
+        if (matches > 0) {
+          const boost = Math.min(0.95, matches * 0.35);
+          const prev = scoreByFile.get(file.id) || 0;
+          scoreByFile.set(file.id, Math.max(prev, boost));
+        }
+      }
+
+      const suggestions = Array.from(scoreByFile.entries())
+        .map(([fileId, score]) => ({
+          fileId,
+          fileName: fileMap.get(fileId) || "Documento",
+          score: Math.round(score * 100),
+          selected: true,
+        }))
+        .filter((s) => s.score >= 20 && !selectedFileIds.includes(s.fileId))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 5);
+
+      setSemanticSuggestions(suggestions);
+    } catch (err) {
+      console.error("Error en búsqueda semántica de proyectos:", err);
+    } finally {
+      setIsSearchingSemantic(false);
+    }
+  };
+
+  const handleApplySemanticSuggestions = () => {
+    const toAdd = semanticSuggestions.filter((s) => s.selected).map((s) => s.fileId);
+    setSelectedFileIds((prev) => Array.from(new Set([...prev, ...toAdd])));
+    setSemanticSuggestions([]);
   };
 
   const handleCreateProject = async () => {
@@ -70,6 +142,7 @@ export const ProjectKnowledgeLinker: React.FC = () => {
     setDescription("");
     setSelectedFolderIds([]);
     setSelectedFileIds([]);
+    setSemanticSuggestions([]);
     setOverriddenHours("");
     setIsCreating(false);
   };
@@ -185,11 +258,84 @@ export const ProjectKnowledgeLinker: React.FC = () => {
             )}
           </div>
 
-          {/* Vinculación Manual de Carpetas y Archivos */}
+          {/* Vinculación de Carpetas y Archivos con Asistente Semántico (Fase 2) */}
           <div className="space-y-2">
-            <label className="text-xs font-medium text-text-secondary block">
-              Vincular Materiales de Estudio de la Biblioteca (Carpetas / Archivos)
-            </label>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <label className="text-xs font-medium text-text-secondary block">
+                Materiales de Estudio ({selectedFolderIds.length} carp., {selectedFileIds.length} arch. seleccionados)
+              </label>
+              <Button
+                variant="outline"
+                size="sm"
+                type="button"
+                onClick={handleSemanticSearch}
+                disabled={isSearchingSemantic || !name.trim()}
+                className="text-xs flex items-center gap-1.5 border-accent-primary/30 text-accent-primary hover:bg-accent-primary/10 self-start sm:self-auto"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>{isSearchingSemantic ? "Analizando biblioteca..." : "Sugerir Documentos por IA Semántica"}</span>
+              </Button>
+            </div>
+
+            {/* Tarjeta de Sugerencias Semánticas Detectadas (Fase 2) */}
+            {semanticSuggestions.length > 0 && (
+              <div className="rounded-lg border border-accent-primary/30 bg-accent-primary/5 p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-accent-primary flex items-center gap-1.5">
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Sugerencias Semánticas Detectadas (Fase 2)
+                  </span>
+                  <span className="text-[11px] text-text-muted">
+                    Elegí cuáles vincular antes de confirmar
+                  </span>
+                </div>
+                <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                  {semanticSuggestions.map((sug) => (
+                    <div
+                      key={sug.fileId}
+                      className="flex items-center justify-between p-1.5 rounded bg-bg-primary/80 border border-border-subtle text-xs"
+                    >
+                      <label className="flex items-center gap-2 cursor-pointer select-none truncate mr-2">
+                        <input
+                          type="checkbox"
+                          checked={sug.selected}
+                          onChange={() => {
+                            setSemanticSuggestions((prev) =>
+                              prev.map((item) =>
+                                item.fileId === sug.fileId ? { ...item, selected: !item.selected } : item
+                              )
+                            );
+                          }}
+                          className="rounded border-border text-accent-primary shrink-0"
+                        />
+                        <span className="truncate max-w-[220px] text-text-primary">{sug.fileName}</span>
+                      </label>
+                      <Badge variant="accent">{sug.score}% Afinidad</Badge>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-end gap-2 pt-1 border-t border-accent-primary/15">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    type="button"
+                    onClick={() => setSemanticSuggestions([])}
+                    className="text-xs"
+                  >
+                    Descartar
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    type="button"
+                    onClick={handleApplySemanticSuggestions}
+                    className="text-xs"
+                  >
+                    Vincular Sugeridos Seleccionados ({semanticSuggestions.filter((s) => s.selected).length})
+                  </Button>
+                </div>
+              </div>
+            )}
 
             <div className="max-h-40 overflow-y-auto rounded border border-border-subtle bg-bg-primary/50 p-2 space-y-1 text-xs">
               {(!folders || folders.length === 0) && (!files || files.length === 0) ? (
