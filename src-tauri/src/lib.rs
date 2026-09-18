@@ -23,7 +23,8 @@ pub fn run() {
 
     let subscriber = tracing_subscriber::registry()
       .with(tracing_subscriber::EnvFilter::new("info,app_lib=debug"))
-      .with(tracing_subscriber::fmt::layer().with_writer(non_blocking));
+      .with(tracing_subscriber::fmt::layer().with_writer(non_blocking))
+      .with(tracing_subscriber::fmt::layer().with_writer(std::io::stdout));
     let _ = subscriber.try_init();
   }
 
@@ -33,14 +34,6 @@ pub fn run() {
     .plugin(tauri_plugin_dialog::init())
     .plugin(tauri_plugin_sql::Builder::default().build())
     .setup(|app| {
-      if cfg!(debug_assertions) {
-        app.handle().plugin(
-          tauri_plugin_log::Builder::default()
-            .level(log::LevelFilter::Info)
-            .build(),
-        )?;
-      }
-
       // Conectar app_handle al Job System y recuperar jobs interrumpidos
       job_queue::GLOBAL_JOB_SYSTEM.set_app_handle(app.handle().clone());
       let recovered = job_queue::GLOBAL_JOB_SYSTEM.recover_interrupted_jobs();
