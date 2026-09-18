@@ -191,7 +191,7 @@ pub fn read_file_bytes(path: String) -> Result<Vec<u8>, String> {
     fs::read(p).map_err(|e| format!("Error al leer archivo {}: {}", path, e))
 }
 
-/// Comando Tauri: Revelar archivo en el Explorador de archivos de Windows
+/// Comando Tauri: Revelar archivo en el gestor de archivos nativo (Windows Explorer, macOS Finder, Linux File Manager)
 #[tauri::command]
 pub fn show_in_folder(path: String) -> Result<(), String> {
     #[cfg(target_os = "windows")]
@@ -199,11 +199,33 @@ pub fn show_in_folder(path: String) -> Result<(), String> {
         use std::process::Command;
         let mut cmd = Command::new("explorer.exe");
         cmd.arg("/select,").arg(&path);
-        cmd.spawn().map_err(|e| format!("Error abriendo explorador: {}", e))?;
+        cmd.spawn().map_err(|e| format!("Error abriendo explorador en Windows: {}", e))?;
         Ok(())
     }
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(target_os = "macos")]
     {
-        Err("show_in_folder solo está implementado para Windows".to_string())
+        use std::process::Command;
+        let mut cmd = Command::new("open");
+        cmd.arg("-R").arg(&path);
+        cmd.spawn().map_err(|e| format!("Error abriendo Finder en macOS: {}", e))?;
+        Ok(())
+    }
+    #[cfg(target_os = "linux")]
+    {
+        use std::process::Command;
+        let p = std::path::Path::new(&path);
+        let dir = if p.is_file() {
+            p.parent().unwrap_or(p)
+        } else {
+            p
+        };
+        let mut cmd = Command::new("xdg-open");
+        cmd.arg(dir);
+        cmd.spawn().map_err(|e| format!("Error abriendo explorador en Linux: {}", e))?;
+        Ok(())
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
+    {
+        Err("show_in_folder no está soportado en esta plataforma".to_string())
     }
 }
