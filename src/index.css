@@ -30,6 +30,16 @@
   --success: #4E7350;
   --warning: #9E7448;
   --error: #9E4E4E;
+
+  /* Tokens de animación estandarizados (FASE 5) */
+  --duration-micro: 100ms;
+  --duration-standard: 200ms;
+  --duration-complex: 300ms;
+
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasis: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Modo oscuro sobrio — grafito mate y biblioteca */
@@ -159,23 +169,23 @@ h1, h2, h3, h4 {
 }
 
 .animate-drawer-slide {
-  animation: drawerSlideIn 320ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: drawerSlideIn var(--duration-complex) var(--ease-emphasis) forwards;
   will-change: transform, opacity;
 }
 
 .animate-overlay-fade {
-  animation: overlayFadeIn 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: overlayFadeIn var(--duration-standard) var(--ease-out) forwards;
   will-change: opacity;
 }
 
 /* Paneles deslizables acelerados por hardware (Smooth Desktop Transitions - 60Hz / 120Hz / 144Hz+) */
+/* Se anima estrictamente transform y opacity para evitar layout thrashing de propiedades geométricas */
 .desktop-drawer-panel {
-  will-change: transform, opacity, right;
+  will-change: transform, opacity;
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
-  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
-              right 300ms cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 220ms ease-out;
+  transition: transform var(--duration-complex) var(--ease-emphasis),
+              opacity var(--duration-standard) var(--ease-out);
 }
 
 /* Capa de composición acelerada por hardware GPU para elementos animados */
@@ -193,7 +203,7 @@ h1, h2, h3, h4 {
 
 /* Soporte para prefers-reduced-motion y configuración de animaciones */
 @media (prefers-reduced-motion: reduce) {
-  .reduced-motion *, .no-animations * {
+  *, *::before, *::after, .reduced-motion *, .no-animations * {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
