@@ -311,7 +311,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Expande posteriormente el contenido interno de cada bloque en sesiones de recuerdo activo.",
     ],
     scientificBasis: "George A. Miller (1956) • The Magical Number Seven, Plus or Minus Two: Some Limits on Our Capacity for Processing Information.",
-    implemented: false,
+    integratesWith: ["session-engine"],
+    implemented: true,
   },
 
   // 16. Aprendizaje Basado en Problemas
@@ -331,7 +332,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Contrasta la solución con casos similares y discute alternativas con pares o docentes.",
     ],
     scientificBasis: "Barrows & Tamblyn (1980) • Problem-Based Learning: An Approach to Medical Education.",
-    implemented: false,
+    integratesWith: ["session-engine"],
+    implemented: true,
   },
 
   // 17. Simulacros de Examen
@@ -474,8 +476,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Lee las ternas (Concepto A &rarr; Conector &rarr; Concepto B) para validar que formen oraciones verdaderas.",
     ],
     scientificBasis: "Joseph D. Novak (1984) • Learning How to Learn (Cambridge University Press).",
-    integratesWith: ["knowledge-graph"],
-    implemented: false,
+    integratesWith: ["knowledge-graph", "session-engine"],
+    implemented: true,
   },
 
   // 24. Dificultades Deseables

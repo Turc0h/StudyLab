@@ -78,6 +78,15 @@ const DualCodingMethod = lazy(() =>
 const DeepWorkMethod = lazy(() =>
   import("../components/study-methods/DeepWorkMethod").then((m) => ({ default: m.DeepWorkMethod })),
 );
+const ConceptMapsMethod = lazy(() =>
+  import("../components/study-methods/ConceptMapsMethod").then((m) => ({ default: m.ConceptMapsMethod })),
+);
+const ChunkingMethod = lazy(() =>
+  import("../components/study-methods/ChunkingMethod").then((m) => ({ default: m.ChunkingMethod })),
+);
+const ProblemBasedLearningMethod = lazy(() =>
+  import("../components/study-methods/ProblemBasedLearningMethod").then((m) => ({ default: m.ProblemBasedLearningMethod })),
+);
 
 const CATEGORIES = [
   { id: "all", label: "Todas las Categorías" },
@@ -201,6 +210,12 @@ export const MethodsPage: React.FC = () => {
           return <DualCodingMethod onSessionFinished={handleBackToCatalog} />;
         case "deep-work":
           return <DeepWorkMethod onSessionFinished={handleBackToCatalog} />;
+        case "concept-maps":
+          return <ConceptMapsMethod onSessionFinished={handleBackToCatalog} />;
+        case "chunking":
+          return <ChunkingMethod onSessionFinished={handleBackToCatalog} />;
+        case "problem-based-learning":
+          return <ProblemBasedLearningMethod onSessionFinished={handleBackToCatalog} />;
         default:
           return (
             <div className="p-8 text-center space-y-4">

@@ -18,7 +18,10 @@ export type StudyMethodId =
   | "kwl-method"
   | "self-explanation"
   | "dual-coding"
-  | "deep-work";
+  | "deep-work"
+  | "concept-maps"
+  | "chunking"
+  | "problem-based-learning";
 
 export interface StudyMethodInfo {
   id: StudyMethodId;

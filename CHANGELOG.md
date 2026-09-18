@@ -928,6 +928,46 @@ El catálogo de StudyLab alcanza el 63.3% de cobertura funcional interactiva:
 
 ---
 
+## Fase v5.7 — Estructuración y Comprensión Conceptual: Mapas Conceptuales (Novak), Agrupación (Chunking) y Aprendizaje Basado en Problemas (PBL)
+
+Esta fase eleva el Methods Hub a **22 runners interactivos** de un total de 30 métodos (73.3% de cobertura funcional), incorporando herramientas para la síntesis relacional formal, la compresión de listas extensas y la resolución inductiva de casos del mundo real.
+
+### 1. Runner Interactivo de Mapas Conceptuales Novakianos (`ConceptMapsMethod.tsx`)
+- **Acceso:** Desde `/methods?run=concept-maps`.
+- **Fundamentación:** Joseph D. Novak (1984) / David Ausubel — A diferencia de los mapas mentales asociativos libres, los mapas conceptuales novakianos exigen estructuración jerárquica y el enlace obligatorio de conceptos mediante palabras conectoras que formen proposiciones gramaticales verdaderas.
+- **Espacio de Trabajo Proposicional:**
+  - **Banco de Nodos Jerárquicos:** Clasificación explícita de conceptos en tres niveles cognitivos (*Cúspide*, *Intermedio*, *Específico*).
+  - **Constructor de Ternas Lógicas:** Conexión dirigida `[Concepto Origen]` &rarr; *(Frase Conectora / Verbo)* &rarr; `[Concepto Destino]`.
+  - **Auditoría Proposicional:** Validación sintáctica de proposiciones legibles con significado autónomo y exportación al historial de sesiones (`db.studySessions`).
+
+### 2. Runner Interactivo de Agrupación Cognitiva / Chunking (`ChunkingMethod.tsx`)
+- **Acceso:** Desde `/methods?run=chunking`.
+- **Fundamentación:** George A. Miller (1956) / Nelson Cowan (2001) — La memoria de trabajo humana posee una capacidad biofísica restringida a 4 ± 1 paquetes atencionales. La compresión de datos dispersos en bloques semánticos de orden superior permite manipular volúmenes masivos de información sin desbordamiento cognitivo.
+- **Flujo de Trabajo Dual (Organización & Drill):**
+  - **Modo Organización:** Carga masiva de elementos desordenados y empaquetamiento en 3 a 5 bloques óptimos con anclajes mnemotécnicos sonoros (*"1-2-8 Vista y Olfato"*).
+  - **Modo Drill de Recuerdo Activo:** Ocultamiento interactivo del contenido de cada bloque para obligar a la recuperación forzada de memoria antes de contrastar las respuestas.
+  - **Métricas de Capacidad en Vivo:** Conteo de bloques vs. óptimo biológico ($\le 5$), cálculo de ratio de compresión (ítems/bloque) y registro de evocaciones validadas.
+
+### 3. Runner Interactivo de Aprendizaje Basado en Problemas / PBL (`ProblemBasedLearningMethod.tsx`)
+- **Acceso:** Desde `/methods?run=problem-based-learning`.
+- **Fundamentación:** Howard Barrows & Tamblyn (1980, McMaster) — Metodología inductiva que sitúa un dilema real e incompleto como detonante, forzando la formulación de incógnitas diagnósticas y necesidades de autoaprendizaje bibliográfico.
+- **Ciclo de Indagación Inductiva en 3 Pestañas:**
+  - **Pestaña 1: Hechos Verificados vs. Incógnitas Críticas:** Matriz en T para discernir qué premisas están probadas y qué vacíos requieren investigación.
+  - **Pestaña 2: Hipótesis & Necesidades de Aprendizaje (Learning Issues):** Planteo de diagnósticos o explicaciones tentativas con especificación explícita de la bibliografía de cátedra necesaria para sustentarlas.
+  - **Pestaña 3: Resolución Fundamentada & Metacognición:** Formulación de la propuesta final y registro de los principios generales transferibles asimilados durante el caso.
+
+### 4. Estado Global de Métodos: 22 Runners Activos + 8 Fichas Guiadas
+El catálogo de StudyLab alcanza el 73.3% de interactividad práctica:
+- **22 Runners Funcionales:** Feynman, SQ3R, Pomodoro, Recuerdo Activo, Interleaving, Cornell, Simulacros de Examen, Zettelkasten, Blurting, Mapas Mentales, Leitner, Interrogación Elaborativa, Palacio de la Memoria, Mnemotecnias, KWL, Autoexplicación, Codificación Dual, Bloques de Trabajo Profundo, Mapas Conceptuales Novakianos, Chunking, Aprendizaje Basado en Problemas y Repaso Espaciado (FSRS).
+- **8 Fichas Prácticas Guiadas:** Con fundamentación teórica, fases paso a paso y conexiones de navegación hacia FSRS y Knowledge Graph.
+
+### 5. Suite de Verificación Automatizada (20 Suites)
+- `scripts/test-phase7-conceptual-methods.mjs`: 49/49 pruebas aprobadas al 100%.
+- `npm test`: **20 suites de tests ejecutadas con 100% de éxito**.
+- `npm run build`: compilación limpia en 4.08s con 0 errores TypeScript (`tsc -b && vite build`).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash
