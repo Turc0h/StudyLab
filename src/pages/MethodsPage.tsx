@@ -60,6 +60,15 @@ const BlurtingMethod = lazy(() =>
 const LeitnerMethod = lazy(() =>
   import("../components/study-methods/LeitnerMethod").then((m) => ({ default: m.LeitnerMethod })),
 );
+const MemoryPalaceMethod = lazy(() =>
+  import("../components/study-methods/MemoryPalaceMethod").then((m) => ({ default: m.MemoryPalaceMethod })),
+);
+const MnemonicsMethod = lazy(() =>
+  import("../components/study-methods/MnemonicsMethod").then((m) => ({ default: m.MnemonicsMethod })),
+);
+const KwlMethod = lazy(() =>
+  import("../components/study-methods/KwlMethod").then((m) => ({ default: m.KwlMethod })),
+);
 
 const CATEGORIES = [
   { id: "all", label: "Todas las Categorías" },
@@ -171,6 +180,12 @@ export const MethodsPage: React.FC = () => {
           return <BlurtingMethod onSessionFinished={handleBackToCatalog} />;
         case "leitner":
           return <LeitnerMethod onSessionFinished={handleBackToCatalog} />;
+        case "method-of-loci":
+          return <MemoryPalaceMethod onSessionFinished={handleBackToCatalog} />;
+        case "mnemonics":
+          return <MnemonicsMethod onSessionFinished={handleBackToCatalog} />;
+        case "kwl-method":
+          return <KwlMethod onSessionFinished={handleBackToCatalog} />;
         default:
           return (
             <div className="p-8 text-center space-y-4">

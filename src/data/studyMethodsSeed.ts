@@ -288,7 +288,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Practica la decodificación activa: de la mnemotecnia a los términos técnicos reales.",
     ],
     scientificBasis: "Bellezza (1981) • Mnemonic Devices: Classification, Characteristics, and Criteria.",
-    implemented: false,
+    integratesWith: ["session-engine"],
+    implemented: true,
   },
 
   // 15. Agrupación (Chunking)
@@ -429,7 +430,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Recorre mentalmente el palacio en orden para evocar con precisión matemática cada elemento.",
     ],
     scientificBasis: "Yates (1966) / Maguire et al. (2003) • Routes to Remembering: The Brains Behind Superior Memory.",
-    implemented: false,
+    integratesWith: ["session-engine"],
+    implemented: true,
   },
 
   // 22. Interrogación Elaborativa
@@ -552,7 +554,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Al finalizar la sesión, resume en la columna L todos los hallazgos y conocimientos adquiridos.",
     ],
     scientificBasis: "Donna Ogle (1986) • K-W-L: A Teaching Model That Develops Active Reading of Expository Text.",
-    implemented: false,
+    integratesWith: ["session-engine"],
+    implemented: true,
   },
 
   // 28. Principio de Segmentación (Mayer)

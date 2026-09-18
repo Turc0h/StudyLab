@@ -12,7 +12,10 @@ export type StudyMethodId =
   | "practice-testing"
   | "zettelkasten"
   | "blurting"
-  | "leitner";
+  | "leitner"
+  | "method-of-loci"
+  | "mnemonics"
+  | "kwl-method";
 
 export interface StudyMethodInfo {
   id: StudyMethodId;

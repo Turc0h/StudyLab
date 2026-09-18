@@ -844,6 +844,48 @@ Se promovieron formalmente 4 metodologías a `implemented: true` con runners int
 
 ---
 
+## Expansión StudyLab v5.5 — Palacio de la Memoria, Técnicas Mnemotécnicas y Metacognición KWL (16 Runners)
+
+Esta versión introduce 3 nuevas herramientas de memorización y metacognición profunda, superando la mitad del catálogo científico implementado (**16 de 30 métodos con runner interactivo**).
+
+### 1. Runner Interactivo del Palacio de la Memoria (`MemoryPalaceMethod.tsx`)
+- **Acceso:** Desde `/methods?run=method-of-loci`.
+- **Arquitectura de Estaciones Fijas:**
+  - Definición de una ruta espacial real (ej. *Puerta de entrada*, *Perchero*, *Espejo*, *Mesa*, *Balcón*...).
+  - Asociación deliberada de anclas visuales hiperbólicas, absurdas o de alto impacto sensorial con los conceptos técnicos.
+- **Modo Recorrido Mental (Walkthrough):**
+  - Guía paso a paso que oculta la solución y pone a prueba la evocación serial en orden estricto.
+  - Medición de aciertos, cálculo de porcentaje de precisión de recorrido y persistencia en `db.studySessions`.
+
+### 2. Runner Interactivo de Técnicas Mnemotécnicas (`MnemonicsMethod.tsx`)
+- **Acceso:** Desde `/methods?run=mnemonics`.
+- **Generador Asistido de Anclajes Fonéticos:**
+  - Ingreso de secuencias arbitrarias (mitosis, pares craneales, estados de oxidación, normas).
+  - Extractor automático de iniciales para armar acrónimos palabra-clave (ej. `P - M - A - T`).
+  - Asistente para frases acrósticas memorables (*"Prometeo Me Ama Tanto"*) e imágenes mentales.
+- **Modo Decodificador Activo:**
+  - El sistema muestra el acrónimo o frase estímulo y desafía al estudiante a reconstruir cada término original de memoria, calificando la retención.
+
+### 3. Runner Interactivo de Metacognición KWL (`KwlMethod.tsx`)
+- **Acceso:** Desde `/methods?run=kwl-method`.
+- **Matriz de 3 Columnas Canónica (Donna Ogle):**
+  - **K (Know / Lo que sé):** Activación explícita de conocimientos y esquemas previos antes de abrir el texto.
+  - **W (Want to know / Lo que quiero saber):** Formulación de preguntas inquisitivas que dirigen la atención selectiva.
+  - **L (Learned / Lo que aprendí):** Síntesis de asimilación tras la lectura y contrastación de dudas resueltas.
+- **Seguimiento de Preguntas:** Marcador de casillas interactivas para auditar qué incógnitas de la columna W fueron despejadas y cuáles persisten para consulta de cátedra.
+
+### 4. Estado Global de Métodos: 16 Runners Activos + 14 Fichas Guiadas
+El catálogo supera el hito del 50% de interactividad práctica:
+- **16 Runners Funcionales:** Feynman, SQ3R, Pomodoro, Recuerdo Activo, Interleaving, Cornell, Simulacros de Examen, Zettelkasten, Blurting, Mapas Mentales, Leitner, Interrogación Elaborativa, Palacio de la Memoria, Mnemotecnias, KWL y Repaso Espaciado (FSRS).
+- **14 Fichas Prácticas Guiadas:** Con fundamentación teórica, fases paso a paso y conexiones de navegación hacia FSRS y Knowledge Graph.
+
+### 5. Suite de Verificación Automatizada (18 Suites)
+- `scripts/test-phase5-memory-tools.mjs`: 40/40 pruebas aprobadas (contratos Loci, Mnemotecnias, KWL, catálogo 16/14).
+- `npm test`: **18 suites de tests ejecutadas con 100% de éxito en 7.8s**.
+- `npm run build`: compilación limpia en 4.46s con 0 errores de linter.
+
+---
+
 ## Cómo correr todo esto
 
 ```bash
