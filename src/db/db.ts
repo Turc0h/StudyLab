@@ -174,6 +174,8 @@ export interface WorkspaceConfigRecord {
   profileType: "deep-problem-solving" | "memory-fortress" | "research-synthesis" | "custom";
   activeWidgets: string[];
   automationEnabled: boolean;
+  contextEngineEnabled?: boolean;
+  studyHoursHeuristic?: number;
   updatedAt: number;
 }
 
@@ -184,6 +186,7 @@ export interface FatigueTelemetryRecord {
   keystrokeVariance: number;
   pauseRate: number;
   sessionDurationSec: number;
+  energyScore?: 1 | 2 | 3 | 4 | 5;
 }
 
 export interface AcademicBoundingBox {
@@ -270,6 +273,48 @@ export interface WorkspaceStateRecord {
   syncedAt: number;
 }
 
+export interface StudyMethod {
+  id: string; // slug, ej: "method-of-loci"
+  name: string;
+  nameEn?: string;
+  category: "memorizacion" | "comprension" | "gestion-tiempo" | "escritura" | "evaluacion" | "metacognicion";
+  bestFor: string[]; // ej: ["materias teóricas densas", "listas ordenadas"]
+  description: string; // 2-4 líneas
+  howTo: string[]; // pasos accionables
+  scientificBasis?: string; // referencia breve al respaldo (sin URLs externas)
+  integratesWith?: ("fsrs" | "pomodoro-timer" | "session-engine" | "knowledge-graph")[];
+  implemented: boolean; // false para los que solo tienen ficha informativa
+}
+
+export interface ContextProjectRecord {
+  id: string;
+  name: string;
+  description?: string;
+  targetSubjectId?: string;
+  targetExamDate?: number;
+  linkedFolderIds: string[];
+  linkedFileIds: string[];
+  unitCount: number;
+  heuristicHoursPerUnit: number;
+  userOverriddenHours?: number;
+  totalEstimatedHours: number;
+  status: "active" | "completed" | "archived";
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface ContextTimeBlockRecord {
+  id: string;
+  projectId?: string;
+  title: string;
+  dayOfWeek: number; // 0=Sunday, 1=Monday... 6=Saturday
+  startTime: string; // "HH:mm"
+  endTime: string; // "HH:mm"
+  isFreeSlot: boolean;
+  isConfirmed: boolean;
+  createdAt: number;
+}
+
 const db = new Dexie("studylab") as Dexie & {
   folders: EntityTable<FolderRecord, "id">;
   files: EntityTable<FileRecord, "id">;
@@ -293,6 +338,9 @@ const db = new Dexie("studylab") as Dexie & {
   workspaceState: EntityTable<WorkspaceStateRecord, "id">;
   studentErrors: EntityTable<StudentErrorRecord, "id">;
   examPlans: EntityTable<ExamPlanRecord, "id">;
+  studyMethods: EntityTable<StudyMethod, "id">;
+  contextProjects: EntityTable<ContextProjectRecord, "id">;
+  contextTimeBlocks: EntityTable<ContextTimeBlockRecord, "id">;
 };
 
 export type StudentErrorCategory =
@@ -384,6 +432,23 @@ db.version(4).stores({
 db.version(5).stores({
   studentErrors: "id, conceptId, subjectId, category, resolved, timestamp",
   examPlans: "id, subjectId, examDate, status",
+});
+
+// v6 — Expansión v5.1: Métodos de Estudio Ampliados (30 métodos) + Context Engine
+db.version(6).stores({
+  studyMethods: "id, category, implemented",
+  contextProjects: "id, name, status, createdAt",
+  contextTimeBlocks: "id, projectId, isConfirmed, dayOfWeek",
+});
+
+// Sembrado automático idempotente al inicializar la base de datos
+db.on("ready", async () => {
+  try {
+    const { seedStudyMethods } = await import("../data/studyMethodsSeed");
+    await seedStudyMethods(db);
+  } catch (e) {
+    console.warn("[StudyLab] Error al autosembrar métodos de estudio:", e);
+  }
 });
 
 /** Alterna el estado de completitud o lectura de un archivo de cátedra. */

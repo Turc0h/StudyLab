@@ -702,6 +702,37 @@ Transformación de StudyLab en un motor de conocimiento universitario de alta pr
 
 ---
 
+## Expansión v5.1 — Catálogo de 30 Métodos Cognitivos y Motor de Contexto Unificado (Context Engine)
+
+### 1. Métodos de Estudio Ampliados (`/methods`)
+- **Catálogo Exhaustivo de 30 Técnicas Científicas**:
+  - Ampliación de 5 a 30 métodos con base empírica estricta (Dunlosky et al., Roediger & Karpicke, Sweller, etc.), sin URLs externas ni dependencias de red.
+  - 6 categorías canónicas: `memorizacion`, `comprension`, `gestion-tiempo`, `escritura`, `evaluacion`, `metacognicion`.
+  - Ficha modal detallada (`MethodPreviewModal.tsx`) con 3 a 5 pasos accionables (`howTo`), metadatos de materias recomendadas (`bestFor`) y respaldo científico formal.
+  - Mantenimiento intacto de los runners preexistentes (`implemented: true` para Feynman, Pomodoro, Active Recall, SQ3R e Interleaving) e incorporación de fichas teóricas (`implemented: false`, badge "Próximamente").
+  - Botones contextuales integrados: "Usar con FSRS", "Ver en Grafo", "Iniciar Sesión" según las capacidades declaradas en `integratesWith`.
+  - Migración a Dexie v6 con tabla `studyMethods` y sembrado automático idempotente (`src/data/studyMethodsSeed.ts`).
+
+### 2. Motor de Contexto Unificado (`/context` — Context Engine)
+- **Aislamiento y Privacidad Local-First**:
+  - Desactivado por defecto (`contextEngineEnabled: false`), configurable desde Ajustes (`/settings`) o mediante el store `useContextEngineStore`.
+  - La ruta `/context` y su icono en la barra lateral solo se visualizan si el módulo está activado.
+  - Cero llamadas a APIs externas o LLMs en la nube; 100% determinista y ejecutado en el cliente.
+- **Submódulos Implementados**:
+  1. *Vinculador de Proyectos & Biblioteca (`ProjectKnowledgeLinker.tsx`):* Creación de proyectos de examen/materia, vinculación con carpetas y archivos locales de Dexie, y estimador heurístico de horas con calibración por promedio móvil.
+  2. *Bloqueador Semanal de Tiempo (`WeeklyCalendarTimeBlocker.tsx`):* Matriz semanal de 7 días y franjas horarias con sugerencias inteligentes; **cero automatizaciones silenciosas** (requiere confirmación manual del usuario antes de guardar en `contextTimeBlocks`).
+  3. *Chequeo Ético de Energía Post-Sesión (`PostSessionEnergyCheck.tsx`):* Registro rápido de 1 a 5 niveles de concentración en `fatigueTelemetry`. Requiere un umbral ético mínimo de 10 registros antes de calcular el informe de ritmo circadiano.
+  4. *Embudo Unificado de Entrada de Texto (`UnifiedTextIntake.tsx` & `textIntakeParser.ts`):* Parser basado en reglas deterministas para notas, tareas y fechas, con tarjeta de vista previa editable obligatoria antes de persistir.
+- **Hoja de Ruta Futura (`docs/CONTEXT_ENGINE_ROADMAP.md`)**:
+  - Documentación de arquitectura para fases subsiguientes: embeddings locales (Transformers.js), Whisper local en Tauri, integración con Ollama offline y principios éticos sobre no intrusión y biometría.
+
+### 3. Suite de Verificación Automatizada
+- `scripts/test-study-methods-catalog.mjs`: 18/18 pruebas aprobadas (integridad de 30 métodos, 6 categorías, idempotencia de Dexie v6 y contratos de UI).
+- `scripts/test-context-engine.mjs`: 37/37 pruebas aprobadas (aislamiento, flags por defecto, parser determinista, confirmación manual, promedio móvil y esquema v6).
+- Verificación integral: `npm test` (14 suites de test ejecutadas con éxito) y `npm run build` (`tsc -b && vite build` completado en 19s).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

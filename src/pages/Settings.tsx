@@ -26,6 +26,7 @@ import { ambientTracks } from "../features/ambient-sound/tracks";
 import { useGoogleCalendarStatus } from "../features/google-calendar/useGoogleCalendar";
 import { useThemeStore } from "../stores/useThemeStore";
 import { useNotificationStore } from "../stores/useNotificationStore";
+import { useContextEngineStore } from "../stores/useContextEngineStore";
 import {
   getStorageEstimate,
   requestStoragePersistence,
@@ -73,6 +74,12 @@ export function Settings() {
   } = useThemeStore();
   const notifPreferences = useNotificationStore((s) => s.preferences);
   const updateNotifPreferences = useNotificationStore((s) => s.updatePreferences);
+  const {
+    contextEngineEnabled,
+    setContextEngineEnabled,
+    heuristicHoursPerUnit,
+    setHeuristicHoursPerUnit,
+  } = useContextEngineStore();
   const [searchParams] = useSearchParams();
   const calendarResult = searchParams.get("calendar");
   const calendarStatus = useGoogleCalendarStatus();
@@ -566,6 +573,61 @@ export function Settings() {
                 <span>Abrir Consola QA (/qa)</span>
               </Button>
             </div>
+          </div>
+        </SettingsSection>
+
+        <SettingsSection
+          title="Motor de Contexto (Context Engine - v5.1)"
+          description="Capa opcional de contexto para coordinar proyectos de estudio, bloqueo de horarios semanales y estimaciones de horas. Es 100% local-first y ningún dato se transfiere a servidores externos."
+        >
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-sm font-medium text-text-primary">Habilitar Motor de Contexto</span>
+                <p className="text-xs text-text-secondary mt-0.5">
+                  Despliega la pestaña y módulo de contexto en la barra lateral para articular materiales y horas de estudio.
+                </p>
+              </div>
+              <Switch
+                checked={contextEngineEnabled}
+                onChange={(val: boolean) => void setContextEngineEnabled(val)}
+              />
+            </div>
+
+            {contextEngineEnabled && (
+              <div className="rounded-xl border border-border-subtle bg-bg-surface-2 p-4 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div>
+                    <h4 className="text-xs font-bold text-text-main">Heurística Base de Horas por Unidad</h4>
+                    <p className="text-[11px] text-text-muted mt-0.5">
+                      Horas de estudio sugeridas por cada unidad o capítulo teórico nuevo.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      step="0.5"
+                      min="0.5"
+                      max="20"
+                      value={heuristicHoursPerUnit}
+                      onChange={(e) => void setHeuristicHoursPerUnit(parseFloat(e.target.value) || 3)}
+                      className="w-20 rounded border border-border-subtle bg-bg-primary px-2 py-1 text-xs text-text-primary focus:outline-none focus:border-accent-primary"
+                    />
+                    <span className="text-xs text-text-muted">hs/unidad</span>
+                  </div>
+                </div>
+                <div className="flex justify-end pt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate("/context")}
+                    className="text-xs gap-1.5"
+                  >
+                    <span>Abrir Motor de Contexto (/context)</span>
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </SettingsSection>
 

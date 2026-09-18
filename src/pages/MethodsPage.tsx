@@ -1,16 +1,16 @@
 import React, { useState, Suspense, lazy } from "react";
 import { useSearchParams } from "react-router-dom";
 import type { StudyMethodId } from "../types";
-import {
-  STUDY_METHODS_CATALOG,
-  type MethodCatalogItem,
-} from "../data/studyMethodsData";
+import { useLiveQuery } from "dexie-react-hooks";
+import { db, type StudyMethod } from "../db/db";
+import { STUDY_METHODS_30_SEEDS } from "../data/studyMethodsSeed";
 import { MethodPreviewModal } from "../components/study-methods/MethodPreviewModal";
 import { Card, CardHeader, CardTitle } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { Badge } from "../components/ui/Badge";
-import { Clock, ArrowLeft, ArrowRight, Eye, Play, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, Play, Sparkles, Search, Layers, Cpu, CheckCircle2 } from "lucide-react";
 import { PanelGuide } from "../components/guide/PanelGuide";
+import { useNavigate } from "react-router-dom";
 
 // Lazy loaded method runners
 const FeynmanMethod = lazy(() =>
@@ -46,16 +46,43 @@ const ElaborativeInterrogationMethod = lazy(() =>
   })),
 );
 
+const CATEGORIES = [
+  { id: "all", label: "Todas las Categorías" },
+  { id: "memorizacion", label: "Memorización & Evocación" },
+  { id: "comprension", label: "Comprensión & Síntesis" },
+  { id: "gestion-tiempo", label: "Gestión de Tiempo" },
+  { id: "escritura", label: "Toma de Notas & Escritura" },
+  { id: "evaluacion", label: "Evaluación & Desafío" },
+  { id: "metacognicion", label: "Metacognición & Estrategia" },
+];
+
+const CATEGORY_NAMES: Record<string, string> = {
+  memorizacion: "Memorización",
+  comprension: "Comprensión",
+  "gestion-tiempo": "Gestión de Tiempo",
+  escritura: "Escritura",
+  evaluacion: "Evaluación",
+  metacognicion: "Metacognición",
+};
+
 export const MethodsPage: React.FC = () => {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const runningParam = searchParams.get("run") as StudyMethodId | null;
 
   const [activeRunningMethod, setActiveRunningMethod] = useState<StudyMethodId | null>(runningParam);
-  const [previewMethod, setPreviewMethod] = useState<MethodCatalogItem | null>(null);
+  const [previewMethod, setPreviewMethod] = useState<StudyMethod | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedStatus, setSelectedStatus] = useState<"all" | "ready" | "preview">("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const handleStartMethod = (id: StudyMethodId) => {
-    setActiveRunningMethod(id);
+  const methodsFromDb = useLiveQuery(() => db.studyMethods.toArray(), []);
+  const allMethods: StudyMethod[] = (methodsFromDb && methodsFromDb.length > 0)
+    ? methodsFromDb
+    : STUDY_METHODS_30_SEEDS;
+
+  const handleStartMethod = (id: string) => {
+    setActiveRunningMethod(id as StudyMethodId);
     setSearchParams({ run: id });
   };
 
@@ -64,15 +91,41 @@ export const MethodsPage: React.FC = () => {
     setSearchParams({});
   };
 
-  const filteredMethods = STUDY_METHODS_CATALOG.filter((m) => {
+  const handleContextualNav = (target: "fsrs" | "pomodoro-timer" | "session-engine" | "knowledge-graph", methodId: string) => {
+    switch (target) {
+      case "fsrs":
+        navigate("/session?deck=default");
+        break;
+      case "knowledge-graph":
+        navigate("/graph");
+        break;
+      case "pomodoro-timer":
+        handleStartMethod("pomodoro");
+        break;
+      case "session-engine":
+        handleStartMethod(methodId);
+        break;
+    }
+  };
+
+  const filteredMethods = allMethods.filter((m) => {
     if (selectedCategory !== "all" && m.category !== selectedCategory) return false;
+    if (selectedStatus === "ready" && !m.implemented) return false;
+    if (selectedStatus === "preview" && m.implemented) return false;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const matchName = m.name.toLowerCase().includes(q) || (m.nameEn && m.nameEn.toLowerCase().includes(q));
+      const matchBest = m.bestFor?.some((b) => b.toLowerCase().includes(q));
+      const matchDesc = m.description.toLowerCase().includes(q);
+      if (!matchName && !matchBest && !matchDesc) return false;
+    }
     return true;
   });
 
   const renderActiveMethodRunner = () => {
     if (!activeRunningMethod) return null;
 
-    const catalogEntry = STUDY_METHODS_CATALOG.find((m) => m.id === activeRunningMethod);
+    const catalogEntry = allMethods.find((m) => m.id === activeRunningMethod);
 
     const getRunner = () => {
       switch (activeRunningMethod) {
@@ -92,6 +145,13 @@ export const MethodsPage: React.FC = () => {
           return <Sq3rMethod onSessionFinished={handleBackToCatalog} />;
         case "elaborative-interrogation":
           return <ElaborativeInterrogationMethod onSessionFinished={handleBackToCatalog} />;
+        default:
+          return (
+            <div className="p-8 text-center space-y-4">
+              <p className="text-text-secondary text-sm">Este método se encuentra en modo ficha teórica guiada.</p>
+              <Button variant="outline" onClick={handleBackToCatalog}>Volver al Catálogo</Button>
+            </div>
+          );
       }
     };
 
@@ -139,118 +199,244 @@ export const MethodsPage: React.FC = () => {
     return <div className="pb-12">{renderActiveMethodRunner()}</div>;
   }
 
-  // Otherwise, render the initial Selection Panel with Rich Previews
+  // Otherwise, render the Catalog of 30 Methods with Filters and Search
   return (
     <div className="space-y-6 pb-12">
       {/* Editorial Header */}
       <div className="flex items-start justify-between border-b border-border-subtle pb-4">
         <div>
-          <h1 className="font-serif text-2xl font-semibold tracking-tight text-text-primary">
-            Catálogo de Métodos de Estudio
-          </h1>
+          <div className="flex items-center gap-2.5">
+            <h1 className="font-serif text-2xl font-semibold tracking-tight text-text-primary">
+              Catálogo de Métodos de Estudio
+            </h1>
+            <Badge variant="neutral">{allMethods.length} Métodos Científicos</Badge>
+          </div>
           <p className="mt-1 font-sans text-sm text-text-secondary">
-            Explora la justificación neurocognitiva, el protocolo y la vista previa de cada técnica antes de iniciar tu sesión.
+            Explora 30 técnicas de estudio basadas en evidencia psicopedagógica, organizadas por objetivo cognitivo y conectadas al motor de sesiones de StudyLab.
           </p>
         </div>
         <PanelGuide
           id="methods-catalog-guide"
           title="Catálogo de Métodos Cognitivos"
-          whatItDoes="Selección de las 8 técnicas de estudio con mayor evidencia científica, adaptadas para ingeniería, medicina y ciencias exactas."
+          whatItDoes="Catálogo integral de 30 métodos de estudio con respaldo neurocognitivo formal, fichas descriptivas y vinculación con FSRS y el grafo."
           howToUse={[
-            "Filtrá por categoría arriba (Comprensión, Retención, Estructura, etc.).",
-            "Tocá 'Vista previa' en cualquier tarjeta para ver el fundamento neurocognitivo y cómo funciona.",
-            "Tocá 'Iniciar Sesión' para arrancar el bloque guiado con temporizador.",
+            "Usá el buscador o filtrá por categoría (Memorización, Comprensión, Tiempo, etc.).",
+            "Filtrá entre 'Listos para Usar' (con runner activo) y 'Fichas Teóricas' informativas.",
+            "Tocá 'Ver Ficha' para consultar los pasos accionables y respaldo científico.",
+            "Usá los botones de acción rápida para saltar a FSRS, el Grafo o iniciar sesión.",
           ]}
-          tip="Para estudiar fórmulas o demostraciones, la combinación recomendada es Feynman (para entender) + FSRS (para no olvidar)."
+          tip="Para asimilar demostraciones o fórmulas complejas, combiná Feynman o Autoexplicación con Repetición Espaciada."
         />
       </div>
 
-      {/* Category Filters */}
+      {/* Search Bar & Status Filter */}
+      <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-muted" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Buscar método por nombre o materias afines..."
+            className="w-full rounded border border-border-subtle bg-bg-secondary/60 pl-9 pr-3 py-1.5 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-colors"
+          />
+        </div>
+
+        {/* Status Pills */}
+        <div className="flex items-center gap-1.5 self-end sm:self-auto text-xs">
+          {[
+            { id: "all", label: `Todos (${allMethods.length})` },
+            { id: "ready", label: `Listos (${allMethods.filter(m => m.implemented).length})` },
+            { id: "preview", label: `Próximamente (${allMethods.filter(m => !m.implemented).length})` },
+          ].map((statusTab) => (
+            <button
+              key={statusTab.id}
+              type="button"
+              onClick={() => setSelectedStatus(statusTab.id as any)}
+              className={`rounded px-2.5 py-1 text-xs font-sans transition-colors ${
+                selectedStatus === statusTab.id
+                  ? "bg-bg-elevated text-accent-primary font-semibold border border-accent-primary/40 shadow-xs"
+                  : "text-text-muted hover:text-text-primary hover:bg-bg-secondary"
+              }`}
+            >
+              {statusTab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Category Filter Pills */}
       <div className="flex flex-wrap items-center gap-2">
-        {[
-          { id: "all", label: "Todos los Métodos (8)" },
-          { id: "comprension", label: "Comprensión & Síntesis (4)" },
-          { id: "memoria", label: "Evocación & Memoria (2)" },
-          { id: "enfoque", label: "Enfoque & Estructuración (2)" },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setSelectedCategory(tab.id)}
-            className={`rounded px-3 py-1.5 text-xs font-sans font-medium transition-colors ${
-              selectedCategory === tab.id
-                ? "bg-accent-primary text-bg-elevated border border-accent-primary"
-                : "bg-bg-secondary text-text-secondary border border-border-subtle hover:bg-bg-elevated hover:text-text-primary"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+        {CATEGORIES.map((tab) => {
+          const count = tab.id === "all"
+            ? allMethods.length
+            : allMethods.filter((m) => m.category === tab.id).length;
+
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setSelectedCategory(tab.id)}
+              className={`rounded px-3 py-1.5 text-xs font-sans font-medium transition-colors ${
+                selectedCategory === tab.id
+                  ? "bg-accent-primary text-bg-elevated border border-accent-primary shadow-xs"
+                  : "bg-bg-secondary text-text-secondary border border-border-subtle hover:bg-bg-elevated hover:text-text-primary"
+              }`}
+            >
+              {tab.label} ({count})
+            </button>
+          );
+        })}
       </div>
 
       {/* Grid of Methods */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
-        {filteredMethods.map((m) => (
-          <Card
-            key={m.id}
-            className="flex flex-col justify-between hover:border-accent-primary/40 transition-colors cursor-pointer group"
-            onClick={() => setPreviewMethod(m)}
+      {filteredMethods.length === 0 ? (
+        <div className="rounded border border-dashed border-border-subtle p-12 text-center">
+          <p className="text-sm text-text-muted">No se encontraron métodos de estudio con los filtros seleccionados.</p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setSelectedCategory("all");
+              setSelectedStatus("all");
+              setSearchQuery("");
+            }}
+            className="mt-3 text-xs"
           >
-            <div>
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between gap-2">
-                  <Badge variant="accent">{m.categoryLabel}</Badge>
-                  <span className="flex items-center gap-1 font-sans text-xs text-text-muted">
-                    <Clock className="h-3 w-3" />
-                    {m.duration}
-                  </span>
-                </div>
-                <CardTitle className="font-serif text-lg font-semibold text-text-primary mt-2">
-                  {m.name}
-                </CardTitle>
-              </CardHeader>
-              <div className="px-6 py-1 space-y-2">
-                <p className="font-sans text-xs text-text-secondary leading-relaxed">
-                  {m.shortDescription}
-                </p>
-                <div className="rounded bg-bg-secondary/70 border border-border-subtle/70 p-2 text-[11px] text-text-muted flex items-start gap-1.5">
-                  <Sparkles className="h-3 w-3 text-accent-primary shrink-0 mt-0.5" />
-                  <span className="line-clamp-1">{m.scientificBasis}</span>
+            Restablecer Filtros
+          </Button>
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
+          {filteredMethods.map((m) => (
+            <Card
+              key={m.id}
+              className="flex flex-col justify-between hover:border-accent-primary/40 transition-colors cursor-pointer group"
+              onClick={() => setPreviewMethod(m)}
+            >
+              <div>
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <Badge variant="accent">{CATEGORY_NAMES[m.category] || m.category}</Badge>
+                    <div className="flex items-center gap-1.5">
+                      {m.implemented ? (
+                        <Badge variant="success">Listo para Usar</Badge>
+                      ) : (
+                        <Badge variant="neutral">Próximamente</Badge>
+                      )}
+                    </div>
+                  </div>
+                  <CardTitle className="font-serif text-lg font-semibold text-text-primary mt-2 flex items-baseline justify-between gap-2">
+                    <span>{m.name}</span>
+                    {m.nameEn && (
+                      <span className="font-sans text-xs font-normal text-text-muted truncate max-w-[200px]">
+                        {m.nameEn}
+                      </span>
+                    )}
+                  </CardTitle>
+                </CardHeader>
+                <div className="px-6 py-1 space-y-2.5">
+                  <p className="font-sans text-xs text-text-secondary leading-relaxed line-clamp-3">
+                    {m.description}
+                  </p>
+
+                  {/* Scientific Basis Snippet */}
+                  {m.scientificBasis && (
+                    <div className="rounded bg-bg-secondary/70 border border-border-subtle/70 p-2 text-[11px] text-text-muted flex items-start gap-1.5">
+                      <Sparkles className="h-3 w-3 text-accent-primary shrink-0 mt-0.5" />
+                      <span className="line-clamp-1">{m.scientificBasis}</span>
+                    </div>
+                  )}
+
+                  {/* Best For Tags */}
+                  {m.bestFor && m.bestFor.length > 0 && (
+                    <div className="flex flex-wrap gap-1 pt-1">
+                      {m.bestFor.slice(0, 3).map((item, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center gap-1 rounded bg-bg-secondary px-2 py-0.5 text-[10px] text-text-muted border border-border-subtle/50"
+                        >
+                          <CheckCircle2 className="h-2.5 w-2.5 text-accent-secondary shrink-0" />
+                          <span className="truncate max-w-[130px]">{item}</span>
+                        </span>
+                      ))}
+                      {m.bestFor.length > 3 && (
+                        <span className="text-[10px] text-text-muted self-center">
+                          +{m.bestFor.length - 3} más
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
 
-            <div className="border-t border-border-subtle px-6 py-3 flex items-center justify-between gap-2 bg-bg-secondary/20">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-xs text-text-secondary group-hover:text-text-primary flex items-center gap-1.5"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setPreviewMethod(m);
-                }}
-              >
-                <Eye className="h-3.5 w-3.5" />
-                <span>Ver Ficha & Vista Previa</span>
-              </Button>
+              <div className="border-t border-border-subtle px-6 py-3 flex flex-wrap items-center justify-between gap-2 bg-bg-secondary/20 mt-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs text-text-secondary group-hover:text-text-primary flex items-center gap-1.5"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPreviewMethod(m);
+                  }}
+                >
+                  <Eye className="h-3.5 w-3.5" />
+                  <span>Ver Ficha Completa</span>
+                </Button>
 
-              <Button
-                variant="primary"
-                size="sm"
-                className="text-xs flex items-center gap-1.5"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleStartMethod(m.id);
-                }}
-              >
-                <Play className="h-3 w-3 fill-current" />
-                <span>Iniciar Método</span>
-                <ArrowRight className="h-3 w-3" />
-              </Button>
-            </div>
-          </Card>
-        ))}
-      </div>
+                <div className="flex items-center gap-2">
+                  {/* Contextual Quick Links for non-implemented or special methods */}
+                  {m.integratesWith?.includes("fsrs") && !m.implemented && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs flex items-center gap-1"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleContextualNav("fsrs", m.id);
+                      }}
+                    >
+                      <Cpu className="h-3 w-3 text-accent-primary" />
+                      <span>Usar con FSRS</span>
+                    </Button>
+                  )}
+
+                  {m.integratesWith?.includes("knowledge-graph") && !m.implemented && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs flex items-center gap-1"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleContextualNav("knowledge-graph", m.id);
+                      }}
+                    >
+                      <Layers className="h-3 w-3 text-accent-primary" />
+                      <span>Ver en Grafo</span>
+                    </Button>
+                  )}
+
+                  {m.implemented ? (
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="text-xs flex items-center gap-1.5"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStartMethod(m.id);
+                      }}
+                    >
+                      <Play className="h-3 w-3 fill-current" />
+                      <span>Iniciar Sesión</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </Button>
+                  ) : null}
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {/* Preview Modal */}
       <MethodPreviewModal

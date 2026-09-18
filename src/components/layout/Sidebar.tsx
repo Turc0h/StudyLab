@@ -18,16 +18,29 @@ import {
   HelpCircle,
   PanelLeftClose,
   PanelLeft,
+  Compass,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { useTutorialStore } from "../../stores/useTutorialStore";
 import { useThemeStore } from "../../stores/useThemeStore";
+import { useContextEngineStore } from "../../stores/useContextEngineStore";
 import { DURATION, EASE_EXPO_OUT } from "../../lib/motion-tokens";
 
 export const Sidebar: React.FC = () => {
   const openTutorial = useTutorialStore((s) => s.openTutorial);
   const isCollapsed = useThemeStore((s) => s.sidebarCollapsed);
   const toggleSidebar = useThemeStore((s) => s.toggleSidebar);
+  const contextEngineEnabled = useContextEngineStore((s) => s.contextEngineEnabled);
+
+  const academicItems = [
+    { to: "/academic", label: "Academic Hub", icon: GraduationCap },
+    { to: "/workspace", label: "Workspace OS", icon: BrainCircuit },
+    { to: "/graph", label: "Grafo Causal", icon: Network },
+  ];
+
+  if (contextEngineEnabled) {
+    academicItems.push({ to: "/context", label: "Motor Contexto", icon: Compass });
+  }
 
   const navSections = [
     {
@@ -39,11 +52,7 @@ export const Sidebar: React.FC = () => {
     },
     {
       title: "Académico & OS",
-      items: [
-        { to: "/academic", label: "Academic Hub", icon: GraduationCap },
-        { to: "/workspace", label: "Workspace OS", icon: BrainCircuit },
-        { to: "/graph", label: "Grafo Causal", icon: Network },
-      ],
+      items: academicItems,
     },
     {
       title: "Documentos & Audio",
