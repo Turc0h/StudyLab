@@ -4,6 +4,16 @@
  */
 export function registerServiceWorker() {
   if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+    // En desarrollo nunca registrar service worker para no romper HMR ni servir módulos cacheados obsoletos
+    if (import.meta.env.DEV) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        for (const registration of registrations) {
+          registration.unregister();
+        }
+      });
+      return;
+    }
+
     window.addEventListener("load", () => {
       navigator.serviceWorker
         .register("/sw.js")

@@ -18,8 +18,9 @@ import { Minimize2 } from "lucide-react";
 import { clsx } from "clsx";
 
 const shellVariants = {
-  hidden: {},
+  hidden: { opacity: 1 },
   visible: {
+    opacity: 1,
     transition: {
       staggerChildren: STAGGER.base,
       delayChildren: 0.05,
@@ -28,7 +29,7 @@ const shellVariants = {
 };
 
 const blockVariants = {
-  hidden: { opacity: 0, y: 8 },
+  hidden: { opacity: 0.98, y: 4 },
   visible: {
     opacity: 1,
     y: 0,
