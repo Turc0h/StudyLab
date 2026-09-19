@@ -80,10 +80,11 @@ flowchart TD
 
 ---
 
-### Fase 5: Activación por Contexto Físico y de Entorno Desktop
-- **Propósito:** Detectar qué herramientas de trabajo tiene abiertas el estudiante para sugerir el perfil cognitivo adecuado (ej. si está abierto Visual Studio Code o RStudio, sugerir perfil *Deep Problem Solving*; si está abierto un visor de diapositivas, sugerir *Memory Fortress*).
-- **Alcance evaluado:** Consulta de ventanas nativas mediante Tauri en Rust con bajo consumo de CPU.
-- **Límites éticos:** Cero keylogging, cero rastreo de navegación web personal y cero telemetría externa. La inspección se limitará a títulos de proceso relevantes configurados en una lista blanca por el propio estudiante.
+### Fase 5: Activación por Contexto Físico y de Entorno Desktop (IMPLEMENTADA en v5.10)
+- **Estado:** Implementada y operativa (`src-tauri/src/desktop_context.rs`, `desktopContextService.ts`, `DesktopEnvironmentContext.tsx`).
+- **Propósito:** Detectar qué herramientas de trabajo tiene abiertas el estudiante para sugerir el perfil cognitivo adecuado (ej. si está abierto Visual Studio Code o RStudio, sugerir perfil *Profundidad Lógica*; si está abierto un visor de documentos o PDF, sugerir *Fortaleza Mnemotécnica*; si está abierto un editor de notas o Markdown, sugerir *Síntesis Divergente*; si hay un simulador, sugerir *Presión de Examen*).
+- **Implementación:** Comando nativo `detect_active_study_tools` en Rust (Tauri v2) con bajo consumo de CPU y filtrado estricto por lista blanca académica. Pestaña dedicada en `/context` con escaneo manual o periódico (30s) y activación en 1 clic.
+- **Límites éticos:** Cero keylogging, cero rastreo de navegación web personal y cero telemetría externa. La inspección se limita estrictamente a los ejecutables de la lista blanca académica local.
 
 ---
 

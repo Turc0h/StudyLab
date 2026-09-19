@@ -1066,6 +1066,43 @@ El catálogo de StudyLab completa su meta arquitectónica:
 
 ---
 
+## Fase v5.10 — Contexto de Entorno Desktop y Sugerencia Cognitiva
+
+Esta fase implementa la **Fase 5 del Roadmap del Motor de Contexto** (`docs/CONTEXT_ENGINE_ROADMAP.md`), conectando de forma pasiva y privada el entorno de trabajo del estudiante con la activación asistida de su postura mental y sus metodologías de estudio recomendadas.
+
+### 1. Backend Nativo en Rust: Comando `detect_active_study_tools` (`desktop_context.rs`)
+- **Ubicación:** `src-tauri/src/desktop_context.rs` e integrado en `lib.rs`.
+- **Privacidad y Ética Innegociable:**
+  - Inspección de procesos de solo lectura basada exclusivamente en una **lista blanca académica local** (`code.exe`, `cursor.exe`, `rstudio.exe`, `sumatrapdf.exe`, `obsidian.exe`, `anki.exe`, `texstudio.exe`, etc.).
+  - Cero keylogging, cero captura de pantalla, cero rastreo de navegación web y cero telemetría externa.
+  - Ejecución ligera en Windows mediante `tasklist /FO CSV /NH` y en POSIX mediante `ps`, con HashSet determinista de bajo impacto de CPU.
+
+### 2. Servicio de Diagnóstico y Ponderación Cognitiva (`desktopContextService.ts`)
+- **Ubicación:** `src/features/context-engine/desktopContextService.ts`.
+- **Mapeo Heurístico a Posturas Mentales:**
+  - *Herramientas de Código/Cálculo (VS Code, RStudio, PyCharm):* Recomienda **Profundidad Lógica & Deducción** (*Feynman*, *PBL*, *Mapas Conceptuales*).
+  - *Visores de Documentos/PDFs (SumatraPDF, Calibre, Acrobat):* Recomienda **Fortaleza Mnemotécnica** (*Leitner*, *Recuerdo Activo*, *Palacio de la Memoria*).
+  - *Gestores de Notas/Markdown (Obsidian, Notion, Word):* Recomienda **Síntesis Divergente** (*Zettelkasten*, *Cornell*, *Codificación Dual*).
+  - *Calculadoras/Simuladores (SpeedCrunch, Anki):* Recomienda **Presión de Examen** (*Simulacros*, *PQ4R*, *Dificultades Deseables*).
+- **Cálculo de Confianza y Diagnóstico:** Genera porcentaje de coincidencia y justificación pedagógica en lenguaje natural para la sugerencia.
+
+### 3. Interfaz de Usuario: Pestaña "Entorno Desktop" (`DesktopEnvironmentContext.tsx`)
+- **Ubicación:** `src/features/context-engine/DesktopEnvironmentContext.tsx` integrado en `ContextEngineDashboard.tsx`.
+- **Capacidades Operativas:**
+  - Indicador de modo (Tauri Nativo vs Navegador Web).
+  - Escaneo bajo demanda o automático periódico cada 30 segundos.
+  - Grilla de herramientas académicas activas con sus categorías y procesos.
+  - Tarjeta destacada con la postura cognitiva sugerida y botón de 1 clic para *"Activar Postura"*.
+  - Catálogo directo de las 4 metodologías científicas recomendadas para ese entorno, con botón de lanzamiento directo a `/methods?run=<id>`.
+
+### 4. Suite de Verificación Automatizada (23 Suites)
+- `scripts/test-phase10-desktop-context.mjs`: 43/43 pruebas aprobadas al 100%.
+- `npm test`: **23 suites de tests ejecutadas con 100% de éxito (395+ aserciones verificadas)**.
+- `cargo check`: compilación limpia en Rust (`src-tauri`) sin errores.
+- `npm run build`: compilación limpia en 4.47s con 0 errores TypeScript (`tsc -b && vite build`).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

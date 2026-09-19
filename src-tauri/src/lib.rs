@@ -3,6 +3,7 @@ pub mod watcher;
 pub mod job_queue;
 pub mod background_jobs;
 pub mod reconciliation;
+pub mod desktop_context;
 
 use std::fs;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -66,6 +67,7 @@ pub fn run() {
       background_jobs::shutdown_job_system,
       background_jobs::enqueue_document_job,
       reconciliation::reconcile_library_state,
+      desktop_context::detect_active_study_tools,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
