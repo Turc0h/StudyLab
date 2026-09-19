@@ -18,6 +18,8 @@ import {
 import { generateId } from "../features/files/fileHelpers";
 import { useGoogleCalendarEvents } from "../features/google-calendar/useGoogleCalendar";
 import { getMethod } from "../features/session-engine/methods";
+import { ConsistencyHeatmapCard } from "../features/analytics/ConsistencyHeatmapCard";
+import { RetentionForecastCard } from "../features/analytics/RetentionForecastCard";
 
 export function Dashboard() {
   const sessions =
@@ -185,6 +187,12 @@ export function Dashboard() {
             </div>
           )}
         </Surface>
+      </div>
+
+      {/* Matriz Anual de Consistencia y Pronóstico de Retención FSRS a 365 Días */}
+      <div className="space-y-4">
+        <ConsistencyHeatmapCard />
+        <RetentionForecastCard />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

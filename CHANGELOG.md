@@ -1371,6 +1371,69 @@ Implementación integral de la **Fase 6 del Roadmap del Context Engine**: Monito
 
 ---
 
+## Fase v5.18 — Matriz Anual de Consistencia Cognitiva y Pronóstico de Retención a 365 Días (FSRS Memory Decay)
+
+**Qué se construyó**
+Implementación del sistema dual de analítica de largo plazo: la **Matriz Anual de Consistencia Cognitiva (52 semanas / 365 días)** con mapeo de densidad horaria y rachas, y el **Motor Matemático de Pronóstico de Retención a 365 Días**, que modela el decaimiento de memoria $R(t, S)$ sobre el mazo FSRS del estudiante, identifica el *Abismo de Olvido* pre-examen y sugiere fechas de refuerzo pedagógico antes de que la retención caiga por debajo del umbral de aprobación (80%).
+
+### 1. Motor de Matriz de Consistencia y Rachas (`consistencyHeatmap.ts`)
+- **Ubicación:** `src/features/analytics/consistencyHeatmap.ts`.
+- **Ventana Deslizante de 52 Semanas (365 días):**
+  - Genera una matriz semanal alineada con domingos (52 columnas $\times$ 7 filas de días).
+  - Agrega telemetría de sesiones de estudio (`db.sessions`) y repasos FSRS (`db.reviewLogs`).
+- **Niveles de Intensidad Cognitiva (0 a 4):**
+  - Nivel 0: Sin actividad registrada.
+  - Nivel 1 (Ligero): < 15 min o < 10 tarjetas.
+  - Nivel 2 (Moderado): 15 a 45 min o 10 a 30 tarjetas.
+  - Nivel 3 (Profundo / Deep Work): 45 a 90 min o 30 a 70 tarjetas.
+  - Nivel 4 (Titán / Hiperfoco): > 90 min o > 70 tarjetas repasadas.
+- **Métricas de Consistencia y Rachas:**
+  - Racha actual activa (días consecutivos hasta hoy).
+  - Racha récord histórica (all-time longest streak).
+  - Total de horas netas de estudio y tarjetas repasadas en el último año.
+  - Promedio de minutos dedicados por día activo.
+  - Porcentaje de consistencia anual sobre el calendario civil.
+
+### 2. Motor Matemático de Pronóstico a 365 Días (`retentionForecast.ts`)
+- **Ubicación:** `src/features/analytics/retentionForecast.ts`.
+- **Fórmula Canónica de Retención FSRS:**
+  - Simula la probabilidad de recuperación a futuro para cada tarjeta $i$ en función de su estabilidad $S_i$ y los días transcurridos:
+    $$R(t, S) = \left(1 + 19 \cdot \frac{t}{S}\right)^{-0.5}$$
+- **Hitos Temporales de Examen:**
+  - Computa la retención estimada a Hoy (0d), 7 días, 30 días (1 mes), 60 días (2 meses), 90 días (típico trimestre / finales universitarios), 180 días (semestre) y 365 días (año).
+- **Detección de Umbrales Críticos:**
+  - Días hasta caer por debajo del **80%** (umbral de aprobación segura).
+  - Días hasta el **70%** (*Abismo Crítico de Olvido* / caída acelerada).
+  - Días hasta el **50%** (Vida Media del Conocimiento / Half-Life $t_{1/2}$).
+- **Recomendaciones Pedagógicas Adaptativas:**
+  - Diagnóstico categorizado en `good`, `warning` y `critical`.
+  - Cálculo de la fecha de refuerzo recomendada (*Booster Review Day*) para impedir que la curva caiga al abismo de olvido.
+
+### 3. Componentes Visuales en el Dashboard
+- **`ConsistencyHeatmapCard.tsx` (`src/features/analytics/ConsistencyHeatmapCard.tsx`):**
+  - Matriz visual interactiva con soporte para temas oscuro y claro.
+  - Foco y hover interactivo sobre cada celda con popover detallado (fecha, minutos, sesiones, tarjetas y nivel de intensidad).
+  - Escala de color gradual de esmeralda / turquesa y leyenda de intensidad.
+  - Franja de KPIs clave: Días Activos, Horas de Foco, Tarjetas Repasadas y Promedio diario.
+- **`RetentionForecastCard.tsx` (`src/features/analytics/RetentionForecastCard.tsx`):**
+  - Selector interactivo de horizonte de examen (30d, 60d, 90d, 180d).
+  - Gráfico vectorial SVG continuo con gradiente dinámico y líneas guía punteadas para los umbrales de 90%, 80% y 70%.
+  - Línea vertical indicadora del día de examen seleccionado con valor de retención proyectado.
+  - Tarjeta de diagnóstico y aviso de refuerzo sugerido con insignia de advertencia.
+
+### 4. Integraciones en el Sistema
+- **Dashboard (`Dashboard.tsx`):** Integración directa de ambos componentes analíticos en la vista principal del estudiante.
+- **Command Palette (`commandPaletteService.ts` / `CommandPalette.tsx`):**
+  - Nueva acción `action-consistency-heatmap` mapeada con el icono `Calendar` y términos de consistencia y racha.
+  - Nueva acción `action-retention-forecast` mapeada con el icono `TrendingUp` y términos de pronóstico y memoria a 365 días.
+
+### 5. Suite de Verificación Automatizada (31 Suites)
+- `scripts/test-phase18-retention-heatmap.mjs`: 20/20 pruebas aprobadas al 100%.
+- `npm test`: **31 suites de tests ejecutadas con 100% de éxito (680+ aserciones verificadas)**.
+- `npm run build`: compilación limpia en 4.61s con 0 errores TypeScript (`tsc -b && vite build`).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

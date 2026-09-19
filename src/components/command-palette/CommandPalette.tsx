@@ -26,6 +26,8 @@ import {
   Flame,
   Mic,
   Heart,
+  Calendar,
+  TrendingUp,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { useCommandPaletteStore } from "../../stores/useCommandPaletteStore";
@@ -60,6 +62,8 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Flame,
   Mic,
   Heart,
+  Calendar,
+  TrendingUp,
 };
 
 const CATEGORY_COLORS: Record<CommandPaletteCategory, { bg: string; text: string; border: string }> = {

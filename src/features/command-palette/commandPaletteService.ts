@@ -207,6 +207,24 @@ export async function searchCommandPalette(
       keywords: ["biometria", "pulso", "corazon", "cardiaco", "hrv", "ble", "bluetooth", "estres", "box breathing", "respiracion"],
       onSelect: () => actions.navigate("/context"),
     },
+    {
+      id: "action-consistency-heatmap",
+      title: "Matriz Anual de Consistencia Cognitiva",
+      subtitle: "Mapa de calor de 52 semanas (365 días) con densidad de horas, rachas y repasos",
+      iconName: "Calendar",
+      badge: "Métricas",
+      keywords: ["heatmap", "consistencia", "racha", "365", "mapa de calor", "anual", "calendario", "habito"],
+      onSelect: () => actions.navigate("/"),
+    },
+    {
+      id: "action-retention-forecast",
+      title: "Pronóstico de Retención a 365 Días (FSRS)",
+      subtitle: "Simulación de curva de olvido R(t, S), umbrales de seguridad y fecha de refuerzo",
+      iconName: "TrendingUp",
+      badge: "FSRS",
+      keywords: ["retencion", "pronostico", "curva de olvido", "forecast", "memoria", "estabilidad", "examen final", "365"],
+      onSelect: () => actions.navigate("/"),
+    },
   ];
 
   // Evaluar Acciones del Sistema
