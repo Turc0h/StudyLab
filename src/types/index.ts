@@ -39,7 +39,8 @@ export type StudyMethodId =
   | "past-exams"
   | "local-ai"
   | "audio-flashcards"
-  | "final-board";
+  | "final-board"
+  | "math-blackboard";
 
 export interface StudyMethodInfo {
   id: StudyMethodId;

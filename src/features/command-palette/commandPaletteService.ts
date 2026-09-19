@@ -297,6 +297,15 @@ export async function searchCommandPalette(
       keywords: ["tribunal", "coloquio", "final", "tesis", "defensa", "jurado", "catedra", "acta", "oral"],
       onSelect: () => actions.navigate("/methods?run=final-board"),
     },
+    {
+      id: "action-math-blackboard",
+      title: "Pizarra Matemática & Demostración Paso a Paso",
+      subtitle: "Evocación ciega de deducciones teóricas, justificación formal y render KaTeX",
+      iconName: "Binary",
+      badge: "Matemática",
+      keywords: ["matematica", "pizarra", "teoremas", "demostracion", "katex", "latex", "formulas", "nyquist", "calculo", "euler", "svd"],
+      onSelect: () => actions.navigate("/methods?run=math-blackboard"),
+    },
   ];
 
   // Evaluar Acciones del Sistema

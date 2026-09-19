@@ -1758,6 +1758,36 @@ Implementación de la estación de planificación temporal y balance de esfuerzo
 
 ---
 
+## Fase v5.27 — Pizarra de Demostraciones Matemáticas & Teoremas Paso a Paso
+
+### 1. Motor de Deducciones Teóricas y Algoritmo de Evocación Ciega (`mathBlackboardEngine.ts`)
+- **Ubicación:** `src/features/math-blackboard/mathBlackboardEngine.ts`.
+- **Catálogo de Teoremas Rigurosos Multi-Área:**
+  - *Ingeniería & Telecomunicaciones:* **Teorema de Muestreo de Nyquist-Shannon** ($f_s \ge 2B$, modulación con peine de Dirac, convolución espectral, criterio anti-aliasing y reconstrucción con sinc).
+  - *Matemática & Física:* **Primer Teorema Fundamental del Cálculo** ($F'(x) = f(x)$, cociente incremental, aditividad de integrales y Teorema del Valor Medio).
+  - *Economía & Finanzas Cuantitativas:* **Ecuación de Euler de Consumo Intertemporal** ($u'(c_t) = \beta (1+r) u'(c_{t+1})$, Lagrangiano intertemporal y tasa marginal de sustitución).
+  - *Computación & Algoritmos:* **Descomposición en Valores Singulares (SVD)** ($A = U \Sigma V^T$, matriz gramiana, autovalores reales y ortonormalidad de vectores singulares).
+- **Evaluador de Expresiones KaTeX (`validateStepDerivation`):** Normaliza sintaxis LaTeX y evalúa concordancia estructural y presencia de operadores clave, otorgando puntaje y feedback formativo.
+- **Persistencia en IndexedDB:** Registro de deducción en `db.sessions` con `methodId: "math-blackboard"`.
+
+### 2. Pizarra KaTeX Interactiva (`MathBlackboardMethod.tsx`)
+- **Ubicación:** `src/components/study-methods/MathBlackboardMethod.tsx`.
+- **Lienzo de Demostración Estilo Pizarra:** Renderizado matemático KaTeX en tiempo real con display equations y tipografía académica.
+- **Barra de Herramientas de Símbolos Rápidos:** Inserción en 1-click de operadores matemáticos comunes ($\int, \sum, \lim, \frac{a}{b}, \sqrt{x}, \partial, \nabla, \alpha, \beta, \lambda, \sigma, \infty, \ge, \le, \in, \iff, \implies$).
+- **Modo Desafío de Evocación Ciega:** Ocultamiento de la fórmula con desafío deductivo y pista contextual de cátedra, permitiendo validar o revelar el paso.
+
+### 3. Integraciones en el Ecosistema
+- **Catálogo de Métodos (`MethodsPage.tsx`):** Carga diferida (`lazy`), runner case `"math-blackboard"` y botón de acceso rápido *"Pizarra Matemática & KaTeX"*.
+- **Tipado Global (`types/index.ts`):** `StudyMethodId` actualizado con `"math-blackboard"`.
+- **Command Palette (`commandPaletteService.ts` / `CommandPalette.tsx`):** Acción `action-math-blackboard` con el icono `Binary` y badge `"Matemática"`.
+
+### 4. Suite de Verificación Automatizada (40 Suites)
+- `scripts/test-phase27-math-blackboard.mjs`: 12/12 pruebas aprobadas al 100%.
+- `npm test`: **40 suites de tests ejecutadas con 100% de éxito**.
+- `npm run build`: compilación limpia en 4.88s con 0 errores TypeScript (`tsc -b && vite build`) y chunk optimizado (`MathBlackboardMethod-DWx9EFmC.js`, 27.09 kB).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash
