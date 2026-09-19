@@ -4,6 +4,7 @@
  */
 
 export const DEFAULT_OLLAMA_HOST = "http://localhost:11434";
+export const DEFAULT_OLLAMA_MODEL = "llama3.2";
 
 export interface OllamaModel {
   name: string;
@@ -26,6 +27,48 @@ export interface OllamaStatus {
   models: OllamaModel[];
   version?: string;
   error?: string;
+}
+
+export interface ChatMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+}
+
+export interface OllamaConfig {
+  host: string;
+  preferredModel: string;
+  temperature: number;
+}
+
+const STORAGE_KEY_CONFIG = "studylab_ollama_config";
+
+export function getStoredOllamaConfig(): OllamaConfig {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_CONFIG);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return {
+        host: parsed.host || DEFAULT_OLLAMA_HOST,
+        preferredModel: parsed.preferredModel || DEFAULT_OLLAMA_MODEL,
+        temperature: typeof parsed.temperature === "number" ? parsed.temperature : 0.7,
+      };
+    }
+  } catch {
+    // fallback
+  }
+  return {
+    host: DEFAULT_OLLAMA_HOST,
+    preferredModel: DEFAULT_OLLAMA_MODEL,
+    temperature: 0.7,
+  };
+}
+
+export function saveStoredOllamaConfig(config: OllamaConfig): void {
+  try {
+    localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(config));
+  } catch {
+    // ignore
+  }
 }
 
 /**
@@ -104,7 +147,7 @@ export async function generateOllamaCompletion(
   }
 ): Promise<string> {
   const host = (options?.host || DEFAULT_OLLAMA_HOST).trim().replace(/\/+$/, "");
-  const model = options?.model || "llama3.2";
+  const model = options?.model || DEFAULT_OLLAMA_MODEL;
 
   const body: Record<string, any> = {
     model,
@@ -131,4 +174,152 @@ export async function generateOllamaCompletion(
 
   const data = await response.json();
   return data.response || "";
+}
+
+/**
+ * Genera texto mediante /api/generate con streaming de tokens en tiempo real.
+ */
+export async function generateOllamaStream(
+  prompt: string,
+  options?: {
+    model?: string;
+    systemPrompt?: string;
+    host?: string;
+    temperature?: number;
+    onChunk?: (token: string, accumulated: string) => void;
+  }
+): Promise<string> {
+  const host = (options?.host || DEFAULT_OLLAMA_HOST).trim().replace(/\/+$/, "");
+  const model = options?.model || DEFAULT_OLLAMA_MODEL;
+
+  const body: Record<string, any> = {
+    model,
+    prompt,
+    stream: true,
+    options: {
+      temperature: options?.temperature ?? 0.7,
+    },
+  };
+
+  if (options?.systemPrompt) {
+    body.system = options.systemPrompt;
+  }
+
+  const response = await fetch(`${host}/api/generate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error en Ollama streaming generate: HTTP ${response.status} ${response.statusText}`);
+  }
+
+  if (!response.body) {
+    throw new Error("El stream de respuesta de Ollama no está disponible.");
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let accumulated = "";
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split("\n");
+    buffer = lines.pop() || "";
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (parsed.response) {
+          accumulated += parsed.response;
+          if (options?.onChunk) {
+            options.onChunk(parsed.response, accumulated);
+          }
+        }
+      } catch {
+        // partial line
+      }
+    }
+  }
+
+  return accumulated;
+}
+
+/**
+ * Conversación interactiva multi-turno mediante /api/chat con streaming en tiempo real.
+ */
+export async function chatOllamaStream(
+  messages: ChatMessage[],
+  options?: {
+    model?: string;
+    host?: string;
+    temperature?: number;
+    onChunk?: (token: string, accumulated: string) => void;
+  }
+): Promise<string> {
+  const host = (options?.host || DEFAULT_OLLAMA_HOST).trim().replace(/\/+$/, "");
+  const model = options?.model || DEFAULT_OLLAMA_MODEL;
+
+  const body = {
+    model,
+    messages,
+    stream: true,
+    options: {
+      temperature: options?.temperature ?? 0.7,
+    },
+  };
+
+  const response = await fetch(`${host}/api/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error en Ollama chat: HTTP ${response.status} ${response.statusText}`);
+  }
+
+  if (!response.body) {
+    throw new Error("El stream de respuesta de Ollama no está disponible.");
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let accumulated = "";
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split("\n");
+    buffer = lines.pop() || "";
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (parsed.message?.content) {
+          const delta = parsed.message.content;
+          accumulated += delta;
+          if (options?.onChunk) {
+            options.onChunk(delta, accumulated);
+          }
+        }
+      } catch {
+        // partial line
+      }
+    }
+  }
+
+  return accumulated;
 }

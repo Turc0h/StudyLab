@@ -270,6 +270,15 @@ export async function searchCommandPalette(
       keywords: ["parciales", "examenes", "pareto", "high yield", "simulacro", "banco", "catedra", "preguntas"],
       onSelect: () => actions.navigate("/methods?run=past-exams"),
     },
+    {
+      id: "action-local-ai",
+      title: "Tutor IA Local & Puente Ollama",
+      subtitle: "Tutor socrático, generador de parciales y evaluación con modelos locales",
+      iconName: "Bot",
+      badge: "IA Local",
+      keywords: ["ollama", "ia", "ai", "local", "socratico", "llama", "mistral", "gemma", "tutor", "offline"],
+      onSelect: () => actions.navigate("/methods?run=local-ai"),
+    },
   ];
 
   // Evaluar Acciones del Sistema

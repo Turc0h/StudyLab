@@ -9,7 +9,7 @@ import { CognitiveTriageModal } from "../components/study-methods/CognitiveTriag
 import { Card, CardHeader, CardTitle } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { Badge } from "../components/ui/Badge";
-import { ArrowLeft, ArrowRight, Eye, Play, Sparkles, Search, Layers, Cpu, CheckCircle2, Flame, Mic, FileText, Columns3, Briefcase, CalendarDays, GraduationCap } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, Play, Sparkles, Search, Layers, Cpu, CheckCircle2, Flame, Mic, FileText, Columns3, Briefcase, CalendarDays, GraduationCap, Bot } from "lucide-react";
 import { PanelGuide } from "../components/guide/PanelGuide";
 import { useNavigate } from "react-router-dom";
 
@@ -132,6 +132,9 @@ const SemesterGanttMethod = lazy(() =>
 );
 const PastExamsMethod = lazy(() =>
   import("../components/study-methods/PastExamsMethod").then((m) => ({ default: m.PastExamsMethod })),
+);
+const LocalAiMethod = lazy(() =>
+  import("../components/study-methods/LocalAiMethod").then((m) => ({ default: m.LocalAiMethod })),
 );
 
 const CATEGORIES = [
@@ -293,6 +296,8 @@ export const MethodsPage: React.FC = () => {
           return <SemesterGanttMethod onSessionFinished={handleBackToCatalog} />;
         case "past-exams":
           return <PastExamsMethod onSessionFinished={handleBackToCatalog} />;
+        case "local-ai":
+          return <LocalAiMethod onSessionFinished={handleBackToCatalog} />;
         default:
           return (
             <div className="p-8 text-center space-y-4">
@@ -434,6 +439,15 @@ export const MethodsPage: React.FC = () => {
             >
               <GraduationCap className="h-3.5 w-3.5 text-purple-400" />
               <span>Banco de Parciales & Pareto</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleStartMethod("local-ai")}
+              className="text-xs flex items-center gap-1.5 border-cyan-500/40 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 hover:text-cyan-200"
+            >
+              <Bot className="h-3.5 w-3.5 text-cyan-400" />
+              <span>Tutor IA Local & Ollama</span>
             </Button>
           </div>
         </div>

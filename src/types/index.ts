@@ -36,7 +36,8 @@ export type StudyMethodId =
   | "comparative-matrix"
   | "case-study"
   | "semester-gantt"
-  | "past-exams";
+  | "past-exams"
+  | "local-ai";
 
 export interface StudyMethodInfo {
   id: StudyMethodId;

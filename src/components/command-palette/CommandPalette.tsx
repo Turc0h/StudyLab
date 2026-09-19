@@ -31,6 +31,7 @@ import {
   Columns3,
   Briefcase,
   CalendarDays,
+  Bot,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { useCommandPaletteStore } from "../../stores/useCommandPaletteStore";
@@ -70,6 +71,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Columns3,
   Briefcase,
   CalendarDays,
+  Bot,
 };
 
 const CATEGORY_COLORS: Record<CommandPaletteCategory, { bg: string; text: string; border: string }> = {

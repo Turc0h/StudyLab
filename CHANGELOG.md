@@ -1648,6 +1648,45 @@ Implementación de la estación de planificación temporal y balance de esfuerzo
 
 ---
 
+## Fase v5.24 — Conexión e Integración de IA Local (Ollama / Local LLM Bridge)
+
+### 1. Cliente HTTP y Streaming Ollama (`ollamaClient.ts`)
+- **Ubicación:** `src/platform/ai/ollamaClient.ts`.
+- **Protocolo y Streaming de Tokens:**
+  - Streaming en tiempo real mediante `ReadableStream` y buffers NDJSON (`generateOllamaStream` y `chatOllamaStream`).
+  - Detección de modelos locales instalados vía `/api/tags` y versión de demonio vía `/api/version`.
+  - Persistencia de configuración de conexión (`OllamaConfig`: host, modelo preferido y temperatura) en almacenamiento local.
+
+### 2. Motor de IA Académica y Modos Cognitivos (`localAiEngine.ts`)
+- **Ubicación:** `src/features/ai-bridge/localAiEngine.ts`.
+- **4 Modos de Estudio Universitarios Especializados:**
+  1. **Tutor Socrático (`socratic_tutor`):** Aplica la regla de oro pedagógica de nunca revelar la respuesta de inmediato; guía al estudiante formulando preguntas socráticas para descomponer premisas y falacias.
+  2. **Generador de Parcial (`exam_question_generator`):** Produce consignas de nivel universitario (opción múltiple con fundamento, preguntas a desarrollo y casos prácticos).
+  3. **Evaluador de Rúbricas (`rubric_evaluator`):** Califica respuestas de 0 a 10, señalando aciertos técnicos, omisiones y la respuesta modelo con la que la cátedra otorgaría el 10/10.
+  4. **Extracción de Flashcards (`flashcard_generator`):** Transforma apuntes en tarjetas atómicas Q/A optimizadas para FSRS.
+- **Simulador Académico Offline Determinista:** En caso de que el demonio Ollama no esté iniciado o el estudiante estudie sin conexión, genera respuestas completas sin bloquear ni colgar la interfaz.
+- **Catálogo de Modelos Recomendados:** Guía de modelos (`llama3.2`, `mistral`, `gemma2`, `qwen2.5`) con tamaño en VRAM/disco y casos de uso.
+- **Persistencia de Sesiones:** Registro de consultas y tiempo de estudio con IA en `db.sessions` con `methodId: "local-ai"`.
+
+### 3. Estudio Visual e Interactivo (`LocalAiMethod.tsx`)
+- **Ubicación:** `src/components/study-methods/LocalAiMethod.tsx`.
+- **Panel Dividido (Split-View):**
+  - Columna izquierda: entrada de apuntes/bibliografía de referencia y campo de consulta o consigna del estudiante.
+  - Columna derecha: consola de streaming en tiempo real con historial de diálogo socrático, botón para copiar y guardado directo en el historial de sesiones.
+- **Drawer de Configuración Rápida:** Selector de modelos locales, control deslizante de temperatura y verificación instantánea de conexión.
+
+### 4. Integraciones en el Ecosistema
+- **Catálogo de Métodos (`MethodsPage.tsx`):** Carga diferida (`lazy`), runner case `"local-ai"` y botón de acceso rápido *"Tutor IA Local & Ollama"*.
+- **Tipado Global (`types/index.ts`):** `StudyMethodId` actualizado con `"local-ai"`.
+- **Command Palette (`commandPaletteService.ts` / `CommandPalette.tsx`):** Nueva acción rápida `action-local-ai` con el icono `Bot`.
+
+### 5. Suite de Verificación Automatizada (37 Suites)
+- `scripts/test-phase24-local-ai.mjs`: 16/16 pruebas aprobadas al 100%.
+- `npm test`: **37 suites de tests ejecutadas con 100% de éxito**.
+- `npm run build`: compilación limpia en 4.52s con 0 errores TypeScript (`tsc -b && vite build`).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash
