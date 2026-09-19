@@ -9,11 +9,14 @@ import { CognitiveTriageModal } from "../components/study-methods/CognitiveTriag
 import { Card, CardHeader, CardTitle } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { Badge } from "../components/ui/Badge";
-import { ArrowLeft, ArrowRight, Eye, Play, Sparkles, Search, Layers, Cpu, CheckCircle2, Flame, Mic, FileText, Columns3, Briefcase, CalendarDays, GraduationCap, Bot, Headphones } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, Play, Sparkles, Search, Layers, Cpu, CheckCircle2, Flame, Mic, FileText, Columns3, Briefcase, CalendarDays, GraduationCap, Bot, Headphones, Scale } from "lucide-react";
 import { PanelGuide } from "../components/guide/PanelGuide";
 import { useNavigate } from "react-router-dom";
 
 // Lazy loaded method runners
+const FinalBoardMethod = lazy(() =>
+  import("../components/study-methods/FinalBoardMethod").then((m) => ({ default: m.FinalBoardMethod })),
+);
 const FeynmanMethod = lazy(() =>
   import("../components/study-methods/FeynmanMethod").then((m) => ({ default: m.FeynmanMethod })),
 );
@@ -303,6 +306,8 @@ export const MethodsPage: React.FC = () => {
           return <LocalAiMethod onSessionFinished={handleBackToCatalog} />;
         case "audio-flashcards":
           return <AudioFlashcardsMethod onSessionFinished={handleBackToCatalog} />;
+        case "final-board":
+          return <FinalBoardMethod onSessionFinished={handleBackToCatalog} />;
         default:
           return (
             <div className="p-8 text-center space-y-4">
@@ -462,6 +467,15 @@ export const MethodsPage: React.FC = () => {
             >
               <Headphones className="h-3.5 w-3.5 text-teal-400" />
               <span>Audio Flashcards & Podcast</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleStartMethod("final-board")}
+              className="text-xs flex items-center gap-1.5 border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 hover:text-amber-200"
+            >
+              <Scale className="h-3.5 w-3.5 text-amber-400" />
+              <span>Tribunal de Examen Final & Tesis</span>
             </Button>
           </div>
         </div>

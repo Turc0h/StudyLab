@@ -1724,6 +1724,40 @@ Implementación de la estación de planificación temporal y balance de esfuerzo
 
 ---
 
+## Fase v5.26 — Tribunal de Examen Final & Defensa de Tesis Multidocente
+
+### 1. Motor de Tribunal Colegiado (`finalBoardEngine.ts`)
+- **Ubicación:** `src/features/oral-defense/finalBoardEngine.ts`.
+- **Modelado de Arquetipos Docentes Colegiados:**
+  1. *El Dogmático:* Rigor doctrinario, definiciones canónicas exactas, citas a autores/leyes y fisiopatología/protocolos formales.
+  2. *El Práctico:* Situaciones límite, excepciones, choque de vasopresores, partición asimétrica y caídas de producción.
+  3. *El Metodólogo / Presidente de Mesa:* Coherencia argumental, síntesis, manejo del tiempo y repreguntas ante respuestas vagas.
+- **Banco de Tribunales y Casos Precargados:**
+  - *Medicina:* Ateneo Clínico Central de UTI y Cardiología (shock mixto, fibrilación auricular refractaria y ECMO V-A).
+  - *Derecho:* Tribunal de Tesis de Grado en Responsabilidad Civil (art. 1757 CCCN, algoritmos de caja negra y riesgo creado).
+  - *Ingeniería:* Defensa de Proyecto Integrador de Software (Consenso Raft multi-grupo, Leader Completeness y Stale Reads).
+- **Detector de Evasivas en Vivo (`detectOralSmoke`):** Audita respuestas telegráficas o evasivas genéricas alertando la falta de anclaje técnico.
+- **Emisión de Acta Oficial de Examen Final (`evaluateBoardPerformance`):** Veredictos colegiados (*Sobresaliente con Distinción*, *Aprobado*, *Insuficiente*), promedio ponderado sobre 10, número de acta formal y fortalezas/observaciones de cada examinador.
+- **Persistencia en IndexedDB:** Registro de examen en `db.sessions` con `methodId: "final-board"`.
+
+### 2. Sala de Tribunal Interactivas (`FinalBoardMethod.tsx`)
+- **Ubicación:** `src/components/study-methods/FinalBoardMethod.tsx`.
+- **Sala de Examen con Avatares:** Indicadores de estado en vivo para cada profesor (*En espera*, *Interrogando ahora*, *Ronda Respondida*).
+- **Locución y Dictado por Voz:** Lectura de consignas con Web Speech API modulando tono según el arquetipo del profesor y dictado por micrófono para argumentación oral continua.
+- **Vista de Acta Oficial Universitaria:** Formato formal imprimible con promedios, veredicto y firmas simuladas.
+
+### 3. Integraciones en el Ecosistema
+- **Catálogo de Métodos (`MethodsPage.tsx`):** Carga diferida (`lazy`), runner case `"final-board"` y botón de acceso rápido *"Tribunal de Examen Final & Tesis"*.
+- **Tipado Global (`types/index.ts`):** `StudyMethodId` actualizado con `"final-board"`.
+- **Command Palette (`commandPaletteService.ts` / `CommandPalette.tsx`):** Acción `action-final-board` con el icono `Scale` y badge `"Tribunal"`.
+
+### 4. Suite de Verificación Automatizada (39 Suites)
+- `scripts/test-phase26-final-board.mjs`: 13/13 pruebas aprobadas al 100%.
+- `npm test`: **39 suites de tests ejecutadas con 100% de éxito**.
+- `npm run build`: compilación limpia en 5.42s con 0 errores TypeScript (`tsc -b && vite build`) y chunk optimizado (`FinalBoardMethod-C_-2bmGt.js`, 32.03 kB).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

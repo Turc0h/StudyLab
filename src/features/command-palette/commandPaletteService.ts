@@ -288,6 +288,15 @@ export async function searchCommandPalette(
       keywords: ["audio", "flashcards", "podcast", "caminata", "walking", "recall", "voz", "manos libres", "bluetooth"],
       onSelect: () => actions.navigate("/methods?run=audio-flashcards"),
     },
+    {
+      id: "action-final-board",
+      title: "Tribunal de Examen Final & Defensa de Tesis",
+      subtitle: "Simulador de jurado colegiado multidocente y emisión de Acta Oficial",
+      iconName: "Scale",
+      badge: "Tribunal",
+      keywords: ["tribunal", "coloquio", "final", "tesis", "defensa", "jurado", "catedra", "acta", "oral"],
+      onSelect: () => actions.navigate("/methods?run=final-board"),
+    },
   ];
 
   // Evaluar Acciones del Sistema

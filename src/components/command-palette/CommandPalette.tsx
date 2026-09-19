@@ -33,6 +33,7 @@ import {
   CalendarDays,
   Bot,
   Headphones,
+  Scale,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { useCommandPaletteStore } from "../../stores/useCommandPaletteStore";
@@ -74,6 +75,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   CalendarDays,
   Bot,
   Headphones,
+  Scale,
 };
 
 const CATEGORY_COLORS: Record<CommandPaletteCategory, { bg: string; text: string; border: string }> = {
