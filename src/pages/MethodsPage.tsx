@@ -9,7 +9,7 @@ import { CognitiveTriageModal } from "../components/study-methods/CognitiveTriag
 import { Card, CardHeader, CardTitle } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { Badge } from "../components/ui/Badge";
-import { ArrowLeft, ArrowRight, Eye, Play, Sparkles, Search, Layers, Cpu, CheckCircle2, Flame, Mic, FileText, Columns3, Briefcase, CalendarDays } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, Play, Sparkles, Search, Layers, Cpu, CheckCircle2, Flame, Mic, FileText, Columns3, Briefcase, CalendarDays, GraduationCap } from "lucide-react";
 import { PanelGuide } from "../components/guide/PanelGuide";
 import { useNavigate } from "react-router-dom";
 
@@ -129,6 +129,9 @@ const CaseStudyMethod = lazy(() =>
 );
 const SemesterGanttMethod = lazy(() =>
   import("../components/study-methods/SemesterGanttMethod").then((m) => ({ default: m.SemesterGanttMethod })),
+);
+const PastExamsMethod = lazy(() =>
+  import("../components/study-methods/PastExamsMethod").then((m) => ({ default: m.PastExamsMethod })),
 );
 
 const CATEGORIES = [
@@ -288,6 +291,8 @@ export const MethodsPage: React.FC = () => {
           return <CaseStudyMethod onSessionFinished={handleBackToCatalog} />;
         case "semester-gantt":
           return <SemesterGanttMethod onSessionFinished={handleBackToCatalog} />;
+        case "past-exams":
+          return <PastExamsMethod onSessionFinished={handleBackToCatalog} />;
         default:
           return (
             <div className="p-8 text-center space-y-4">
@@ -420,6 +425,15 @@ export const MethodsPage: React.FC = () => {
             >
               <CalendarDays className="h-3.5 w-3.5 text-indigo-400" />
               <span>Cronograma & Gantt</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleStartMethod("past-exams")}
+              className="text-xs flex items-center gap-1.5 border-purple-500/40 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20 hover:text-purple-200"
+            >
+              <GraduationCap className="h-3.5 w-3.5 text-purple-400" />
+              <span>Banco de Parciales & Pareto</span>
             </Button>
           </div>
         </div>

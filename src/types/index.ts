@@ -35,7 +35,8 @@ export type StudyMethodId =
   | "essay-exam"
   | "comparative-matrix"
   | "case-study"
-  | "semester-gantt";
+  | "semester-gantt"
+  | "past-exams";
 
 export interface StudyMethodInfo {
   id: StudyMethodId;

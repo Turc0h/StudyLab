@@ -261,6 +261,15 @@ export async function searchCommandPalette(
       keywords: ["cronograma", "gantt", "cuatrimestre", "parciales", "fechas", "calendario", "recuperatorios", "colapso", "semanas"],
       onSelect: () => actions.navigate("/methods?run=semester-gantt"),
     },
+    {
+      id: "action-past-exams",
+      title: "Banco de Parciales Anteriores & Predictor Pareto High-Yield",
+      subtitle: "Analizar exámenes de cátedra, recurrencia 80/20 y simulacros",
+      iconName: "GraduationCap",
+      badge: "Parciales",
+      keywords: ["parciales", "examenes", "pareto", "high yield", "simulacro", "banco", "catedra", "preguntas"],
+      onSelect: () => actions.navigate("/methods?run=past-exams"),
+    },
   ];
 
   // Evaluar Acciones del Sistema

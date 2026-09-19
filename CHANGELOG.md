@@ -1605,6 +1605,49 @@ Implementación de la estación de planificación temporal y balance de esfuerzo
 
 ---
 
+## Fase v5.23 — Banco de Parciales Anteriores & Predictor de Temas High-Yield (*Past Exams & Pareto Topic Forecaster*)
+
+### 1. Motor de Banco de Exámenes y Pronosticador Pareto (`pastExamsEngine.ts`)
+- **Ubicación:** `src/features/past-exams/pastExamsEngine.ts`.
+- **Estructura Canónica del Examen y Preguntas:**
+  - Tipos de consigna formales: `multiple_choice`, `essay`, `practical_case`.
+  - Atributos por examen: `id`, `title`, `subject`, `chairOrProfessor` (cátedra/docente), `term` (cuatrimestre), `year`, `totalMaxPoints`, `passingScore`, `timeLimitMinutes`, `questions`.
+  - Criterios por pregunta: `topic`, `type`, `points`, `options`, `correctAnswer`, `rubricCriteria` (criterios de corrección de cátedra), `modelAnswer` oficial y `difficulty` (1-5).
+- **Banco de Parciales Multidisciplinario Precargado:**
+  - **Medicina (Farmacología & Cardiología Clínica):** 4 parciales históricos (2022-2024) con temas clave como *Inhibidores SGLT2*, *Antiarrítmicos Clase I y III (Amiodarona)*, *Shock Cardiogénico vs Séptico*, *DOACs en Fibrilación Auricular*, *Intoxicación Digitálica*.
+  - **Derecho (Obligaciones & Contratos Civiles y Comerciales):** 3 parciales con temas como *Régimen de la Seña (art. 1059 CCCN)*, *Teoría de la Imprevisión y Frustración de la Finalidad*, *Pacto Comisorio y Cláusula Resolutoria Implícita*.
+  - **Ingeniería en Sistemas / Informática (Sistemas Distribuidos):** 3 parciales con temas como *Algoritmos de Consenso (Raft vs Paxos)*, *Teorema CAP y Linearizabilidad*, *Transacciones Distribuidas (2PC y Patrón Saga)*, *Filtros de Bloom*.
+- **Algoritmo Estadístico Pareto (Ley 80/20) y Clasificación High-Yield (`calculateParetoTopicAnalysis`):**
+  - Analiza la recurrencia temática porcentual en todos los parciales de una cátedra.
+  - Clasifica temas en: `CRITICAL_HIGH_YIELD` (≥ 70% de presencia — "Fijo en el parcial"), `HIGH_YIELD` (50-69% — "Muy probable"), `MEDIUM_YIELD` (25-49%), y `LOW_YIELD` (< 25%).
+  - Calcula la concentración de puntos del percentil 20 (demostrando que el 20% de los temas acaparan ~78-85% del puntaje histórico de la materia).
+- **Generador de Simulacros Compuestos High-Yield (`generateCompositeHighYieldExam`):**
+  - Ensambla automáticamente un examen de simulación seleccionando las consignas de mayor peso estadístico.
+- **Motor de Calificación y Diagnóstico (`gradeMockExamSubmission`):**
+  - Autocalificación para multiple choice, checklist de rúbricas para ensayos/casos y reporte diagnóstico de brechas críticas.
+- **Persistencia e Historial:**
+  - Registro de exámenes custom en `localStorage` (`saveCustomExam`, `deleteCustomExam`) y sesiones de práctica en `db.sessions` (`saveMockExamSession`).
+
+### 2. Componente Visual e Interactivo (`PastExamsMethod.tsx`)
+- **Ubicación:** `src/components/study-methods/PastExamsMethod.tsx`.
+- **Tres Modos de Trabajo:**
+  1. **Banco de Exámenes:** Explorador de parciales por materia/cátedra, tarjetas de examen con tiempo límite, puntaje y visualizador desplegable de consignas oficiales y respuestas modelo.
+  2. **Predictor Pareto (80/20):** Panel con porcentaje de concentración de puntos, barra de progreso por probabilidad histórica de evaluación y botón para generar simulacro compuesto adaptativo.
+  3. **Simulador de Parcial:** Cronómetro regresivo interactivo (alerta roja animada < 5 min), resolución de preguntas con selección múltiple o desarrollo guiado por rúbrica de cátedra, reporte final con semáforo de aprobación y detección de temas no dominados.
+- **Modal de Carga de Nuevos Parciales:** Formulario ágil para registrar exámenes de cátedras reales.
+
+### 3. Integraciones en el Ecosistema
+- **Catálogo de Métodos (`MethodsPage.tsx`):** Carga diferida (`lazy`), runner case `"past-exams"` y botón directo *"Banco de Parciales & Pareto"* en la cabecera.
+- **Tipado Global (`types/index.ts`):** `StudyMethodId` actualizado con `"past-exams"`.
+- **Command Palette (`commandPaletteService.ts` / `CommandPalette.tsx`):** Acción rápida `action-past-exams` con icono `GraduationCap`.
+
+### 4. Suite de Verificación Automatizada (36 Suites)
+- `scripts/test-phase23-past-exams.mjs`: 15/15 pruebas aprobadas al 100%.
+- `npm test`: **36 suites de tests ejecutadas con 100% de éxito**.
+- `npm run build`: compilación limpia con 0 errores TypeScript (`tsc -b && vite build`).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash
