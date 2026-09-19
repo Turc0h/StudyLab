@@ -29,7 +29,8 @@ export type StudyMethodId =
   | "desirable-difficulties"
   | "segmentation-principle"
   | "multisensory-learning"
-  | "sleep-consolidation";
+  | "sleep-consolidation"
+  | "cram";
 
 export interface StudyMethodInfo {
   id: StudyMethodId;

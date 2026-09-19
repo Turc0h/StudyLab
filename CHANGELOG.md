@@ -1246,6 +1246,41 @@ Esta fase implementa el **Generador de Dossier Universitario Imprimible y Export
 
 ---
 
+## Fase v5.15 — Modo Repaso Rápido de Emergencia (Cram Mode / Blitz Session)
+
+Esta fase introduce el **Modo Repaso Rápido de Emergencia (Cram Mode / Blitz Session)**, una herramienta pedagógica diseñada para situaciones de examen inminente (a menos de 12 o 24 horas) donde el estudiante necesita repasar de forma intensa sus conceptos más débiles sin distorsionar los cronogramas FSRS de largo plazo.
+
+### 1. Motor de Priorización de Urgencia (`cramSelector.ts`)
+- **Ubicación:** `src/features/cram/cramSelector.ts`.
+- **Garantía de Aislamiento FSRS:**
+  - El modo de emergencia NO invoca `executeFsrsReview` ni altera `stability`, `difficulty`, `lapses` o `dueDate` en `db.cardsFsrs`.
+  - Permite repeticiones continuas inmediatas protegiendo el modelo matemático de retención a largo plazo.
+- **Ponderación Algorítmica de Urgencia (`calculateItemUrgencyScore`):**
+  - **Errores Pedagógicos No Resueltos (`studentErrors`):** Calificación crítica de 95/100, garantizando que los fallos analizados aparezcan al frente de la sesión.
+  - **Tarjetas FSRS Vulnerables:** Calcula la Retrievability en tiempo real $R(t, S) = (1 + 19 \cdot t / S)^{-0.5}$. Aquellas con menor probabilidad de recuerdo y alta dificultad obtienen mayor prioridad (hasta 90/100).
+  - **Tarjetas Leitner en Cajas Críticas:** Prioriza ítems en Caja 1 y 2.
+- **Filtro Modular por Materia:** Permite acotar el repaso Blitz a una cátedra específica o abarcar todo el repositorio.
+
+### 2. Componente de Ejecución Interactivo (`CramMethod.tsx`)
+- **Ubicación:** `src/components/study-methods/CramMethod.tsx`.
+- **Tres Fases Tácticas:**
+  1. *Setup:* Selector de materia, temporizador por tarjeta (30s Sprint, 45s Blitz, 60s Táctico o Sin Límite), interruptor para conceptos débiles y límite de tarjetas.
+  2. *Blitz:* Interfaz interactiva de alta concentración con cronómetro regresivo animado, volteo ágil (<kbd>Espacio</kbd>), y calificación rápida (<kbd>1</kbd> Fallo, <kbd>2</kbd> Dudoso, <kbd>3</kbd> Dominado).
+     - **Re-inserción de Fallos:** Cualquier tarjeta calificada con fallo vuelve automáticamente al final de la cola Blitz para asegurar su dominio antes de salir de la sesión.
+  3. *Diagnóstico Final:* Resumen de aciertos inmediatos, dudas y fallos reinsertados, tasa de efectividad y listado de conceptos críticos a vigilar antes de entrar al aula, junto con recomendaciones neurocognitivas de descanso pre-examen.
+
+### 3. Integración en el Ecosistema
+- **Catálogo de Métodos (`MethodsPage.tsx`):** Botón directo *"Modo Repaso de Emergencia (Blitz)"* en el encabezado y runner activo para `cram` (`/methods?run=cram`).
+- **Dashboard (`Dashboard.tsx`):** Botón de acceso rápido *"Repaso Blitz Pre-Examen"* con icono animado de llama en la cabecera principal.
+- **Command Palette (`commandPaletteService.ts`):** Acción global `action-cram` disponible con `Ctrl+K` bajo términos como *"cram"*, *"emergencia"*, *"blitz"*, *"repaso rapido"*, *"examen"*, *"parcial"*.
+
+### 4. Suite de Verificación Automatizada (28 Suites)
+- `scripts/test-phase15-cram-mode.mjs`: 33/33 pruebas aprobadas al 100%.
+- `npm test`: **28 suites de tests ejecutadas con 100% de éxito (600+ aserciones verificadas)**.
+- `npm run build`: compilación limpia en 4.61s con 0 errores TypeScript (`tsc -b && vite build`).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

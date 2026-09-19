@@ -9,7 +9,7 @@ import { CognitiveTriageModal } from "../components/study-methods/CognitiveTriag
 import { Card, CardHeader, CardTitle } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { Badge } from "../components/ui/Badge";
-import { ArrowLeft, ArrowRight, Eye, Play, Sparkles, Search, Layers, Cpu, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, Play, Sparkles, Search, Layers, Cpu, CheckCircle2, Flame } from "lucide-react";
 import { PanelGuide } from "../components/guide/PanelGuide";
 import { useNavigate } from "react-router-dom";
 
@@ -111,6 +111,9 @@ const MultisensoryLearningMethod = lazy(() =>
 );
 const SleepConsolidationMethod = lazy(() =>
   import("../components/study-methods/SleepConsolidationMethod").then((m) => ({ default: m.SleepConsolidationMethod })),
+);
+const CramMethod = lazy(() =>
+  import("../components/study-methods/CramMethod").then((m) => ({ default: m.CramMethod })),
 );
 
 const CATEGORIES = [
@@ -258,6 +261,8 @@ export const MethodsPage: React.FC = () => {
           return <MultisensoryLearningMethod onSessionFinished={handleBackToCatalog} />;
         case "sleep-consolidation":
           return <SleepConsolidationMethod onSessionFinished={handleBackToCatalog} />;
+        case "cram":
+          return <CramMethod onSessionFinished={handleBackToCatalog} />;
         default:
           return (
             <div className="p-8 text-center space-y-4">
@@ -336,6 +341,15 @@ export const MethodsPage: React.FC = () => {
             >
               <Sparkles className="h-3.5 w-3.5" />
               <span>Asistente de Triaje Cognitivo</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleStartMethod("cram")}
+              className="text-xs flex items-center gap-1.5 border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 hover:text-amber-200"
+            >
+              <Flame className="h-3.5 w-3.5 text-amber-400" />
+              <span>Modo Repaso de Emergencia (Blitz)</span>
             </Button>
           </div>
         </div>

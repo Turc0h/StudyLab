@@ -86,6 +86,15 @@ export function Dashboard() {
         eyebrow="Panorama general"
         title="Dashboard"
         description="Tu racha, el avance por materia y la telemetría predictiva del Sistema Operativo Cognitivo."
+        action={
+          <Link
+            to="/methods?run=cram"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 font-mono text-xs font-semibold shadow-xs transition-colors"
+          >
+            <Flame size={15} className="text-amber-400 animate-pulse" />
+            <span>Repaso Blitz Pre-Examen</span>
+          </Link>
+        }
       />
 
       {/* Cognitive OS Telemetry Hub */}

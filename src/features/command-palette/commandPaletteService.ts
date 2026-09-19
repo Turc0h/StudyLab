@@ -171,6 +171,24 @@ export async function searchCommandPalette(
       keywords: ["libros", "books", "capitulos", "separar", "indice", "tomos"],
       onSelect: () => actions.navigate("/books"),
     },
+    {
+      id: "action-dossier",
+      title: "Exportar Dossier Universitario Imprimible (A4 / MD / HTML)",
+      subtitle: "Compila apuntes, conceptos, subrayados, post-its y banco de errores por materia",
+      iconName: "Printer",
+      badge: "Dossier",
+      keywords: ["dossier", "imprimir", "pdf", "resumen", "compendio", "sintesis", "apuntes", "materia"],
+      onSelect: () => actions.navigate("/files?dossier=true"),
+    },
+    {
+      id: "action-cram",
+      title: "Modo Repaso Rápido de Emergencia (Cram Blitz Pre-Examen)",
+      subtitle: "Evocación acelerada de conceptos vulnerables y errores sin alterar intervalos FSRS",
+      iconName: "Flame",
+      badge: "Emergencia",
+      keywords: ["cram", "emergencia", "blitz", "repaso rapido", "examen", "parcial", "manana", "urgente", "prueba"],
+      onSelect: () => actions.navigate("/methods?run=cram"),
+    },
   ];
 
   // Evaluar Acciones del Sistema
