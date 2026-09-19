@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Moon, Sun, HardDrive, Maximize2, Sparkles, PanelLeft, Pin, Bell } from "lucide-react";
+import { Moon, Sun, HardDrive, Maximize2, Sparkles, PanelLeft, Pin, Bell, Search } from "lucide-react";
 import { Badge } from "../ui/Badge";
 import { SyncStatusIndicator } from "./SyncStatusIndicator";
 import { useFocusModeStore } from "../../stores/useFocusModeStore";
@@ -7,6 +7,7 @@ import { useGuideModeStore } from "../../stores/useGuideModeStore";
 import { useThemeStore } from "../../stores/useThemeStore";
 import { useOrganizationStore } from "../../stores/useOrganizationStore";
 import { useNotificationStore } from "../../stores/useNotificationStore";
+import { useCommandPaletteStore } from "../../stores/useCommandPaletteStore";
 import { clsx } from "clsx";
 
 export interface HeaderProps {
@@ -32,6 +33,7 @@ export const Header: React.FC<HeaderProps> = ({
   const isNotifOpen = useNotificationStore((s) => s.isOpen);
   const toggleNotif = useNotificationStore((s) => s.toggleOpen);
   const notifications = useNotificationStore((s) => s.notifications);
+  const openCommandPalette = useCommandPaletteStore((s) => s.open);
 
   const unreadCount = useMemo(
     () => notifications.filter((n) => !n.read).length,
@@ -59,6 +61,21 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="flex items-center gap-3">
+        {/* Botón Paleta de Comandos Universal (Ctrl+K) */}
+        <button
+          type="button"
+          onClick={openCommandPalette}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-subtle bg-bg-elevated text-xs font-sans text-text-secondary hover:text-text-primary hover:border-accent-primary transition-colors shadow-2xs cursor-pointer"
+          title="Buscar técnicas, apuntes o comandos (Ctrl+K)"
+          aria-label="Abrir paleta de comandos"
+        >
+          <Search className="h-3.5 w-3.5 text-accent-primary" />
+          <span className="hidden md:inline">Buscar...</span>
+          <kbd className="hidden sm:inline-block rounded bg-bg-secondary px-1.5 py-0.5 text-[10px] font-mono text-text-muted border border-border-subtle">
+            ⌘K
+          </kbd>
+        </button>
+
         {/* Botón Modo Guía Interactivo */}
         <button
           type="button"

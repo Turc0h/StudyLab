@@ -1172,6 +1172,43 @@ Esta fase consolida el ecosistema de preservación y migración de datos de Stud
 
 ---
 
+## Fase v5.13 — Command Palette Unificada (Ctrl+K / Cmd+K) y Navegación Universal
+
+Esta fase implementa la **Paleta de Comandos Global (Command Palette / Spotlight)**, elevando la experiencia de usuario y ergonomía de navegación de StudyLab al estándar de un entorno de desarrollo profesional (como VS Code, Raycast u Obsidian).
+
+### 1. Store Global de Paleta (`useCommandPaletteStore.ts`)
+- **Ubicación:** `src/stores/useCommandPaletteStore.ts`.
+- Gestiona el estado de visibilidad (`isOpen`), la consulta actual (`query`) y las acciones de apertura, cierre y alternancia (`open`, `close`, `toggle`, `setQuery`).
+
+### 2. Motor de Búsqueda Multimodal y Ponderación (`commandPaletteService.ts`)
+- **Ubicación:** `src/features/command-palette/commandPaletteService.ts`.
+- **Indexación y Búsqueda sobre 5 Entidades del Sistema:**
+  1. **Métodos de Estudio (Catálogo de 30 Métodos):** Búsqueda difusa ponderada por nombre en español, nombre en inglés, categoría, palabras clave y casos de uso pedagógico. Al seleccionarlo, navega directamente a `/methods?run={id}` iniciando el runner correspondiente.
+  2. **Acciones Rápidas del Sistema:** Acceso directo a Asistente de Triaje Cognitivo (`/methods?triage=true`), Respaldo `.studylab-bundle` (`/settings`), Consola de Diagnóstico QA (`/qa`), Generador de Sonido Ambiente (`/ambient`), Modo Enfoque (Distraction-Free), Centro de Organización (`Ctrl+O`), Bandeja de Notificaciones (`Ctrl+N`), Alternar Tema (Oscuro/Claro) y Digitalización OCR.
+  3. **Documentos y Archivos PDF:** Búsqueda en tiempo real sobre la tabla `files` de Dexie, abriendo el visualizador directamente en `/pdf?fileId={id}`.
+  4. **Proyectos del Motor de Contexto:** Búsqueda en la tabla `contextProjects` con navegación ágil a `/context?project={id}`.
+  5. **Conceptos del Grafo de Conocimiento:** Búsqueda en la tabla `concepts` mostrando score de dominio y navegando a `/graph?concept={id}`.
+
+### 3. Componente Modal de Paleta (`CommandPalette.tsx`)
+- **Ubicación:** `src/components/command-palette/CommandPalette.tsx`.
+- **Navegación 100% por Teclado:**
+  - `ArrowDown` / `ArrowUp` para ciclar resultados con auto-scroll.
+  - `Enter` para ejecutar la acción seleccionada y cerrar la paleta.
+  - `Escape` o clic en el fondo para cancelar.
+- **Códigos de Color Semánticos:** Badges visuales por categoría (`MÉTODO` en ámbar, `ARCHIVO` en esmeralda, `PROYECTO` en violeta, `CONCEPTO` en cian, `ACCIÓN` en rosa).
+- **Indicador de Atajo:** Indicador `↵ Ejecutar` dinámico sobre el elemento activo.
+
+### 4. Integración en el Shell (`Shell.tsx`) y Cabecera (`Header.tsx`)
+- `Shell.tsx`: Registra el listener global `Ctrl+K` / `Cmd+K` y monta `<CommandPalette />`.
+- `Header.tsx`: Incorpora botón disparador con icono `Search`, etiqueta responsive y chip de teclado `⌘K`.
+
+### 5. Suite de Verificación Automatizada (26 Suites)
+- `scripts/test-phase13-command-palette.mjs`: 44/44 pruebas aprobadas al 100%.
+- `npm test`: **26 suites de tests ejecutadas con 100% de éxito (520+ aserciones verificadas)**.
+- `npm run build`: compilación limpia en 5.11s con 0 errores TypeScript (`tsc -b && vite build`).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

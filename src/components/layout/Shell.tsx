@@ -11,6 +11,8 @@ import { useThemeStore } from "../../stores/useThemeStore";
 import { useFocusModeStore } from "../../stores/useFocusModeStore";
 import { useOrganizationStore } from "../../stores/useOrganizationStore";
 import { useNotificationStore } from "../../stores/useNotificationStore";
+import { useCommandPaletteStore } from "../../stores/useCommandPaletteStore";
+import { CommandPalette } from "../command-palette/CommandPalette";
 import { EASE_EXPO_OUT, DURATION, STAGGER } from "../../lib/motion-tokens";
 import { Minimize2 } from "lucide-react";
 import { clsx } from "clsx";
@@ -53,6 +55,9 @@ export const Shell: React.FC = () => {
   const isNotifOpen = useNotificationStore((s) => s.isOpen);
   const setIsNotifOpen = useNotificationStore((s) => s.setIsOpen);
   const toggleNotif = useNotificationStore((s) => s.toggleOpen);
+  const isCommandPaletteOpen = useCommandPaletteStore((s) => s.isOpen);
+  const toggleCommandPalette = useCommandPaletteStore((s) => s.toggle);
+  const closeCommandPalette = useCommandPaletteStore((s) => s.close);
   const location = useLocation();
 
   useEffect(() => {
@@ -78,20 +83,25 @@ export const Shell: React.FC = () => {
     }
   }, [animationsEnabled, reducedMotion]);
 
-  // Manejo de atajos globales: Esc para Modo Enfoque / Drawers, Ctrl+B para Sidebar, Ctrl+O para Org, Ctrl+N para Notificaciones
+  // Manejo de atajos globales: Esc, Ctrl+K (Command Palette), Ctrl+B (Sidebar), Ctrl+O (Org), Ctrl+N (Notif)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ignorar eventos generados por mantener pulsada la tecla repetidamente
       if (e.repeat) return;
 
       if (e.key === "Escape") {
-        if (isNotifOpen) {
+        if (isCommandPaletteOpen) {
+          closeCommandPalette();
+        } else if (isNotifOpen) {
           setIsNotifOpen(false);
         } else if (isOrgOpen) {
           closeOrg();
         } else if (isFocusMode) {
           exitFocusMode();
         }
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        toggleCommandPalette();
       } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b") {
         e.preventDefault();
         toggleSidebar();
@@ -105,7 +115,20 @@ export const Shell: React.FC = () => {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isFocusMode, exitFocusMode, toggleSidebar, isOrgOpen, closeOrg, toggleOrg, isNotifOpen, setIsNotifOpen, toggleNotif]);
+  }, [
+    isCommandPaletteOpen,
+    closeCommandPalette,
+    toggleCommandPalette,
+    isFocusMode,
+    exitFocusMode,
+    toggleSidebar,
+    isOrgOpen,
+    closeOrg,
+    toggleOrg,
+    isNotifOpen,
+    setIsNotifOpen,
+    toggleNotif,
+  ]);
 
   const getPageMeta = () => {
     const path = location.pathname;
@@ -214,6 +237,9 @@ export const Shell: React.FC = () => {
       <NotificationCenter />
 
       <GuideStatusBar />
+
+      {/* Paleta de Comandos Unificada (Ctrl+K / Cmd+K) */}
+      <CommandPalette />
     </motion.div>
   );
 };
