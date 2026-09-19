@@ -1475,6 +1475,49 @@ Implementación del entorno de entrenamiento para exámenes escritos a desarroll
 
 ---
 
+## Fase v5.20 — Matriz Comparativa y Despiece Teórico de Autores (Comparative Matrix & Active Recall Grids)
+
+**Qué se construyó**
+Implementación del motor multidimensional de comparación teórica y contraste epistemológico para carreras universitarias. Permite construir cuadros comparativos entre autores, escuelas o patologías clínicas, identificar puntos de fricción conceptual frecuentemente examinados en mesas de examen y realizar entrenamiento intensivo mediante **Active Recall a Celdas Ciegas** con autoevaluación semántica.
+
+### 1. Motor de Matrices y Despiece Teórico (`comparativeMatrixEngine.ts`)
+- **Ubicación:** `src/features/comparative-matrix/comparativeMatrixEngine.ts`.
+- **Estructura Multidimensional:**
+  - Ejes de Entidades (columnas) y Dimensiones Analíticas (filas) con indexación canónica `${entityIdx}_${dimIdx}`.
+  - Puntos de Fricción Teórica (*Friction Points*): catálogo de trampas docentes, objeciones cruzadas y puntos de choque doctrinal (ej. génesis del lenguaje entre Piaget y Vygotsky, efecto desplazamiento en macroeconomía, o fracción de eyección normal en insuficiencia cardíaca).
+- **Banco de Matrices Precargadas:**
+  - Psicología & Educación: *Corrientes del Aprendizaje (Conductismo vs Cognitivismo vs Constructivismo)*.
+  - Medicina & Fisiopatología: *Diagnóstico Diferencial: Insuficiencia Cardíaca Sistólica (ICFEr) vs Diastólica (ICFEp)*.
+  - Economía & Finanzas: *Macroeconomía: Keynesianismo vs Monetarismo vs Escuela Austríaca*.
+  - Derecho & Jurídico: *Derecho de Daños: Responsabilidad Contractual vs Extracontractual*.
+- **Generador de Celdas Ciegas:**
+  - Enmascara celdas aleatoria o totalmente (ratio 50% o 100%) para forzar la evocación activa sin pistas visuales.
+- **Evaluador de Respuestas Semánticas:**
+  - Compara la evocación del estudiante contra la definición canónica de cátedra, identificando palabras clave dominadas y conceptos omitidos.
+- **Persistencia:** Registro de sesiones de despiece en `db.sessions` con `methodId: "comparative-matrix"`.
+
+### 2. Componente Interactivo (`ComparativeMatrixMethod.tsx`)
+- **Ubicación:** `src/components/study-methods/ComparativeMatrixMethod.tsx`.
+- **Modo 1 (Cuadro Completo de Estudio):**
+  - Vista panorámica tabular con tipografía técnica, códigos de entidad y panel inferior de preguntas trampa de final de cátedra.
+- **Modo 2 (Active Recall a Celdas Ciegas):**
+  - Celdas ocultas con estado interactivo: área de evocación escrita/mental, revelación de respuesta canónica con acierto porcentual, y autoevaluación en 3 niveles (*Dominado*, *Dudoso*, *Fallo*).
+  - Barra de progreso de maestría en tiempo real sobre el total de celdas ocultas.
+- **Creador de Matrices Propias:**
+  - Permite al estudiante diseñar matrices comparativas ad-hoc para cualquier materia ingresando entidades y dimensiones separadas por comas.
+
+### 3. Integraciones en el Sistema
+- **Catálogo de Métodos (`MethodsPage.tsx`):** Carga diferida (`lazy`), switch case para `"comparative-matrix"` y botón directo *"Matriz Comparativa de Cátedra"* en la cabecera.
+- **Tipado Global (`types/index.ts`):** Inclusión de `"comparative-matrix"` en `StudyMethodId`.
+- **Command Palette (`commandPaletteService.ts` / `CommandPalette.tsx`):** Nueva acción rápida global `action-comparative-matrix` mapeada con el icono `Columns3` y términos como *"comparativa"*, *"matriz"*, *"autores"*, *"teorias"*, *"diferencial"*, *"cuadro"*.
+
+### 4. Suite de Verificación Automatizada (33 Suites)
+- `scripts/test-phase20-comparative-matrix.mjs`: 15/15 pruebas aprobadas al 100%.
+- `npm test`: **33 suites de tests ejecutadas con 100% de éxito (710+ aserciones verificadas)**.
+- `npm run build`: compilación limpia en 3.94s con 0 errores TypeScript (`tsc -b && vite build`).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

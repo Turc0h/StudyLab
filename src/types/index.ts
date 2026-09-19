@@ -32,7 +32,8 @@ export type StudyMethodId =
   | "sleep-consolidation"
   | "cram"
   | "oral-defense"
-  | "essay-exam";
+  | "essay-exam"
+  | "comparative-matrix";
 
 export interface StudyMethodInfo {
   id: StudyMethodId;

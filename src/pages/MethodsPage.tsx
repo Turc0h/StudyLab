@@ -9,7 +9,7 @@ import { CognitiveTriageModal } from "../components/study-methods/CognitiveTriag
 import { Card, CardHeader, CardTitle } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { Badge } from "../components/ui/Badge";
-import { ArrowLeft, ArrowRight, Eye, Play, Sparkles, Search, Layers, Cpu, CheckCircle2, Flame, Mic, FileText } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, Play, Sparkles, Search, Layers, Cpu, CheckCircle2, Flame, Mic, FileText, Columns3 } from "lucide-react";
 import { PanelGuide } from "../components/guide/PanelGuide";
 import { useNavigate } from "react-router-dom";
 
@@ -120,6 +120,9 @@ const OralDefenseMethod = lazy(() =>
 );
 const EssayExamMethod = lazy(() =>
   import("../components/study-methods/EssayExamMethod").then((m) => ({ default: m.EssayExamMethod })),
+);
+const ComparativeMatrixMethod = lazy(() =>
+  import("../components/study-methods/ComparativeMatrixMethod").then((m) => ({ default: m.ComparativeMatrixMethod })),
 );
 
 const CATEGORIES = [
@@ -273,6 +276,8 @@ export const MethodsPage: React.FC = () => {
           return <OralDefenseMethod onSessionFinished={handleBackToCatalog} />;
         case "essay-exam":
           return <EssayExamMethod onFinish={handleBackToCatalog} />;
+        case "comparative-matrix":
+          return <ComparativeMatrixMethod onSessionFinished={handleBackToCatalog} />;
         default:
           return (
             <div className="p-8 text-center space-y-4">
@@ -378,6 +383,15 @@ export const MethodsPage: React.FC = () => {
             >
               <FileText className="h-3.5 w-3.5 text-cyan-400" />
               <span>Examen a Desarrollo & Ensayo</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleStartMethod("comparative-matrix")}
+              className="text-xs flex items-center gap-1.5 border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 hover:text-emerald-200"
+            >
+              <Columns3 className="h-3.5 w-3.5 text-emerald-400" />
+              <span>Matriz Comparativa de Cátedra</span>
             </Button>
           </div>
         </div>

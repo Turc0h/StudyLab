@@ -234,6 +234,15 @@ export async function searchCommandPalette(
       keywords: ["desarrollo", "ensayo", "escrito", "parcial", "redaccion", "rubrica", "humo", "tesis", "consigna"],
       onSelect: () => actions.navigate("/methods?run=essay-exam"),
     },
+    {
+      id: "action-comparative-matrix",
+      title: "Matriz Comparativa y Despiece Teórico",
+      subtitle: "Despiece multidimensional de escuelas/autores con active recall a celdas ciegas",
+      iconName: "Columns3",
+      badge: "Matriz",
+      keywords: ["comparativa", "matriz", "autores", "teorias", "diferencial", "cuadro", "ciegas", "despiece"],
+      onSelect: () => actions.navigate("/methods?run=comparative-matrix"),
+    },
   ];
 
   // Evaluar Acciones del Sistema
