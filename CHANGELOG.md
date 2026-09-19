@@ -1281,6 +1281,44 @@ Esta fase introduce el **Modo Repaso Rápido de Emergencia (Cram Mode / Blitz Se
 
 ---
 
+## Fase v5.16 — Simulador de Coloquios y Exámenes Orales (Oral Defense Simulator)
+
+Esta fase implementa el **Simulador de Coloquios y Exámenes Orales con Rúbrica Universitaria y Temporizador de Ponencia**, dotando a StudyLab de un entorno de entrenamiento para defensas de tesinas, exámenes finales orales y coloquios de cátedra (frecuentes en carreras de Medicina, Derecho, Ingeniería, Ciencias Exactas y Humanidades).
+
+### 1. Motor de Evaluación y Generador de Objeciones (`oralDefenseEngine.ts`)
+- **Ubicación:** `src/features/oral-defense/oralDefenseEngine.ts`.
+- **Rúbrica Universitaria Normalizada sobre 10 Puntos (`calculateOralRubricScore`):**
+  - Evalúa 5 dimensiones esenciales del desempeño oral (escala 1 a 5 por dimensión, sumando de 5 a 25 y normalizando a base 10):
+    1. *Dominio Conceptual & Deducción Teórica:* Capacidad de justificar principios de base sin memoria mecánica.
+    2. *Rigor Terminológico y Ausencia de Muletillas:* Uso de vocabulario de cátedra preciso y eliminación de titubeos.
+    3. *Manejo del Tiempo y Estructura Discursiva:* Estructuración en introducción, nudo demostrativo y conclusión dentro del límite de tiempo.
+    4. *Solvencia ante Objeciones y Repreguntas:* Habilidad para defender hipótesis ante condiciones de borde y contraejemplos.
+    5. *Serenidad, Convicción y Presencia Escénica:* Proyección de la voz, manejo de la ansiedad y postura corporal asertiva.
+  - Dictamen cualitativo automatizado: Insuficiente (< 4.0), Regular / Aprobado (4.0 - 6.9), Distinguido (7.0 - 8.9) y Sobresaliente (9.0 - 10.0).
+- **Generador de Preguntas de la Mesa Examinadora (`generateJuryQuestions`):**
+  - Modela preguntas con roles diferenciados: *Profesor Titular* (deducción de leyes fundamentales y síntesis epistemológica), *Jefe de Trabajos Prácticos* (casos límite y contingencias prácticas) y *Vocal del Tribunal* (preguntas trampa y falsas analogías).
+- **Persistencia en Base de Datos:** Registra las defensas en `db.sessions` con `methodId: "oral-defense"` y duración real.
+
+### 2. Componente de Ejecución Interactivo (`OralDefenseMethod.tsx`)
+- **Ubicación:** `src/components/study-methods/OralDefenseMethod.tsx`.
+- **Flujo Guiado de 4 Fases:**
+  1. *Fase de Setup:* Selección de cátedra/materia o tema libre, duración de la exposición (3 min Flash, 5 min Estándar, 10 min Defensa Formal), cantidad de repreguntas docentes y redacción de la *Ficha de Ponencia* (hasta 5 viñetas guía permitidas en la mesa de examen).
+  2. *Fase de Exposición Oral en Vivo:* Cronómetro regresivo animado, atril virtual, ficha de ponencia colapsable y medidor de ritmo de habla opcional mediante la Web Speech API (`SpeechRecognition`) con cálculo en vivo de palabras por minuto (ppm).
+  3. *Fase de Preguntas del Tribunal:* Rondas secuenciales con intervención docente, intención didáctica declarada y temporizador recomendado de respuesta oral (75s a 120s).
+  4. *Fase de Rúbrica y Veredicto:* Formulario interactivo de autoevaluación o co-evaluación en 5 dimensiones con cálculo de nota en tiempo real y dictamen del tribunal.
+
+### 3. Integración en el Ecosistema StudyLab
+- **Catálogo de Métodos (`MethodsPage.tsx`):** Botón directo *"Simulador de Coloquio Oral"* en la cabecera del catálogo y switch de runner activo para `/methods?run=oral-defense`.
+- **Command Palette (`commandPaletteService.ts` / `CommandPalette.tsx`):** Nueva acción global `action-oral-defense` disponible con `Ctrl+K` bajo términos como *"oral"*, *"coloquio"*, *"defensa"*, *"tesis"*, *"tribunal"*, *"discurso"*, mapeada con el icono `Mic`.
+- **Tipado Global (`types/index.ts`):** Inclusión de `"oral-defense"` dentro del tipo `StudyMethodId`.
+
+### 4. Suite de Verificación Automatizada (29 Suites)
+- `scripts/test-phase16-oral-defense.mjs`: 32/32 pruebas aprobadas al 100%.
+- `npm test`: **29 suites de tests ejecutadas con 100% de éxito (630+ aserciones verificadas)**.
+- `npm run build`: compilación limpia en 3.55s con 0 errores TypeScript (`tsc -b && vite build`).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

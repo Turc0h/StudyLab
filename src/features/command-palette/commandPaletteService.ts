@@ -189,6 +189,15 @@ export async function searchCommandPalette(
       keywords: ["cram", "emergencia", "blitz", "repaso rapido", "examen", "parcial", "manana", "urgente", "prueba"],
       onSelect: () => actions.navigate("/methods?run=cram"),
     },
+    {
+      id: "action-oral-defense",
+      title: "Simulador de Coloquios y Exámenes Orales",
+      subtitle: "Entrena exposiciones de cátedra con contra-preguntas docentes y rúbrica sobre 10",
+      iconName: "Mic",
+      badge: "Coloquio",
+      keywords: ["oral", "coloquio", "defensa", "tesis", "examen final", "tribunal", "discurso", "presentacion", "hablar"],
+      onSelect: () => actions.navigate("/methods?run=oral-defense"),
+    },
   ];
 
   // Evaluar Acciones del Sistema
