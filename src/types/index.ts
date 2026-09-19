@@ -33,7 +33,8 @@ export type StudyMethodId =
   | "cram"
   | "oral-defense"
   | "essay-exam"
-  | "comparative-matrix";
+  | "comparative-matrix"
+  | "case-study";
 
 export interface StudyMethodInfo {
   id: StudyMethodId;

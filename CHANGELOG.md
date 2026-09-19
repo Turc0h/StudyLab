@@ -1518,6 +1518,48 @@ Implementación del motor multidimensional de comparación teórica y contraste 
 
 ---
 
+## Fase v5.21 — Simulador de Casos Prácticos y Viñetas Clínicas / Legales (Ockham Diagnostic Simulator)
+
+**Qué se construyó**
+Implementación del simulador de casos prácticos y viñetas reales para carreras profesionales avanzadas (Medicina, Derecho, Ingeniería/DevOps). Modela la resolución progresiva de escenarios complejos con **Criterio de Navaja de Ockham**, penalizando el sobrecosto de pruebas innecesarias o iatrogénicas, y confrontando el diagnóstico y plan terapéutico del estudiante contra el Gold Standard de cátedra.
+
+### 1. Motor de Casos Prácticos y Eficiencia Diagnóstica (`caseStudyEngine.ts`)
+- **Ubicación:** `src/features/case-study/caseStudyEngine.ts`.
+- **Estructura Canónica de la Viñeta:**
+  - Motivo de consulta / Hecho detonante (`chiefComplaint`), Antecedentes fácticos (`anamnesisOrFacts`) y Examen físico o inspección de entorno (`physicalExamOrContext`).
+- **Mesa de Investigaciones Complementarias:**
+  - Clasificación por categorías: Laboratorio, Imágenes, Telemetría / Trazado, Peritaje / Prueba, Historial.
+  - Parámetros `isEssential` (estudios indispensables de 1ª línea) y `costPoints` (penalización en caso de ser solicitadas sin justificación).
+- **Banco de Casos Clínicos y Profesionales Precargados:**
+  - **Medicina (Cardiología / Urgencias):** *Dolor Torácico Agudo en Paciente de 58 Años* (IAM anteroseptal vs Disección Aórtica / Pericarditis; penaliza angio-TC y espera de troponinas cuando el ECG ya es patognomónico).
+  - **Derecho & Litigio:** *Incumplimiento de Suministro Industrial y Caso Fortuito* (Resolución contractual imputable vs Eximente por Fuerza Mayor; penaliza testimoniales superfluas y analiza peritajes contables y cartas documento).
+  - **Ingeniería de Software & DevOps:** *Caída de Latencia Crítica en Pasarela de Pagos* (Agotamiento de Pool HikariCP / Contención de conexiones vs Saturación CPU / DDoS; penaliza reinicio masivo que detona efecto Thundering Herd).
+- **Algoritmo de Evaluación de 3 Dimensiones (0 - 10):**
+  - **Acierto Diagnóstico (45%):** Concordancia semántica con el diagnóstico principal y diferenciales.
+  - **Criterio de Navaja de Ockham (25%):** Economía de pruebas. Deduce puntos por pruebas redundantes o potencialmente iatrogénicas y por omisión de pruebas críticas. Categoriza en *Excelente (Criterio Ockham)*, *Moderada* o *Exceso de Pruebas / Iatrogenia*.
+  - **Plan Terapéutico / Resolutivo (30%):** Pertinencia de la intervención inmediata y penalización severa por incurrir en conductas formalmente contraindicadas.
+- **Persistencia Local:** Almacenamiento del intento y duración en `db.sessions` con `methodId: "case-study"`.
+
+### 2. Componente Interactivo Progresivo (`CaseStudyMethod.tsx`)
+- **Ubicación:** `src/components/study-methods/CaseStudyMethod.tsx`.
+- **Flujo en 4 Fases Progresivas:**
+  1. **Presentación de la Viñeta:** Lectura del motivo de consulta, hechos y examen físico inicial.
+  2. **Mesa de Estudios:** Catálogo de pruebas disponibles con categorías y advertencias de costo. Desbloqueo progresivo con revelación instantánea de hallazgos.
+  3. **Diagnóstico y Conducta:** Formulación por escrito del diagnóstico principal, hipótesis diferenciales y plan terapéutico inmediato.
+  4. **Confrontación Gold Standard:** Pantalla de devolución con nota final sobre 10, desglose por dimensiones, veredicto de Ockham, comparación cara a cara entre la respuesta del estudiante y la de cátedra, advertencias sobre conductas contraindicadas y **Perlas de Cátedra para Finales**.
+
+### 3. Integraciones en el Ecosistema
+- **Catálogo de Métodos (`MethodsPage.tsx`):** Carga diferida (`lazy`), caso `"case-study"` en el despachador de runners y botón directo *"Casos Prácticos & Viñetas"* en la barra superior.
+- **Tipado del Sistema (`types/index.ts`):** `StudyMethodId` actualizado con `"case-study"`.
+- **Command Palette (`commandPaletteService.ts` / `CommandPalette.tsx`):** Acción rápida global `action-case-study` vinculada a `/methods?run=case-study` con icono `Briefcase` y términos de búsqueda especializados (*"caso"*, *"clinico"*, *"vinetas"*, *"medicina"*, *"derecho"*, *"ingenieria"*, *"ockham"*, *"diagnostico"*).
+
+### 4. Suite de Verificación Automatizada (34 Suites)
+- `scripts/test-phase21-case-study.mjs`: 16/16 pruebas aprobadas al 100%.
+- `npm test`: **34 suites de tests ejecutadas con 100% de éxito (726+ aserciones verificadas)**.
+- `npm run build`: compilación limpia en 5.18s con 0 errores TypeScript (`tsc -b && vite build`).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

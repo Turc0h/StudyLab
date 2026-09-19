@@ -243,6 +243,15 @@ export async function searchCommandPalette(
       keywords: ["comparativa", "matriz", "autores", "teorias", "diferencial", "cuadro", "ciegas", "despiece"],
       onSelect: () => actions.navigate("/methods?run=comparative-matrix"),
     },
+    {
+      id: "action-case-study",
+      title: "Simulador de Casos Prácticos y Viñetas Clínicas / Legales",
+      subtitle: "Resolución progresiva de viñetas con costo de pruebas (Navaja de Ockham) y gold standard",
+      iconName: "Briefcase",
+      badge: "Casos",
+      keywords: ["caso", "clinico", "vinetas", "medicina", "derecho", "ingenieria", "ockham", "diagnostico", "juicio"],
+      onSelect: () => actions.navigate("/methods?run=case-study"),
+    },
   ];
 
   // Evaluar Acciones del Sistema
