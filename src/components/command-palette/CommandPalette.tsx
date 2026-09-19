@@ -30,6 +30,7 @@ import {
   TrendingUp,
   Columns3,
   Briefcase,
+  CalendarDays,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { useCommandPaletteStore } from "../../stores/useCommandPaletteStore";
@@ -68,6 +69,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   TrendingUp,
   Columns3,
   Briefcase,
+  CalendarDays,
 };
 
 const CATEGORY_COLORS: Record<CommandPaletteCategory, { bg: string; text: string; border: string }> = {

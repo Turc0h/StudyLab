@@ -252,6 +252,15 @@ export async function searchCommandPalette(
       keywords: ["caso", "clinico", "vinetas", "medicina", "derecho", "ingenieria", "ockham", "diagnostico", "juicio"],
       onSelect: () => actions.navigate("/methods?run=case-study"),
     },
+    {
+      id: "action-semester-gantt",
+      title: "Cronograma Dinámico de Cuatrimestre y Diagrama de Gantt",
+      subtitle: "Planificación de 16 semanas, balance de horas de estudio y alerta de semanas de colapso",
+      iconName: "CalendarDays",
+      badge: "Gantt",
+      keywords: ["cronograma", "gantt", "cuatrimestre", "parciales", "fechas", "calendario", "recuperatorios", "colapso", "semanas"],
+      onSelect: () => actions.navigate("/methods?run=semester-gantt"),
+    },
   ];
 
   // Evaluar Acciones del Sistema

@@ -1560,6 +1560,51 @@ Implementación del simulador de casos prácticos y viñetas reales para carrera
 
 ---
 
+## Fase v5.22 — Cronograma Dinámico de Cuatrimestre & Diagrama de Gantt Académico (Semester Gantt & Workload Balancer)
+
+**Qué se construyó**
+Implementación de la estación de planificación temporal y balance de esfuerzo cuatrimestral para estudiantes universitarios. Modela el ciclo lectivo completo en 16 semanas, calcula la tasa diaria de horas necesarias por examen y emite alertas automáticas de **"Semanas de Colapso"** cuando coinciden 2 o más evaluaciones mayores o la demanda supera la capacidad fisiológica semanal.
+
+### 1. Motor de Cronograma y Carga Académica (`semesterGanttEngine.ts`)
+- **Ubicación:** `src/features/semester-planner/semesterGanttEngine.ts`.
+- **Estructura Canónica del Hito Académico:**
+  - Tipos formales: `Primer Parcial`, `Segundo Parcial`, `Recuperatorio`, `Entrega TP Obligatorio`, `Coloquio / Examen Final`.
+  - Parámetros: fecha de vencimiento (`dueDate`), horas estimadas de preparación profunda (`estimatedPrepHours`) y nivel de dificultad (`Media`, `Alta`, `Crítica`).
+- **Planes Universitarios Modelo Precargados:**
+  - **Ingeniería en Sistemas / Software:** *Sistemas Distribuidos*, *Bases de Datos Masivas*, *Arquitectura de Software*.
+  - **Medicina:** *Cardiología & ECG*, *Farmacología Clínica*, *Neumonología*.
+  - **Derecho:** *Obligaciones & Contratos*, *Derecho de Daños*.
+- **Algoritmo de Detección de Semanas de Colapso (`detectSemesterOverloads`):**
+  - Evalúa ventanas rodantes de 7 días. Si coinciden 2 o más exámenes o la carga semanal excede 24-30 horas, dispara el estado `Semana de Colapso` con recomendación proactiva de adelantamiento de estudio.
+- **Proyector de Esfuerzo Diario (`calculateDailyHoursRequired`):**
+  - Calcula la tasa diaria en `h/día` necesaria para llegar a la fecha sin saturación. Clasifica el estado de urgencia en *Holgado*, *Moderado*, *Alerta Cramming* (<= 7 días) o *Vencido*.
+- **Persistencia e Integración:** Sincronización automática de hitos con `db.deadlines` y persistencia de sesiones en `db.sessions` con `methodId: "semester-gantt"`.
+
+### 2. Componente Visual e Interactivo (`SemesterGanttMethod.tsx`)
+- **Ubicación:** `src/components/study-methods/SemesterGanttMethod.tsx`.
+- **Diagrama Gantt de 16 Semanas:**
+  - Cuadrícula temporal responsiva (`grid-cols-16`) con semanas numeradas e indicador visual de sobrecarga.
+  - Barras por cátedra con píldoras de examen etiquetadas (`P1`, `P2`, `TP`, `FIN`) coloreadas por materia y severidad.
+  - Al hacer clic en cualquier hito, despliega panel de detalle con dificultad, horas estimadas y fecha exacta.
+- **Panel de Alerta de Colapso Cognitivo:**
+  - Tarjetas de advertencia con desglose de materias en conflicto y botón de acción rápida *"Activar Cram Mode (Repaso 7 Días)"* con redirección fluida a `/methods?run=cram`.
+- **Formulario Ágil de Registro:**
+  - Permite al estudiante sumar nuevos parciales y entregas con sliders de días restantes y horas estimadas.
+- **Matriz de Tasa Diaria de Estudio:**
+  - Tarjetas de monitoreo continuo de horas/día por materia con badges semaforizados de urgencia.
+
+### 3. Integraciones en el Ecosistema
+- **Catálogo de Métodos (`MethodsPage.tsx`):** Carga diferida (`lazy`), runner case `"semester-gantt"` y botón directo *"Cronograma & Gantt"* en la barra superior.
+- **Tipado Global (`types/index.ts`):** `StudyMethodId` actualizado con `"semester-gantt"`.
+- **Command Palette (`commandPaletteService.ts` / `CommandPalette.tsx`):** Nueva acción rápida `action-semester-gantt` vinculada a `/methods?run=semester-gantt` con el icono `CalendarDays`.
+
+### 4. Suite de Verificación Automatizada (35 Suites)
+- `scripts/test-phase22-semester-gantt.mjs`: 15/15 pruebas aprobadas al 100%.
+- `npm test`: **35 suites de tests ejecutadas con 100% de éxito (741+ aserciones verificadas)**.
+- `npm run build`: compilación limpia en 5.03s con 0 errores TypeScript (`tsc -b && vite build`).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

@@ -9,7 +9,7 @@ import { CognitiveTriageModal } from "../components/study-methods/CognitiveTriag
 import { Card, CardHeader, CardTitle } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { Badge } from "../components/ui/Badge";
-import { ArrowLeft, ArrowRight, Eye, Play, Sparkles, Search, Layers, Cpu, CheckCircle2, Flame, Mic, FileText, Columns3, Briefcase } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, Play, Sparkles, Search, Layers, Cpu, CheckCircle2, Flame, Mic, FileText, Columns3, Briefcase, CalendarDays } from "lucide-react";
 import { PanelGuide } from "../components/guide/PanelGuide";
 import { useNavigate } from "react-router-dom";
 
@@ -126,6 +126,9 @@ const ComparativeMatrixMethod = lazy(() =>
 );
 const CaseStudyMethod = lazy(() =>
   import("../components/study-methods/CaseStudyMethod").then((m) => ({ default: m.CaseStudyMethod })),
+);
+const SemesterGanttMethod = lazy(() =>
+  import("../components/study-methods/SemesterGanttMethod").then((m) => ({ default: m.SemesterGanttMethod })),
 );
 
 const CATEGORIES = [
@@ -283,6 +286,8 @@ export const MethodsPage: React.FC = () => {
           return <ComparativeMatrixMethod onSessionFinished={handleBackToCatalog} />;
         case "case-study":
           return <CaseStudyMethod onSessionFinished={handleBackToCatalog} />;
+        case "semester-gantt":
+          return <SemesterGanttMethod onSessionFinished={handleBackToCatalog} />;
         default:
           return (
             <div className="p-8 text-center space-y-4">
@@ -406,6 +411,15 @@ export const MethodsPage: React.FC = () => {
             >
               <Briefcase className="h-3.5 w-3.5 text-amber-400" />
               <span>Casos Prácticos & Viñetas</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleStartMethod("semester-gantt")}
+              className="text-xs flex items-center gap-1.5 border-indigo-500/40 bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500/20 hover:text-indigo-200"
+            >
+              <CalendarDays className="h-3.5 w-3.5 text-indigo-400" />
+              <span>Cronograma & Gantt</span>
             </Button>
           </div>
         </div>
