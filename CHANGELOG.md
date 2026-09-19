@@ -1103,6 +1103,39 @@ Esta fase implementa la **Fase 5 del Roadmap del Motor de Contexto** (`docs/CONT
 
 ---
 
+## Fase v5.11 — Asistente de Triaje Cognitivo para los 30 Métodos
+
+Esta fase introduce el **Motor de Triaje Cognitivo (Cognitive Triage & Matcher Engine)** dentro del Methods Hub (`/methods`), resolviendo la sobrecarga de opciones para el estudiante al diagnosticar su situación académica inmediata y prescribir las 3 metodologías óptimas entre el catálogo completo de 30 métodos interactivos.
+
+### 1. Motor de Ponderación Multidimensional (`cognitiveTriageEngine.ts`)
+- **Ubicación:** `src/features/study-methods/cognitiveTriageEngine.ts`.
+- **Diagnóstico en 4 Dimensiones Pedagógicas:**
+  - **Horizonte Temporal / Urgencia:** Menos de 24 horas (modo choque pre-examen), 2 a 7 días (semana de parciales), o más de 2 semanas (cursada regular).
+  - **Naturaleza del Material:** Lógico-deductivo / fórmulas, fáctico-memorístico puro, doctrinal / textos densos, o integrador / visual multimodal.
+  - **Nivel de Dominio:** Primer contacto desde cero, consolidación intermedia, o avanzado con búsqueda de brechas y rúbrica.
+  - **Nivel de Energía:** Pico circadiano matutino, energía media sostenida, o fatiga mental / estudio nocturno.
+- **Matriz de Compatibilidad y Prescripción:** Pondera los 30 métodos con scores de 0 a 100, genera porcentaje de compatibilidad (50% a 99%), diagnóstico contextualizado, alertas de seguridad pedagógica ante fatiga extrema y fundamentos redactados por método.
+
+### 2. Modal Asistente Interactivo de Triaje (`CognitiveTriageModal.tsx`)
+- **Ubicación:** `src/components/study-methods/CognitiveTriageModal.tsx`.
+- **Experiencia de Usuario:**
+  - Asistente guiado de 4 pasos con barra de progreso porcentual y navegación ágil (menos de 45 segundos de completado).
+  - Pantalla de podio de resultados con los 3 métodos recomendados (Medalla de Oro / Recomendación Principal, 2do y 3er puesto).
+  - Cada tarjeta presenta el porcentaje de compatibilidad, categoría, justificación pedagógica y clave metodológica.
+  - Botón directo *"Iniciar Runner"* que enlaza sin fricción al entorno interactivo del método elegido.
+
+### 3. Integración en MethodsPage (`MethodsPage.tsx`)
+- **Ubicación:** `src/pages/MethodsPage.tsx`.
+- Botón prominente en la cabecera: *"Asistente de Triaje Cognitivo"*.
+- Soporte para apertura directa vía parámetro de URL `/methods?triage=true`.
+
+### 4. Suite de Verificación Automatizada (24 Suites)
+- `scripts/test-phase11-cognitive-triage.mjs`: 30/30 pruebas aprobadas al 100%.
+- `npm test`: **24 suites de tests ejecutadas con 100% de éxito (425+ aserciones verificadas)**.
+- `npm run build`: compilación limpia en 4.51s con 0 errores TypeScript (`tsc -b && vite build`).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

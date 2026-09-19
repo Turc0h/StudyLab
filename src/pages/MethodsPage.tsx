@@ -5,6 +5,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db, type StudyMethod } from "../db/db";
 import { STUDY_METHODS_30_SEEDS } from "../data/studyMethodsSeed";
 import { MethodPreviewModal } from "../components/study-methods/MethodPreviewModal";
+import { CognitiveTriageModal } from "../components/study-methods/CognitiveTriageModal";
 import { Card, CardHeader, CardTitle } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { Badge } from "../components/ui/Badge";
@@ -141,6 +142,7 @@ export const MethodsPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedStatus, setSelectedStatus] = useState<"all" | "ready" | "preview">("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [isTriageOpen, setIsTriageOpen] = useState<boolean>(searchParams.get("triage") === "true");
 
   const methodsFromDb = useLiveQuery(() => db.studyMethods.toArray(), []);
   const allMethods: StudyMethod[] = (methodsFromDb && methodsFromDb.length > 0)
@@ -325,6 +327,17 @@ export const MethodsPage: React.FC = () => {
           <p className="mt-1 font-sans text-sm text-text-secondary">
             Explora 30 técnicas de estudio basadas en evidencia psicopedagógica, organizadas por objetivo cognitivo y conectadas al motor de sesiones de StudyLab.
           </p>
+          <div className="mt-3 flex items-center gap-2">
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsTriageOpen(true)}
+              className="text-xs flex items-center gap-1.5 shadow-xs"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>Asistente de Triaje Cognitivo</span>
+            </Button>
+          </div>
         </div>
         <PanelGuide
           id="methods-catalog-guide"
@@ -554,6 +567,13 @@ export const MethodsPage: React.FC = () => {
         method={previewMethod}
         onClose={() => setPreviewMethod(null)}
         onStartMethod={handleStartMethod}
+      />
+
+      {/* Cognitive Triage Modal */}
+      <CognitiveTriageModal
+        isOpen={isTriageOpen}
+        onClose={() => setIsTriageOpen(false)}
+        onSelectMethod={handleStartMethod}
       />
     </div>
   );
