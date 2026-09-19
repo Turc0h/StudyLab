@@ -1434,6 +1434,47 @@ Implementación del sistema dual de analítica de largo plazo: la **Matriz Anual
 
 ---
 
+## Fase v5.19 — Simulador de Exámenes a Desarrollo y Ensayos Universitarios (Essay & Synthesis Evaluator)
+
+**Qué se construyó**
+Implementación del entorno de entrenamiento para exámenes escritos a desarrollo, preguntas de cátedra y ensayos académicos. Incorpora un motor de rúbrica analítica en 4 dimensiones, un **"Detector de Humo" (análisis de verborragia vacía y frases cliché)**, contador en vivo de palabras con guía estructural (Tesis $\to$ Fundamentación $\to$ Casos Límites $\to$ Síntesis), y banco de consignas para Medicina, Derecho, Ingeniería y Ciencias Sociales.
+
+### 1. Motor de Evaluación y Rúbrica de Cátedra (`essayGraderEngine.ts`)
+- **Ubicación:** `src/features/essay-grader/essayGraderEngine.ts`.
+- **Rúbrica Universitaria de 4 Dimensiones:**
+  - *Dominio Conceptual (35%):* densidad de conceptos y terminología técnica obligatoria de cátedra.
+  - *Estructura & Cohesión (25%):* detección de planteo inicial/tesis, desarrollo argumental, casos límites y conclusión formal.
+  - *Rigor Crítico & Conectores (20%):* uso de conectores causales, excepciones y contrastes de doctrina.
+  - *Claridad & Detector de Humo (20%):* penalización progresiva por frases vacías y verborragia retórica sin contenido.
+- **Detector de Humo:**
+  - Identifica catálogo de frases cliché académicas (*"como todos sabemos"*, *"a lo largo de la historia"*, *"es un tema muy interesante y de suma importancia"*, *"no cabe duda que"*, etc.).
+  - Cuantifica el porcentaje de caracteres consumidos por relleno vacuo y emite feedback pedagógico específico.
+- **Banco de Consignas Precargadas:**
+  - Medicina: *Fisiopatología del Shock Séptico y Cascada Inflamatoria*.
+  - Derecho: *Principio de Proporcionalidad y Control de Constitucionalidad*.
+  - Ingeniería: *Teorema de Nyquist-Shannon y Fenómeno de Aliasing*.
+  - Humanidades: *La Dialéctica del Amo y el Esclavo en Hegel*.
+- **Persistencia:** Registro de exámenes en `db.sessions` con `methodId: "essay-exam"`.
+
+### 2. Componente Interactivo (`EssayExamMethod.tsx`)
+- **Ubicación:** `src/components/study-methods/EssayExamMethod.tsx`.
+- **Flujo Guiado de 3 Fases:**
+  - *Fase 1 (Setup):* Selección de consigna precargada o creación de pregunta personalizada con palabras clave de cátedra, límites de tiempo (10 a 45 min) y extensión objetivo (200 a 800 palabras).
+  - *Fase 2 (Redacción bajo Tiempo):* Editor serif amplio, temporizador regresivo animado, contador de palabras y barra de progreso porcentual, junto a una guía colapsable de estructura universitaria recomendada.
+  - *Fase 3 (Dictamen y Rúbrica):* Nota numérica sobre 10 con categoría de veredicto (*Sobresaliente*, *Distinguido*, *Aprobado*, *Insuficiente*), barras de puntuación por dimensión, diagnóstico de verborragia, chips de términos clave cubiertos/ausentes y recomendaciones de mejora.
+
+### 3. Integraciones en el Sistema
+- **Catálogo de Métodos (`MethodsPage.tsx`):** Carga diferida (`lazy`), switch case para `"essay-exam"` y botón directo *"Examen a Desarrollo & Ensayo"* en la cabecera.
+- **Tipado Global (`types/index.ts`):** Inclusión de `"essay-exam"` en `StudyMethodId`.
+- **Command Palette (`commandPaletteService.ts` / `CommandPalette.tsx`):** Nueva acción rápida global `action-essay-exam` mapeada con el icono `FileText` y términos como *"desarrollo"*, *"ensayo"*, *"escrito"*, *"parcial"*, *"redaccion"*, *"rubrica"*.
+
+### 4. Suite de Verificación Automatizada (32 Suites)
+- `scripts/test-phase19-essay-exam.mjs`: 15/15 pruebas aprobadas al 100%.
+- `npm test`: **32 suites de tests ejecutadas con 100% de éxito (695+ aserciones verificadas)**.
+- `npm run build`: compilación limpia en 4.26s con 0 errores TypeScript (`tsc -b && vite build`).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

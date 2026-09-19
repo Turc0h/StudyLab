@@ -31,7 +31,8 @@ export type StudyMethodId =
   | "multisensory-learning"
   | "sleep-consolidation"
   | "cram"
-  | "oral-defense";
+  | "oral-defense"
+  | "essay-exam";
 
 export interface StudyMethodInfo {
   id: StudyMethodId;

@@ -225,6 +225,15 @@ export async function searchCommandPalette(
       keywords: ["retencion", "pronostico", "curva de olvido", "forecast", "memoria", "estabilidad", "examen final", "365"],
       onSelect: () => actions.navigate("/"),
     },
+    {
+      id: "action-essay-exam",
+      title: "Simulador de Exámenes a Desarrollo y Ensayos",
+      subtitle: "Redacción bajo tiempo con rúbrica universitaria de 4 dimensiones y detector de humo",
+      iconName: "FileText",
+      badge: "Ensayo",
+      keywords: ["desarrollo", "ensayo", "escrito", "parcial", "redaccion", "rubrica", "humo", "tesis", "consigna"],
+      onSelect: () => actions.navigate("/methods?run=essay-exam"),
+    },
   ];
 
   // Evaluar Acciones del Sistema
