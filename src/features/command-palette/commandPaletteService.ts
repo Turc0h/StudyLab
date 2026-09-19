@@ -279,6 +279,15 @@ export async function searchCommandPalette(
       keywords: ["ollama", "ia", "ai", "local", "socratico", "llama", "mistral", "gemma", "tutor", "offline"],
       onSelect: () => actions.navigate("/methods?run=local-ai"),
     },
+    {
+      id: "action-audio-flashcards",
+      title: "Audio Flashcards & Podcast Universitario",
+      subtitle: "Evocación activa manos libres, pausas de reflexión y modo caminata",
+      iconName: "Headphones",
+      badge: "Audio",
+      keywords: ["audio", "flashcards", "podcast", "caminata", "walking", "recall", "voz", "manos libres", "bluetooth"],
+      onSelect: () => actions.navigate("/methods?run=audio-flashcards"),
+    },
   ];
 
   // Evaluar Acciones del Sistema

@@ -9,7 +9,7 @@ import { CognitiveTriageModal } from "../components/study-methods/CognitiveTriag
 import { Card, CardHeader, CardTitle } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { Badge } from "../components/ui/Badge";
-import { ArrowLeft, ArrowRight, Eye, Play, Sparkles, Search, Layers, Cpu, CheckCircle2, Flame, Mic, FileText, Columns3, Briefcase, CalendarDays, GraduationCap, Bot } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, Play, Sparkles, Search, Layers, Cpu, CheckCircle2, Flame, Mic, FileText, Columns3, Briefcase, CalendarDays, GraduationCap, Bot, Headphones } from "lucide-react";
 import { PanelGuide } from "../components/guide/PanelGuide";
 import { useNavigate } from "react-router-dom";
 
@@ -135,6 +135,9 @@ const PastExamsMethod = lazy(() =>
 );
 const LocalAiMethod = lazy(() =>
   import("../components/study-methods/LocalAiMethod").then((m) => ({ default: m.LocalAiMethod })),
+);
+const AudioFlashcardsMethod = lazy(() =>
+  import("../components/study-methods/AudioFlashcardsMethod").then((m) => ({ default: m.AudioFlashcardsMethod })),
 );
 
 const CATEGORIES = [
@@ -298,6 +301,8 @@ export const MethodsPage: React.FC = () => {
           return <PastExamsMethod onSessionFinished={handleBackToCatalog} />;
         case "local-ai":
           return <LocalAiMethod onSessionFinished={handleBackToCatalog} />;
+        case "audio-flashcards":
+          return <AudioFlashcardsMethod onSessionFinished={handleBackToCatalog} />;
         default:
           return (
             <div className="p-8 text-center space-y-4">
@@ -448,6 +453,15 @@ export const MethodsPage: React.FC = () => {
             >
               <Bot className="h-3.5 w-3.5 text-cyan-400" />
               <span>Tutor IA Local & Ollama</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleStartMethod("audio-flashcards")}
+              className="text-xs flex items-center gap-1.5 border-teal-500/40 bg-teal-500/10 text-teal-300 hover:bg-teal-500/20 hover:text-teal-200"
+            >
+              <Headphones className="h-3.5 w-3.5 text-teal-400" />
+              <span>Audio Flashcards & Podcast</span>
             </Button>
           </div>
         </div>

@@ -37,7 +37,8 @@ export type StudyMethodId =
   | "case-study"
   | "semester-gantt"
   | "past-exams"
-  | "local-ai";
+  | "local-ai"
+  | "audio-flashcards";
 
 export interface StudyMethodInfo {
   id: StudyMethodId;

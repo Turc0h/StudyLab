@@ -1687,6 +1687,43 @@ Implementación de la estación de planificación temporal y balance de esfuerzo
 
 ---
 
+## Fase v5.25 — Audio Flashcards & Podcast Universitario (*Audio Active Recall & Walking Study*)
+
+### 1. Motor de Audio Flashcards y Playlists (`audioFlashcardsEngine.ts`)
+- **Ubicación:** `src/features/audio-flashcards/audioFlashcardsEngine.ts`.
+- **Arquitectura de Evocación Activa Manos Libres:**
+  - Ciclo de aprendizaje auditivo estructurado: Enunciado de la Pregunta &rarr; Pausa reflexiva para evocación activa mental/verbal &rarr; Chime sonoro de alerta &rarr; Explicación y Respuesta detallada &rarr; Pausa de consolidación pre-siguiente tarjeta.
+  - Generador de Chime acústico nativo mediante **Web Audio API** (`AudioContext` y oscilador sinusoidal sintetizado de 587 Hz a 880 Hz), sin necesidad de descargar archivos de audio externos binarios ni dependencias pesadas.
+  - Controlador de síntesis de voz con **Web Speech API** (`SpeechSynthesisUtterance`), soporte de selección de voces en español, modulación de velocidad (0.75x - 1.75x) y tono.
+- **Playlists Universitarias Precargadas:**
+  - **Medicina & Farmacología:** SGLT2, 4 pilares terapéuticos de IC con FEVI reducida, toxicidades de amiodarona, shock por infarto de VD, score CHA2DS2-VASc y noradrenalina en shock séptico.
+  - **Derecho Civil & Comercial:** Régimen de la seña en el CCyC vs Vélez, teoría de la imprevisión (art. 1091), pacto comisorio tácito, frustración de la finalidad contractual y efectos sobre terceros.
+  - **Ingeniería de Software & Sistemas:** Consenso Raft (quórum de mayorías), Teorema CAP (CP vs AP), vulnerabilidad bloqueante de 2PC, límites de causalidad en relojes de Lamport y filtros de Bloom.
+- **Persistencia de Sesiones:** Función `saveAudioStudySessionRecord` para registrar tiempo de escucha y cantidad de conceptos repasados en `db.sessions` con `methodId: "audio-flashcards"`.
+
+### 2. Interfaz de Usuario y "Modo Caminata (OLED)" (`AudioFlashcardsMethod.tsx`)
+- **Ubicación:** `src/components/study-methods/AudioFlashcardsMethod.tsx`.
+- **Máquina de Estados de Reproducción:** Estados interactivos (`idle`, `question`, `pause_recall`, `answer`, `pause_consolidation`) con barra de progreso animada y cuenta regresiva de segundos para evocación activa.
+- **Modo Caminata (*Walking Study Mode*):**
+  - Vista a pantalla completa con fondo negro profundo para ahorro de batería en paneles OLED de laptops y móviles.
+  - Botones táctiles de gran tamaño para operación sin necesidad de mirar fijamente la pantalla mientras se camina o entrena.
+- **Integración con MediaSession API:**
+  - Manejadores de eventos de hardware para auriculares Bluetooth (`navigator.mediaSession.setActionHandler` para `play`, `pause`, `nexttrack`, `previoustrack`).
+  - Permite estudiar con el teléfono/laptop en el bolsillo o mochila y controlar el avance o pausa con los botones físicos o toques del auricular.
+- **Panel de Ajustes:** Configuración personalizada de segundos de pausa de evocación (1 a 15s), pausa entre tarjetas, velocidad de locución y selección de voz del sistema operativo.
+
+### 3. Integraciones en el Ecosistema
+- **Catálogo de Métodos (`MethodsPage.tsx`):** Carga diferida (`lazy`), runner case `"audio-flashcards"` y botón de acceso rápido *"Audio Flashcards"*.
+- **Tipado Global (`types/index.ts`):** `StudyMethodId` actualizado con `"audio-flashcards"`.
+- **Command Palette (`commandPaletteService.ts` / `CommandPalette.tsx`):** Acción `action-audio-flashcards` con el icono `Headphones` y badge `"Audio"`.
+
+### 4. Suite de Verificación Automatizada (38 Suites)
+- `scripts/test-phase25-audio-flashcards.mjs`: 13/13 pruebas aprobadas al 100%.
+- `npm test`: **38 suites de tests ejecutadas con 100% de éxito**.
+- `npm run build`: compilación limpia en 5.60s con 0 errores TypeScript (`tsc -b && vite build`) y code-splitting optimizado (chunk de 20.65 kB).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash
