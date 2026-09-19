@@ -198,6 +198,15 @@ export async function searchCommandPalette(
       keywords: ["oral", "coloquio", "defensa", "tesis", "examen final", "tribunal", "discurso", "presentacion", "hablar"],
       onSelect: () => actions.navigate("/methods?run=oral-defense"),
     },
+    {
+      id: "action-biometrics",
+      title: "Telemetría Biométrica & Pulso Cardíaco BLE",
+      subtitle: "Monitoreo en vivo de BPM y HRV para detectar fatiga cognitiva y estrés pre-examen",
+      iconName: "Heart",
+      badge: "Biometría",
+      keywords: ["biometria", "pulso", "corazon", "cardiaco", "hrv", "ble", "bluetooth", "estres", "box breathing", "respiracion"],
+      onSelect: () => actions.navigate("/context"),
+    },
   ];
 
   // Evaluar Acciones del Sistema

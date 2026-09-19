@@ -6,16 +6,17 @@ import { PostSessionEnergyCheck } from "./PostSessionEnergyCheck";
 import { UnifiedTextIntake } from "./UnifiedTextIntake";
 import { CognitiveProfileSelector } from "./CognitiveProfileSelector";
 import { DesktopEnvironmentContext } from "./DesktopEnvironmentContext";
+import { BiometricsMonitorCard } from "../biometrics/BiometricsMonitorCard";
 import { PanelGuide } from "../../components/guide/PanelGuide";
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
-import { Compass, Calendar, Battery, Sparkles, Settings, Brain, Laptop } from "lucide-react";
+import { Compass, Calendar, Battery, Sparkles, Settings, Brain, Laptop, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export const ContextEngineDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { contextEngineEnabled } = useContextEngineStore();
-  const [activeTab, setActiveTab] = useState<"projects" | "calendar" | "energy" | "intake" | "profiles" | "desktop">("projects");
+  const [activeTab, setActiveTab] = useState<"projects" | "calendar" | "energy" | "intake" | "profiles" | "desktop" | "biometrics">("projects");
 
   if (!contextEngineEnabled) {
     return (
@@ -82,6 +83,7 @@ export const ContextEngineDashboard: React.FC = () => {
           { id: "intake", label: "Embudo Rápido de Texto", icon: Sparkles },
           { id: "profiles", label: "Perfiles Cognitivos", icon: Brain },
           { id: "desktop", label: "Entorno Desktop", icon: Laptop },
+          { id: "biometrics", label: "Biometría & Pulso BLE", icon: Heart },
         ].map((tab) => {
           const Icon = tab.icon;
           return (
@@ -110,6 +112,7 @@ export const ContextEngineDashboard: React.FC = () => {
         {activeTab === "intake" && <UnifiedTextIntake />}
         {activeTab === "profiles" && <CognitiveProfileSelector />}
         {activeTab === "desktop" && <DesktopEnvironmentContext />}
+        {activeTab === "biometrics" && <BiometricsMonitorCard />}
       </div>
     </div>
   );

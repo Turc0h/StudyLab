@@ -1319,6 +1319,58 @@ Esta fase implementa el **Simulador de Coloquios y Exámenes Orales con Rúbrica
 
 ---
 
+## Fase v5.17 — Telemetría Biométrica BLE & Pulso Cardíaco Local (Fase 6 Context Engine)
+
+**Qué se construyó**
+Implementación integral de la **Fase 6 del Roadmap del Context Engine**: Monitoreo biométrico local mediante Web Bluetooth API (`navigator.bluetooth`) y servicio estandarizado Bluetooth SIG Heart Rate (`0x180D`, `0x2A37`), cálculo matemático de variabilidad de frecuencia cardíaca (HRV / RMSSD), diagnóstico autonómico del estrés cognitivo y protocolo guiado de Respiración Cuadrada (*Box Breathing*) 4-4-4-4 para reducción de taquicardia y ansiedad pre-examen.
+
+### 1. Motor de Decodificación GATT y Algoritmos Biométricos (`biometricsService.ts`)
+- **Ubicación:** `src/features/biometrics/biometricsService.ts`.
+- **Decodificador Binario Bluetooth SIG:**
+  - Inspecciona el flag byte en la posición 0 de la característica GATT `0x2A37`.
+  - Soporta medición en formato 8 bits (Uint8) y 16 bits (Uint16 Little-Endian).
+  - Parser de intervalos R-R (resolución $1/1024$ de segundo convertida a milisegundos).
+  - Detección de contacto con la piel (*Skin Contact Sensor*).
+  - Extracción de energía gastada en kilojulios (kJ).
+- **Cálculo Matemático de HRV (RMSSD):**
+  - Implementa la raíz cuadrada de la media de las diferencias al cuadrado de intervalos R-R consecutivos:
+    $$\text{RMSSD} = \sqrt{\frac{1}{N-1}\sum_{i=1}^{N-1}(RR_{i+1} - RR_i)^2}$$
+- **Evaluador de Estrés Autonómico:**
+  - Clasifica el estado neurofisiológico en 4 niveles con recomendaciones cognitivas concretas:
+    - `stressed`: $\text{BPM} \ge 100$, sobrecarga simpática o ansiedad pre-examen; sugiere activar la Respiración Cuadrada.
+    - `fatigued`: $\text{BPM} \ge 88$ con baja variabilidad o desgaste sostenido.
+    - `focused`: $70 \le \text{BPM} \le 85$, óptimo para trabajo profundo (*flow state*).
+    - `calm`: $\text{BPM} < 70$, tono parasimpático basal y reposo cognitivo.
+- **Generador Sintético Offline (`SyntheticHeartRateSimulator`):**
+  - Permite pruebas y validación sin hardware Bluetooth físico mediante simulación oscilatoria con deriva sinusoidal y ruido aleatorio gaussiano para perfiles `calm`, `focused` y `stressed`.
+
+### 2. Store Reactivo y Control de Telemetría (`useBiometricsStore.ts`)
+- **Ubicación:** `src/stores/useBiometricsStore.ts`.
+- **Integración con Web Bluetooth API:** Conexión segura con filtro de servicio `heart_rate`, suscripción a `startNotifications()` y reconexión/desconexión resiliente.
+- **Historial Deslizante:** Buffer circular de 30 muestras temporales para graficado reactivo de sparklines en tiempo real.
+- **Gestión Modal:** Control de visibilidad del modal de Respiración Cuadrada.
+
+### 3. Componentes de Visualización e Intervención
+- **`BiometricsMonitorCard.tsx` (`src/features/biometrics/BiometricsMonitorCard.tsx`):**
+  - Tacómetro cardíaco con icono de corazón animado sincronizado con la frecuencia cardíaca actual (`60 / currentBpm` segundos por latido).
+  - Sparkline SVG interactivo del historial reciente de pulso con gradiente dinámico.
+  - Insignia y tarjeta de diagnóstico del estado neurovegetativo con colorimetría semántica.
+  - Controles de conexión BLE real y switch de perfiles del simulador sintético (*Calma*, *Foco Óptimo*, *Estrés de Examen*).
+- **`BoxBreathingModal.tsx` (`src/features/biometrics/BoxBreathingModal.tsx`):**
+  - Protocolo de respiración diafragmática 4-4-4-4: Inhalar (4s) $\to$ Retener lleno (4s) $\to$ Exhalar (4s) $\to$ Retener vacío (4s).
+  - Anillo visual concéntrico pulsante con escalado CSS dinámico, contador de ciclos completados y retroalimentación de tono vagal.
+
+### 4. Integraciones en el Sistema
+- **Context Engine Dashboard (`ContextEngineDashboard.tsx`):** Pestaña dedicada `"biometrics"` (*"Biometría & Pulso BLE"*) que integra la tarjeta de monitoreo en el panel de telemetría de estudio.
+- **Command Palette (`commandPaletteService.ts` / `CommandPalette.tsx`):** Nueva acción global `action-biometrics` (`Ctrl+K`) accesible mediante términos como *"pulso"*, *"ritmo cardiaco"*, *"frecuencia cardiaca"*, *"estres"*, *"biometria"*, *"ble"*, *"bluetooth"*, mapeada con el icono `Heart`.
+
+### 5. Suite de Verificación Automatizada (30 Suites)
+- `scripts/test-phase17-biometrics.mjs`: 26/26 pruebas aprobadas al 100%.
+- `npm test`: **30 suites de tests ejecutadas con 100% de éxito (660+ aserciones verificadas)**.
+- `npm run build`: compilación limpia en 4.16s con 0 errores TypeScript (`tsc -b && vite build`).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

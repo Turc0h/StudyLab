@@ -25,6 +25,7 @@ import {
   Printer,
   Flame,
   Mic,
+  Heart,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { useCommandPaletteStore } from "../../stores/useCommandPaletteStore";
@@ -58,6 +59,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Printer,
   Flame,
   Mic,
+  Heart,
 };
 
 const CATEGORY_COLORS: Record<CommandPaletteCategory, { bg: string; text: string; border: string }> = {
