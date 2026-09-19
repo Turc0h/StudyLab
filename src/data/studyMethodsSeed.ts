@@ -228,7 +228,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Monitorea el progreso constante sin ceder a la tentación de acumular tareas para el fin de semana.",
     ],
     scientificBasis: "Cepeda, Pashler, Vul, Wixted & Rohrer (2006) • Distributed Practice in Verbal Recall Tasks: A Review and Quantitative Synthesis.",
-    implemented: false,
+    integratesWith: ["session-engine"],
+    implemented: true,
   },
 
   // 12. Método SQ3R
@@ -416,7 +417,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Reconstruye mentalmente la experiencia sensorial completa durante las sesiones de recuerdo.",
     ],
     scientificBasis: "Shams & Seitz (2008) • Benefits of Multisensory Learning: Neural Mechanisms and Behavioral Correlates.",
-    implemented: false,
+    integratesWith: ["session-engine"],
+    implemented: true,
   },
 
   // 21. Palacio de la Memoria (Método de Loci)
@@ -499,7 +501,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Mide tus resultados en pruebas de transferencia a problemas inéditos, no en familiaridad con el texto.",
     ],
     scientificBasis: "Robert A. Bjork (1994) • Memory and Metamemory Considerations in the Training of Human Beings.",
-    implemented: false,
+    integratesWith: ["session-engine"],
+    implemented: true,
   },
 
   // 25. Zettelkasten (Notas Enlazadas)
@@ -582,7 +585,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Al final del conjunto de segmentos, sintetiza la transición lógica entre cada uno de ellos.",
     ],
     scientificBasis: "Richard E. Mayer (2001, 2009) • Multimedia Learning (Cambridge University Press).",
-    implemented: false,
+    integratesWith: ["session-engine"],
+    implemented: true,
   },
 
   // 29. Bloques de Trabajo Profundo (Deep Work)
@@ -623,7 +627,8 @@ export const STUDY_METHODS_30_SEEDS: StudyMethod[] = [
       "Al despertar, realiza una breve sesión de recuerdo activo para verificar la consolidación nocturna.",
     ],
     scientificBasis: "Diekelmann & Born (2010) • The Memory Function of Sleep (Nature Reviews Neuroscience).",
-    implemented: false,
+    integratesWith: ["session-engine"],
+    implemented: true,
   },
 ];
 

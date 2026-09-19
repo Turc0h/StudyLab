@@ -96,6 +96,21 @@ const StoryMethod = lazy(() =>
 const Pq4rMethod = lazy(() =>
   import("../components/study-methods/Pq4rMethod").then((m) => ({ default: m.Pq4rMethod })),
 );
+const DistributedPracticeMethod = lazy(() =>
+  import("../components/study-methods/DistributedPracticeMethod").then((m) => ({ default: m.DistributedPracticeMethod })),
+);
+const DesirableDifficultiesMethod = lazy(() =>
+  import("../components/study-methods/DesirableDifficultiesMethod").then((m) => ({ default: m.DesirableDifficultiesMethod })),
+);
+const SegmentationPrincipleMethod = lazy(() =>
+  import("../components/study-methods/SegmentationPrincipleMethod").then((m) => ({ default: m.SegmentationPrincipleMethod })),
+);
+const MultisensoryLearningMethod = lazy(() =>
+  import("../components/study-methods/MultisensoryLearningMethod").then((m) => ({ default: m.MultisensoryLearningMethod })),
+);
+const SleepConsolidationMethod = lazy(() =>
+  import("../components/study-methods/SleepConsolidationMethod").then((m) => ({ default: m.SleepConsolidationMethod })),
+);
 
 const CATEGORIES = [
   { id: "all", label: "Todas las Categorías" },
@@ -231,6 +246,16 @@ export const MethodsPage: React.FC = () => {
           return <StoryMethod onSessionFinished={handleBackToCatalog} />;
         case "pq4r":
           return <Pq4rMethod onSessionFinished={handleBackToCatalog} />;
+        case "distributed-practice":
+          return <DistributedPracticeMethod onSessionFinished={handleBackToCatalog} />;
+        case "desirable-difficulties":
+          return <DesirableDifficultiesMethod onSessionFinished={handleBackToCatalog} />;
+        case "segmentation-principle":
+          return <SegmentationPrincipleMethod onSessionFinished={handleBackToCatalog} />;
+        case "multisensory-learning":
+          return <MultisensoryLearningMethod onSessionFinished={handleBackToCatalog} />;
+        case "sleep-consolidation":
+          return <SleepConsolidationMethod onSessionFinished={handleBackToCatalog} />;
         default:
           return (
             <div className="p-8 text-center space-y-4">

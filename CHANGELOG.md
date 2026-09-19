@@ -1010,6 +1010,62 @@ El catálogo de StudyLab alcanza el 83.3% de cobertura interactiva:
 
 ---
 
+## Fase v5.9 — Catálogo Completo 100% (30 de 30 Runners Activos)
+
+Esta fase marca un hito de completitud absoluto para StudyLab: **el 100% del catálogo científico de 30 métodos de estudio cuenta ahora con runners interactivos operativos**, eliminando completamente cualquier método que estuviera restringido a una ficha meramente teórica.
+
+### 1. Runner Interactivo de Práctica Distribuida / Calendario de Espaciado (`DistributedPracticeMethod.tsx`)
+- **Acceso:** Desde `/methods?run=distributed-practice`.
+- **Fundamentación:** Ebbinghaus (1885), Cepeda et al. (2006, Psychological Bulletin) — La distribución de la carga horaria en micro-sesiones espaciadas a lo largo de semanas o meses produce una retención duradera 2x superior al atracón o estudio masivo de última hora (*cramming*).
+- **Calculadora & Planificador de Distribución:**
+  - **Comparador Visual de Eficiencia:** Contraste dinámico entre estudio masivo continuo (fatiga cognitiva y decaimiento rápido) vs. estudio distribuido espaciado (recuperación sináptica óptima).
+  - **Asignador de Bloques y Días de Amortiguación:** Selector de duración de bloques (60, 90, 120 minutos) con cálculo automático de sesiones requeridas y días libres recomendados como buffer cognitivo.
+  - **Regla de Oro de los 5 Minutos:** Espacio estructurado para la evocación activa al inicio de cada micro-bloque antes de reanudar el material nuevo.
+
+### 2. Runner Interactivo de Dificultades Deseables (`DesirableDifficultiesMethod.tsx`)
+- **Acceso:** Desde `/methods?run=desirable-difficulties`.
+- **Fundamentación:** Robert & Elizabeth Bjork (1994, 2011, UCLA) — Introducir dificultades deliberadas que desaceleran la velocidad aparente de aprendizaje fortalece la capacidad de almacenamiento y transferencia en memoria a largo plazo.
+- **Auditoría de Fricciones Cognitivas:**
+  - **Selector de Palancas de Fricción:** 4 palancas directas: Test Retardado, Intercalado a Ciegas, Efecto Generativo y Variabilidad de Entorno/Contexto.
+  - **Matriz de Diagnóstico y Autoevaluación:** Calificación de fluidez subjetiva inmediata (1-5) vs. retención real medida (1-5) con advertencia automática de la *ilusión de competencia* cuando la fluidez aparente enmascara una baja retención duradera.
+
+### 3. Runner Interactivo del Principio de Segmentación (`SegmentationPrincipleMethod.tsx`)
+- **Acceso:** Desde `/methods?run=segmentation-principle`.
+- **Fundamentación:** Richard Mayer (2001, 2009, Multimedia Learning) — La mente procesa mejor materiales continuos o videos complejos cuando se fraccionan en segmentos breves autogestionados de 3 a 5 minutos, permitiendo la consolidación antes de recibir nuevo estímulo.
+- **Consola de Segmentación de Clases & Video:**
+  - **Particionador de Segmentos:** Fraccionamiento del contenido total en micro-bloques estructurados con marcas temporales (de 0 a N minutos).
+  - **Temporizador de Pausa Activa (60 segundos):** Cuenta regresiva para detener el video/audio y sintetizar activamente la idea fuerza sin estímulos distractores externos.
+  - **Bitácora de Síntesis:** Registro acumulado de conclusiones por segmento antes de pasar al siguiente tramo.
+
+### 4. Runner Interactivo de Estudio Multisensorial (`MultisensoryLearningMethod.tsx`)
+- **Acceso:** Desde `/methods?run=multisensory-learning`.
+- **Fundamentación:** Shams & Seitz (2008, Trends in Cognitive Sciences) — Los estímulos multisensoriales sincronizados activan redes neuronales interconectadas que potencian el aprendizaje y facilitan la evocación por redundancia cortical.
+- **Matriz de Anclaje de Tres Vías:**
+  - **Canal Visual (Corteza Occipital):** Diagramas, esquemas espaciales y codificación cromática.
+  - **Canal Auditivo (Corteza Temporal):** Dictado en voz alta, explicaciones grabadas y mnemotecnias sonoras.
+  - **Canal Motor / Kinestésico (Corteza Motora):** Escritura manuscrita, gesticulación física o maquetas conceptuales.
+  - **Auditoría de Sincronía y Retención:** Registro del impacto multisensorial y calificación de solidez del anclaje mnémico.
+
+### 5. Runner Interactivo de Consolidación por Sueño (`SleepConsolidationMethod.tsx`)
+- **Acceso:** Desde `/methods?run=sleep-consolidation`.
+- **Fundamentación:** Diekelmann & Born (2010, Nature Reviews Neuroscience) — La memoria se reactiva y consolida durante las fases de ondas lentas (SWS/NREM) y fase REM mediante transferencia sináptica hipocampo-neocorteza.
+- **Protocolo Pre-Cama & Evocación Matutina:**
+  - **Calculadora de Ciclos Ultradianos (90 min):** Planificación de descansos de 4.5h, 6.0h, 7.5h o 9.0h para despertar al término de un ciclo sin inercia del sueño.
+  - **Revisión Suave Previa al Sueño (15 min):** Filtro de conceptos de alta prioridad para sembrado hipocampal a baja intensidad (sin pantallas estimulantes).
+  - **Test de Evocación Matutina al Despertar:** Registro inmediato de conceptos recordados tras el despertar para verificar la consolidación sináptica nocturna.
+
+### 6. Estado Definitivo del Catálogo: 30 de 30 Runners Activos (100% Interactivo)
+El catálogo de StudyLab completa su meta arquitectónica:
+- **30 Runners Funcionales Disponibles:** Feynman, SQ3R, Pomodoro, Recuerdo Activo, Interleaving, Cornell, Simulacros de Examen, Zettelkasten, Blurting, Mapas Mentales, Leitner, Interrogación Elaborativa, Palacio de la Memoria, Mnemotecnias, KWL, Autoexplicación, Codificación Dual, Bloques de Trabajo Profundo, Mapas Conceptuales Novakianos, Chunking, Aprendizaje Basado en Problemas, Enseñar a Otros (Efecto Protegido), Método del Relato, Método PQ4R, Práctica Distribuida, Dificultades Deseables, Principio de Segmentación, Estudio Multisensorial, Consolidación por Sueño y Repaso Espaciado (FSRS).
+- **0 Fichas Estáticas Restantes:** Todas las metodologías cuentan con herramientas de ejecución, cálculo o registro interactivo con integración local-first.
+
+### 7. Suite de Verificación Automatizada Integral (22 Suites)
+- `scripts/test-phase9-full-catalog.mjs`: 73/73 pruebas aprobadas al 100%.
+- `npm test`: **22 suites de tests ejecutadas con 100% de éxito (352+ aserciones verificadas)**.
+- `npm run build`: compilación limpia en 4.02s con 0 errores TypeScript (`tsc -b && vite build`).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

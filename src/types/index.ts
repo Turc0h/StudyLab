@@ -24,7 +24,12 @@ export type StudyMethodId =
   | "problem-based-learning"
   | "protege-effect"
   | "story-method"
-  | "pq4r";
+  | "pq4r"
+  | "distributed-practice"
+  | "desirable-difficulties"
+  | "segmentation-principle"
+  | "multisensory-learning"
+  | "sleep-consolidation";
 
 export interface StudyMethodInfo {
   id: StudyMethodId;

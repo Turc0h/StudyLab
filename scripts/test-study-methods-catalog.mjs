@@ -71,14 +71,17 @@ const CORE_IMPLEMENTED_IDS = [
   "protege-effect",
   "story-method",
   "pq4r",
+  "distributed-practice",
+  "desirable-difficulties",
+  "segmentation-principle",
+  "multisensory-learning",
+  "sleep-consolidation",
 ];
 const implementedCore = STUDY_METHODS_30_SEEDS.filter(m => CORE_IMPLEMENTED_IDS.includes(m.id) && m.implemented === true);
-assert(implementedCore.length === 25, `Los métodos con runner interactivo conservan implemented: true (actual: ${implementedCore.length})`);
+assert(implementedCore.length === 30, `Los 30 métodos poseen runner interactivo implementado (actual: ${implementedCore.length})`);
 
-// Test 5: Los restantes métodos informativos tienen implemented: false
-const nonCoreMethods = STUDY_METHODS_30_SEEDS.filter(m => !CORE_IMPLEMENTED_IDS.includes(m.id));
-const allNonCoreFalse = nonCoreMethods.every(m => m.implemented === false);
-assert(allNonCoreFalse, `Los 5 métodos restantes tienen implemented: false (fichas informativas)`);
+// Test 5: Los 30 métodos del catálogo son interactivos
+assert(STUDY_METHODS_30_SEEDS.every(m => m.implemented === true), `El 100% de los 30 métodos posee implemented: true`);
 
 // Test 6: Calidad de contenido (description 2-4 líneas y howTo con 3 a 5 pasos)
 const validStepsAndDesc = STUDY_METHODS_30_SEEDS.every(m => {
