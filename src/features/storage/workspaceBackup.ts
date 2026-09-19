@@ -4,20 +4,50 @@ import { storeFileBlob } from "./fileStorage";
 
 export interface BackupManifest {
   app: "StudyLab";
-  version: "5.0";
+  version: "5.12";
+  format: "studylab-bundle";
   timestamp: number;
   totalFiles: number;
+  sha256Checksum: string;
+  dexieSchemaVersion: number;
   tableCounts: Record<string, number>;
 }
 
+export interface BackupInspectionResult {
+  manifest: BackupManifest;
+  isValid: boolean;
+  checksumValid: boolean;
+  stats: {
+    fileCount: number;
+    cardCount: number;
+    studySessionCount: number;
+    projectCount: number;
+    totalTables: number;
+  };
+  error?: string;
+}
+
 /**
- * Exports the entire StudyLab workspace into a portable .zip package.
+ * Calcula el hash criptográfico SHA-256 de una cadena de texto en hexadecimal.
+ */
+export async function computeSha256(text: string): Promise<string> {
+  const enc = new TextEncoder();
+  const buffer = enc.encode(text);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+/**
+ * Exporta el espacio de trabajo completo de StudyLab a un paquete portable .studylab-bundle (formato zip con SHA-256).
+ * Incluye las 28 tablas de Dexie, documentos binarios, sesiones de los 30 métodos y Context Engine.
  */
 export async function exportWorkspaceToZip(onProgress?: (msg: string, pct: number) => void): Promise<Blob> {
-  onProgress?.("Recopilando base de datos...", 10);
+  onProgress?.("Recopilando todas las tablas de la base de datos...", 10);
   const zip = new JSZip();
 
-  // 1. Export tables to JSON
+  // 1. Export all 28 tables to JSON
   const [
     folders,
     files,
@@ -40,6 +70,15 @@ export async function exportWorkspaceToZip(onProgress?: (msg: string, pct: numbe
     workspaceState,
     studentErrors,
     examPlans,
+    studySessions,
+    studyMethods,
+    contextProjects,
+    contextProjectDocs,
+    contextEvents,
+    energyLogs,
+    textIntakes,
+    fatigueTelemetry,
+    contextTimeBlocks,
   ] = await Promise.all([
     db.folders.toArray(),
     db.files.toArray(),
@@ -62,11 +101,20 @@ export async function exportWorkspaceToZip(onProgress?: (msg: string, pct: numbe
     db.workspaceState.toArray(),
     db.studentErrors.toArray(),
     db.examPlans.toArray(),
+    (db as any).studySessions ? (db as any).studySessions.toArray() : Promise.resolve([]),
+    db.studyMethods ? db.studyMethods.toArray() : Promise.resolve([]),
+    db.contextProjects ? db.contextProjects.toArray() : Promise.resolve([]),
+    (db as any).contextProjectDocs ? (db as any).contextProjectDocs.toArray() : Promise.resolve([]),
+    (db as any).contextEvents ? (db as any).contextEvents.toArray() : Promise.resolve([]),
+    (db as any).energyLogs ? (db as any).energyLogs.toArray() : Promise.resolve([]),
+    (db as any).textIntakes ? (db as any).textIntakes.toArray() : Promise.resolve([]),
+    db.fatigueTelemetry ? db.fatigueTelemetry.toArray() : Promise.resolve([]),
+    db.contextTimeBlocks ? db.contextTimeBlocks.toArray() : Promise.resolve([]),
   ]);
 
   const databaseData = {
     folders,
-    files: files.map((f) => ({ ...f, blob: undefined })), // Omit blob from json, saved in files/
+    files: (files as any[]).map((f) => ({ ...f, blob: undefined })), // Omit blob from json, saved in files/
     highlights,
     postits,
     sessions,
@@ -86,9 +134,21 @@ export async function exportWorkspaceToZip(onProgress?: (msg: string, pct: numbe
     workspaceState,
     studentErrors,
     examPlans,
+    studySessions,
+    studyMethods,
+    contextProjects,
+    contextProjectDocs,
+    contextEvents,
+    energyLogs,
+    textIntakes,
+    fatigueTelemetry,
+    contextTimeBlocks,
   };
 
-  zip.file("studylab_db.json", JSON.stringify(databaseData, null, 2));
+  const dbJson = JSON.stringify(databaseData, null, 2);
+  const sha256Checksum = await computeSha256(dbJson);
+
+  zip.file("studylab_db.json", dbJson);
 
   // 2. Package binary file blobs
   onProgress?.("Empaquetando documentos PDF binarios...", 30);
@@ -103,12 +163,15 @@ export async function exportWorkspaceToZip(onProgress?: (msg: string, pct: numbe
     onProgress?.(`Comprimiendo archivo ${i + 1}/${files.length}...`, pct);
   }
 
-  // 3. Manifest metadata
+  // 3. Manifest metadata with cryptographic signature
   const manifest: BackupManifest = {
     app: "StudyLab",
-    version: "5.0",
+    version: "5.12",
+    format: "studylab-bundle",
     timestamp: Date.now(),
     totalFiles: files.length,
+    sha256Checksum,
+    dexieSchemaVersion: 6,
     tableCounts: {
       folders: folders.length,
       files: files.length,
@@ -117,12 +180,17 @@ export async function exportWorkspaceToZip(onProgress?: (msg: string, pct: numbe
       concepts: concepts.length,
       academicSources: academicSources.length,
       academicChunks: academicChunks.length,
+      studySessions: studySessions.length,
+      studyMethods: studyMethods.length,
+      contextProjects: contextProjects.length,
+      contextEvents: contextEvents.length,
+      energyLogs: energyLogs.length,
     },
   };
 
   zip.file("studylab_manifest.json", JSON.stringify(manifest, null, 2));
 
-  onProgress?.("Generando archivo comprimido .zip final...", 85);
+  onProgress?.("Generando archivo portable final...", 85);
   const zipBlob = await zip.generateAsync({ type: "blob", compression: "DEFLATE" });
   onProgress?.("¡Exportación completada con éxito!", 100);
 
@@ -130,13 +198,80 @@ export async function exportWorkspaceToZip(onProgress?: (msg: string, pct: numbe
 }
 
 /**
- * Imports and restores an entire StudyLab workspace from a .zip backup.
+ * Inspecciona un archivo .studylab-bundle o .zip sin realizar modificaciones en la base de datos local.
+ * Verifica la firma criptográfica SHA-256 y extrae estadísticas previas.
+ */
+export async function inspectBackupBundle(bundleFile: File | Blob): Promise<BackupInspectionResult> {
+  try {
+    const zip = await JSZip.loadAsync(bundleFile);
+
+    const manifestFile = zip.file("studylab_manifest.json");
+    if (!manifestFile) {
+      return {
+        manifest: null as any,
+        isValid: false,
+        checksumValid: false,
+        stats: { fileCount: 0, cardCount: 0, studySessionCount: 0, projectCount: 0, totalTables: 0 },
+        error: "El archivo no contiene studylab_manifest.json válido.",
+      };
+    }
+
+    const manifest: BackupManifest = JSON.parse(await manifestFile.async("string"));
+    const dbFile = zip.file("studylab_db.json");
+
+    if (!dbFile) {
+      return {
+        manifest,
+        isValid: false,
+        checksumValid: false,
+        stats: { fileCount: 0, cardCount: 0, studySessionCount: 0, projectCount: 0, totalTables: 0 },
+        error: "Falta el archivo studylab_db.json dentro del paquete.",
+      };
+    }
+
+    const dbContent = await dbFile.async("string");
+    let checksumValid = true;
+
+    if (manifest.sha256Checksum) {
+      const calculatedHash = await computeSha256(dbContent);
+      checksumValid = calculatedHash === manifest.sha256Checksum;
+    }
+
+    const dbData = JSON.parse(dbContent);
+    const totalTables = Object.keys(dbData).length;
+
+    return {
+      manifest,
+      isValid: true,
+      checksumValid,
+      stats: {
+        fileCount: dbData.files?.length || 0,
+        cardCount: (dbData.cardsFsrs?.length || 0) + (dbData.flashcards?.length || 0),
+        studySessionCount: (dbData.studySessions?.length || 0) + (dbData.sessions?.length || 0),
+        projectCount: dbData.contextProjects?.length || 0,
+        totalTables,
+      },
+    };
+  } catch (err: any) {
+    return {
+      manifest: null as any,
+      isValid: false,
+      checksumValid: false,
+      stats: { fileCount: 0, cardCount: 0, studySessionCount: 0, projectCount: 0, totalTables: 0 },
+      error: err.message || "Error al descomprimir el archivo de respaldo.",
+    };
+  }
+}
+
+/**
+ * Importa y restaura el espacio de trabajo completo desde un archivo .studylab-bundle o .zip.
+ * Vierte con seguridad las 28 tablas y reconstruye los binarios en IndexedDB.
  */
 export async function importWorkspaceFromZip(
   zipFile: File | Blob,
   onProgress?: (msg: string, pct: number) => void,
 ): Promise<BackupManifest> {
-  onProgress?.("Leyendo archivo zip de respaldo...", 10);
+  onProgress?.("Leyendo archivo de respaldo...", 10);
   const zip = await JSZip.loadAsync(zipFile);
 
   const manifestFile = zip.file("studylab_manifest.json");
@@ -145,16 +280,27 @@ export async function importWorkspaceFromZip(
   }
 
   const manifest: BackupManifest = JSON.parse(await manifestFile.async("string"));
-  onProgress?.("Restaurando datos estructurados...", 30);
+  onProgress?.("Validando integridad de la base de datos...", 20);
 
   const dbFile = zip.file("studylab_db.json");
   if (!dbFile) {
     throw new Error("No se encontraron los datos de la base de datos en el respaldo.");
   }
 
-  const dbData = JSON.parse(await dbFile.async("string"));
+  const dbText = await dbFile.async("string");
 
-  // Restore tables safely
+  // Validar checksum SHA-256 si está presente en el manifiesto
+  if (manifest.sha256Checksum) {
+    const hash = await computeSha256(dbText);
+    if (hash !== manifest.sha256Checksum) {
+      throw new Error("Fallo de integridad criptográfica: el archivo studylab_db.json ha sido alterado o está corrupto.");
+    }
+  }
+
+  const dbData = JSON.parse(dbText);
+  onProgress?.("Restaurando tablas del sistema...", 35);
+
+  // Restore all tables safely
   if (dbData.folders?.length) await db.folders.bulkPut(dbData.folders);
   if (dbData.highlights?.length) await db.highlights.bulkPut(dbData.highlights);
   if (dbData.postits?.length) await db.postits.bulkPut(dbData.postits);
@@ -176,9 +322,21 @@ export async function importWorkspaceFromZip(
   if (dbData.studentErrors?.length) await db.studentErrors.bulkPut(dbData.studentErrors);
   if (dbData.examPlans?.length) await db.examPlans.bulkPut(dbData.examPlans);
 
+  // Restore new v5 tables
+  const anyDb = db as any;
+  if (dbData.studySessions?.length && anyDb.studySessions) await anyDb.studySessions.bulkPut(dbData.studySessions);
+  if (dbData.studyMethods?.length && db.studyMethods) await db.studyMethods.bulkPut(dbData.studyMethods);
+  if (dbData.contextProjects?.length && db.contextProjects) await db.contextProjects.bulkPut(dbData.contextProjects);
+  if (dbData.contextProjectDocs?.length && anyDb.contextProjectDocs) await anyDb.contextProjectDocs.bulkPut(dbData.contextProjectDocs);
+  if (dbData.contextEvents?.length && anyDb.contextEvents) await anyDb.contextEvents.bulkPut(dbData.contextEvents);
+  if (dbData.energyLogs?.length && anyDb.energyLogs) await anyDb.energyLogs.bulkPut(dbData.energyLogs);
+  if (dbData.textIntakes?.length && anyDb.textIntakes) await anyDb.textIntakes.bulkPut(dbData.textIntakes);
+  if (dbData.fatigueTelemetry?.length && db.fatigueTelemetry) await db.fatigueTelemetry.bulkPut(dbData.fatigueTelemetry);
+  if (dbData.contextTimeBlocks?.length && db.contextTimeBlocks) await db.contextTimeBlocks.bulkPut(dbData.contextTimeBlocks);
+
   // Restore file records and extract blobs
   const fileRecords = dbData.files || [];
-  onProgress?.("Restaurando archivos PDF y documentos...", 60);
+  onProgress?.("Restaurando archivos PDF y documentos binarios...", 60);
 
   for (let i = 0; i < fileRecords.length; i++) {
     const f = fileRecords[i];
@@ -203,6 +361,6 @@ export async function importWorkspaceFromZip(
     onProgress?.(`Restaurando archivo ${i + 1}/${fileRecords.length}...`, pct);
   }
 
-  onProgress?.("¡Workspace restaurado con éxito!", 100);
+  onProgress?.("¡Espacio de trabajo restaurado al 100% con éxito!", 100);
   return manifest;
 }

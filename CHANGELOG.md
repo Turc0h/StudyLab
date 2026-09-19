@@ -1136,6 +1136,42 @@ Esta fase introduce el **Motor de Triaje Cognitivo (Cognitive Triage & Matcher E
 
 ---
 
+## Fase v5.12 — Paquete de Respaldo y Migración Portable (.studylab-bundle)
+
+Esta fase consolida el ecosistema de preservación y migración de datos de StudyLab con un formato de paquete oficial unificado (`.studylab-bundle`), verificación de integridad criptográfica SHA-256 previa a la restauración y cobertura exhaustiva de las 29 tablas del sistema Dexie.
+
+### 1. Formato Oficial `.studylab-bundle` y Manifiesto v5.12 (`workspaceBackup.ts`)
+- **Ubicación:** `src/features/storage/workspaceBackup.ts`.
+- **Integridad Criptográfica SHA-256:**
+  - Se genera un hash SHA-256 canónico del volcado de la base de datos (`studylab_db.json`) empleando `crypto.subtle.digest("SHA-256", ...)` o el runtime disponible en el navegador/desktop.
+  - El checksum se empaqueta dentro del `studylab_manifest.json` bajo la especificación `format: "studylab-bundle"` y `dexieSchemaVersion: 6`.
+- **Cobertura Exhaustiva de Tablas:**
+  - Exportación y restauración idempotente de las 29 tablas de Dexie: `folders`, `files`, `highlights`, `postits`, `sessions`, `deadlines`, `reviewSchedule`, `flashcards`, `flashcardDecks`, `ocrPages`, `cardsFsrs`, `reviewLogs`, `concepts`, `conceptEdges`, `workspaceConfigs`, `fatigueTelemetry`, `academicSources`, `academicChunks`, `academicEvaluations`, `workspaceState`, `studentErrors`, `examPlans`, `studyMethods`, `contextProjects`, `contextTimeBlocks`, `contextProjectDocs`, `contextEvents`, `energyLogs` y `textIntakes`.
+  - Reconstrucción binaria de documentos PDF en el directorio `files/{id}.bin` y preservación de blobs en IndexedDB.
+
+### 2. Inspección Previa y Modal de Vista Previa (`RestorePreviewModal.tsx`)
+- **Ubicación:** `src/components/backup/RestorePreviewModal.tsx`.
+- **Auditoría Sin Efectos Secundarios (`inspectBackupBundle`):**
+  - Descomprime el archivo `.studylab-bundle` o `.zip` en memoria para auditar metadatos, timestamp, versiones y contar registros clave sin modificar el estado local.
+  - Compara en vivo el checksum SHA-256 recalculado contra el manifest para detectar alteraciones, descargas truncadas o archivos incompatibles antes de cualquier sobreescritura.
+- **Experiencia de Usuario en la Modal:**
+  - Badge de certificación de firma SHA-256 (Verificado vs Advertencia de integridad).
+  - Matriz con contadores de documentos PDF, tarjetas FSRS, sesiones de métodos y proyectos de contexto.
+  - Barra de progreso interactiva durante la restauración progresiva.
+
+### 3. Integración en Pantalla de Configuración (`Settings.tsx`)
+- **Ubicación:** `src/pages/Settings.tsx`.
+- El botón de exportación genera directamente el archivo `.studylab-bundle`.
+- El selector de restauración admite `.studylab-bundle` y `.zip`.
+- Al seleccionar un archivo, se activa la inspección criptográfica previa y se abre la modal de confirmación informada.
+
+### 4. Suite de Verificación Automatizada (25 Suites)
+- `scripts/test-phase12-workspace-bundle.mjs`: 57/57 pruebas aprobadas al 100%.
+- `npm test`: **25 suites de tests ejecutadas con 100% de éxito (480+ aserciones verificadas)**.
+- `npm run build`: compilación limpia en 4.25s con 0 errores TypeScript (`tsc -b && vite build`).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

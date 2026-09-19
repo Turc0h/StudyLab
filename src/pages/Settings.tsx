@@ -39,7 +39,10 @@ import {
 import {
   exportWorkspaceToZip,
   importWorkspaceFromZip,
+  inspectBackupBundle,
+  type BackupInspectionResult,
 } from "../features/storage/workspaceBackup";
+import { RestorePreviewModal } from "../components/backup/RestorePreviewModal";
 import { purgeLegacyFatigueTelemetry } from "../features/study-engine/fatigueMonitor";
 import { exportCoursePackage, importCoursePackage } from "../features/study-engine/coursePackage";
 import { exportDeckToAnkiTsv, importCardsFromAnkiData } from "../features/fsrs/ankiInterop";
@@ -91,11 +94,17 @@ export function Settings() {
   const [storageEstimate, setStorageEstimate] = useState<StorageEstimateResult | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [isInspecting, setIsInspecting] = useState(false);
   const [backupStatus, setBackupStatus] = useState<string | null>(null);
   const [backupProgress, setBackupProgress] = useState(0);
   const [purgedCount, setPurgedCount] = useState<number | null>(null);
   const [ollamaStatus, setOllamaStatus] = useState<OllamaStatus | null>(null);
   const [isCheckingOllama, setIsCheckingOllama] = useState(false);
+
+  // v5.12: Estados para Vista Previa e Inspección Criptográfica de Respaldos
+  const [inspectionResult, setInspectionResult] = useState<BackupInspectionResult | null>(null);
+  const [isInspectModalOpen, setIsInspectModalOpen] = useState(false);
+  const [selectedBackupFile, setSelectedBackupFile] = useState<File | null>(null);
 
   const handleCheckOllama = async () => {
     setIsCheckingOllama(true);
@@ -131,10 +140,10 @@ export function Settings() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `studylab_workspace_backup_${new Date().toISOString().slice(0, 10)}.zip`;
+      a.download = `studylab_workspace_backup_${new Date().toISOString().slice(0, 10)}.studylab-bundle`;
       a.click();
       URL.revokeObjectURL(url);
-      setBackupStatus("¡Respaldo descargado exitosamente!");
+      setBackupStatus("¡Paquete portable (.studylab-bundle) descargado exitosamente!");
     } catch (err) {
       console.error(err);
       setBackupStatus("Error al exportar el workspace.");
@@ -144,21 +153,44 @@ export function Settings() {
     }
   };
 
-  const handleImportZip = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSelectBackupFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setIsInspecting(true);
+    setBackupStatus("Inspeccionando archivo y verificando firma SHA-256...");
+    try {
+      const inspection = await inspectBackupBundle(file);
+      setSelectedBackupFile(file);
+      setInspectionResult(inspection);
+      setIsInspectModalOpen(true);
+      setBackupStatus(null);
+    } catch (err) {
+      console.error("Error inspecting backup bundle:", err);
+      setBackupStatus("Error al inspeccionar el paquete de respaldo. Asegúrese de que sea un archivo válido.");
+      setTimeout(() => setBackupStatus(null), 5000);
+    } finally {
+      setIsInspecting(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleConfirmRestore = async () => {
+    if (!selectedBackupFile) return;
     setIsImporting(true);
     setBackupProgress(0);
     try {
-      const manifest = await importWorkspaceFromZip(file, (msg, pct) => {
+      const manifest = await importWorkspaceFromZip(selectedBackupFile, (msg, pct) => {
         setBackupStatus(msg);
         setBackupProgress(pct);
       });
       setBackupStatus(`¡Restauración exitosa! (${manifest.totalFiles} archivos recuperados)`);
       void getStorageEstimate().then(setStorageEstimate);
+      setIsInspectModalOpen(false);
+      setSelectedBackupFile(null);
+      setInspectionResult(null);
     } catch (err) {
       console.error(err);
-      setBackupStatus("Error al restaurar: asegúrese de que el .zip sea un respaldo válido.");
+      setBackupStatus("Error al restaurar: asegúrese de que el archivo sea un respaldo válido.");
     } finally {
       setIsImporting(false);
       setTimeout(() => setBackupStatus(null), 5000);
@@ -429,10 +461,10 @@ export function Settings() {
           )}
         </SettingsSection>
 
-        {/* Sección: Respaldo Completo (.zip) */}
+        {/* Sección: Respaldo Completo (.studylab-bundle / .zip) */}
         <SettingsSection
-          title="Copia de Seguridad y Portabilidad (.zip)"
-          description="Exportá o restaurá tu biblioteca universitaria completa (PDFs, vectores, tarjetas FSRS, historial de estudio y conceptos) sin depender de servidores externos."
+          title="Copia de Seguridad y Portabilidad (.studylab-bundle / .zip)"
+          description="Exportá o restaurá tu entorno universitario completo (los 30 métodos de estudio, sesiones interactivas, flashcards FSRS, Motor de Contexto y archivos) con verificación criptográfica SHA-256."
         >
           {backupStatus && (
             <div className="p-3 rounded-lg bg-accent-primary/10 border border-accent-primary/30 text-xs text-accent-primary font-mono flex flex-col gap-2">
@@ -450,25 +482,31 @@ export function Settings() {
             <Button
               variant="primary"
               size="sm"
-              disabled={isExporting || isImporting}
+              disabled={isExporting || isImporting || isInspecting}
               onClick={() => void handleExportZip()}
               className="gap-1.5 text-xs font-mono cursor-pointer"
             >
               <Download size={14} />
-              <span>{isExporting ? "Exportando..." : "Exportar Workspace Completo (.zip)"}</span>
+              <span>{isExporting ? "Exportando..." : "Exportar Paquete (.studylab-bundle)"}</span>
             </Button>
 
             <label className="inline-flex">
               <input
                 type="file"
-                accept=".zip"
-                onChange={(e) => void handleImportZip(e)}
-                disabled={isExporting || isImporting}
+                accept=".studylab-bundle,.zip"
+                onChange={(e) => void handleSelectBackupFile(e)}
+                disabled={isExporting || isImporting || isInspecting}
                 className="hidden"
               />
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-subtle bg-bg-surface-2 hover:bg-bg-surface-3 text-xs font-mono text-text-primary cursor-pointer transition-colors">
                 <Upload size={14} />
-                <span>{isImporting ? "Restaurando..." : "Restaurar Workspace desde .zip"}</span>
+                <span>
+                  {isInspecting
+                    ? "Verificando SHA-256..."
+                    : isImporting
+                    ? "Restaurando..."
+                    : "Inspeccionar y Restaurar Respaldo"}
+                </span>
               </span>
             </label>
           </div>
@@ -779,6 +817,23 @@ export function Settings() {
           </div>
         </SettingsSection>
       </div>
+
+      {/* v5.12: Modal de Inspección y Vista Previa de Respaldo */}
+      <RestorePreviewModal
+        isOpen={isInspectModalOpen}
+        onClose={() => {
+          if (!isImporting) {
+            setIsInspectModalOpen(false);
+            setSelectedBackupFile(null);
+            setInspectionResult(null);
+          }
+        }}
+        inspection={inspectionResult}
+        onConfirmRestore={() => void handleConfirmRestore()}
+        restoring={isImporting}
+        restoreProgress={backupProgress}
+        restoreMessage={backupStatus || "Restaurando..."}
+      />
     </div>
   );
 }
