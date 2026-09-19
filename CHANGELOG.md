@@ -1209,6 +1209,43 @@ Esta fase implementa la **Paleta de Comandos Global (Command Palette / Spotlight
 
 ---
 
+## Fase v5.14 — Exportador e Impresor de Dossier Universitario (A4 / Markdown / HTML)
+
+Esta fase implementa el **Generador de Dossier Universitario Imprimible y Exportador Académico Multiformato**, permitiendo a los estudiantes compilar en un solo documento de alta fidelidad todos sus apuntes, conceptos, subrayados, post-its, banco de errores pedagógicos y tarjetas de autoevaluación por materia o cátedra.
+
+### 1. Motor de Compilación de Datos y Exportación (`dossierGenerator.ts`)
+- **Ubicación:** `src/features/dossier/dossierGenerator.ts`.
+- **Extracción Multientidad (`buildDossierData`):**
+  - Consulta Dexie IndexedDB filtrando por carpeta de materia (`folderId`) o abarcando todo el repositorio.
+  - Recopila: conceptos clave con score de dominio, documentos PDF asociados, fragmentos de texto subrayados con número de página, notas post-it con sus anotaciones, banco de errores del estudiante (`studentErrors`) con causas de fallo y correcciones analíticas, y tarjetas de estudio (FSRS y Leitner).
+- **Generación en Markdown Académico (`generateDossierMarkdown`):**
+  - Genera un archivo `.md` estructurado y limpio con metadatos, tabla de resumen estadístico y secciones modulares.
+  - Las preguntas de autoevaluación se maquetan en bloques `<details><summary>` nativos colapsables para facilitar el estudio activo.
+- **Generación en HTML Autónomo A4 (`generateDossierHtml`):**
+  - Hoja de estilo embebida con reglas `@media print`: tamaño exacto `@page { size: A4; margin: 20mm; }`, saltos de página semánticos (`page-break-before: always`) entre secciones mayores, y prevención de cortes de página dentro de tarjetas (`break-inside: avoid`).
+  - Barra de herramientas flotante con botón `window.print()` que se oculta automáticamente al imprimir o exportar a PDF en el navegador.
+
+### 2. Modal de Configuración y Vista Previa (`DossierPreviewModal.tsx`)
+- **Ubicación:** `src/components/dossier/DossierPreviewModal.tsx`.
+- **Selector de Materia / Cátedra:** Permite elegir qué carpeta de materia exportar con auto-detección del nombre y contadores en tiempo real.
+- **Interruptores de Sección:** Toggles para incluir/excluir individualmente conceptos clave, subrayados de textos, notas adhesivas, banco de errores y cuestionario de autoevaluación.
+- **Vista Previa Dual:** Pestañas para visualizar el maquetado A4 en tiempo real o inspeccionar el código fuente Markdown generado.
+- **Tres Acciones Inmediatas:**
+  1. `Imprimir / Guardar como PDF`: abre el diálogo de impresión nativo del navegador con maquetación A4 perfecta.
+  2. `Descargar .md`: descarga el archivo Markdown formateado.
+  3. `Descargar .html`: descarga un archivo HTML autónomo listo para compartir o abrir offline.
+
+### 3. Integración en el Gestor de Archivos (`Files.tsx`) y Command Palette (`commandPaletteService.ts`)
+- **Gestor de Archivos:** Incorpora el botón **"Exportar Dossier"** en la barra de herramientas de `/files` y escucha el parámetro `?dossier=true`.
+- **Command Palette:** Nueva acción global `action-dossier` invocable con `Ctrl+K` bajo términos como *"dossier"*, *"imprimir"*, *"pdf"*, *"resumen"*, *"apuntes"*, *"materia"*, o *"compendio"*.
+
+### 4. Suite de Verificación Automatizada (27 Suites)
+- `scripts/test-phase14-dossier-generator.mjs`: 39/39 pruebas aprobadas al 100%.
+- `npm test`: **27 suites de tests ejecutadas con 100% de éxito (560+ aserciones verificadas)**.
+- `npm run build`: compilación limpia con 0 errores TypeScript (`tsc -b && vite build`).
+
+---
+
 ## Cómo correr todo esto
 
 ```bash

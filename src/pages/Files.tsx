@@ -1,5 +1,6 @@
-import { FolderPlus, Search } from "lucide-react";
+import { FolderPlus, Search, Printer } from "lucide-react";
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { PageHeader } from "../components/PageHeader";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
@@ -9,12 +10,15 @@ import { Breadcrumbs } from "../features/files/Breadcrumbs";
 import { FileGrid } from "../features/files/FileGrid";
 import { FolderTree } from "../features/files/FolderTree";
 import { NewFolderModal } from "../features/files/NewFolderModal";
+import { DossierPreviewModal } from "../components/dossier/DossierPreviewModal";
 import { isDesktop } from "../platform";
 
 export function Files() {
+  const [searchParams] = useSearchParams();
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [dossierOpen, setDossierOpen] = useState(searchParams.get("dossier") === "true");
   const [openFileState, setOpenFileState] = useState<{ id: string; page?: number } | null>(null);
 
   return (
@@ -36,6 +40,10 @@ export function Files() {
               ]}
               tip="Podés usar la plantilla de tu carrera para generar toda la estructura de materias en 1 clic."
             />
+            <Button variant="secondary" size="sm" onClick={() => setDossierOpen(true)} className="gap-1.5 cursor-pointer">
+              <Printer size={16} strokeWidth={1.75} />
+              <span>Exportar Dossier</span>
+            </Button>
             <Button variant="primary" size="sm" onClick={() => setModalOpen(true)}>
               <FolderPlus size={16} strokeWidth={1.75} />
               Nueva carpeta
@@ -121,6 +129,13 @@ export function Files() {
           onClose={() => setOpenFileState(null)}
         />
       )}
+
+      {/* Modal de Exportación y Vista Previa de Dossier */}
+      <DossierPreviewModal
+        isOpen={dossierOpen}
+        onClose={() => setDossierOpen(false)}
+        initialFolderId={currentFolderId}
+      />
     </div>
   );
 }

@@ -73,6 +73,15 @@ export async function searchCommandPalette(
       onSelect: () => actions.navigate("/settings"),
     },
     {
+      id: "action-dossier",
+      title: "Exportar Dossier Universitario Imprimible (PDF/Markdown)",
+      subtitle: "Compendio de cátedra con grafo conceptual, fórmulas KaTeX, notas y autoevaluación",
+      iconName: "Printer",
+      badge: "Dossier",
+      keywords: ["dossier", "imprimir", "pdf", "resumen", "compendio", "sintesis", "apuntes", "materia"],
+      onSelect: () => actions.navigate("/files?dossier=true"),
+    },
+    {
       id: "action-qa",
       title: "Consola de Diagnóstico y Verificación QA (/qa)",
       subtitle: "Auditoría en vivo de los 31 subsistemas, algoritmos FSRS y GraphRAG",
