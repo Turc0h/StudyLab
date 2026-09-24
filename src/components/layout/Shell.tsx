@@ -7,11 +7,13 @@ import { AnimatedOutlet } from "./AnimatedOutlet";
 import { GuideStatusBar } from "../guide/GuideStatusBar";
 import { OrganizationDrawer } from "../organization/OrganizationDrawer";
 import { NotificationCenter } from "../notifications/NotificationCenter";
+import { toggleFloatingIslandWindow, openFloatingIslandWindow } from "../../platform/islandWindow";
 import { useThemeStore } from "../../stores/useThemeStore";
 import { useFocusModeStore } from "../../stores/useFocusModeStore";
 import { useOrganizationStore } from "../../stores/useOrganizationStore";
 import { useNotificationStore } from "../../stores/useNotificationStore";
 import { useCommandPaletteStore } from "../../stores/useCommandPaletteStore";
+import { useDynamicIslandStore } from "../../stores/useDynamicIslandStore";
 import { CommandPalette } from "../command-palette/CommandPalette";
 import { EASE_EXPO_OUT, DURATION, STAGGER } from "../../lib/motion-tokens";
 import { Minimize2 } from "lucide-react";
@@ -59,6 +61,9 @@ export const Shell: React.FC = () => {
   const isCommandPaletteOpen = useCommandPaletteStore((s) => s.isOpen);
   const toggleCommandPalette = useCommandPaletteStore((s) => s.toggle);
   const closeCommandPalette = useCommandPaletteStore((s) => s.close);
+  const isIslandExpanded = useDynamicIslandStore((s) => s.isExpanded);
+  const setIslandExpanded = useDynamicIslandStore((s) => s.setExpanded);
+  const toggleIslandExpanded = useDynamicIslandStore((s) => s.toggleExpanded);
   const location = useLocation();
 
   useEffect(() => {
@@ -84,14 +89,21 @@ export const Shell: React.FC = () => {
     }
   }, [animationsEnabled, reducedMotion]);
 
-  // Manejo de atajos globales: Esc, Ctrl+K (Command Palette), Ctrl+B (Sidebar), Ctrl+O (Org), Ctrl+N (Notif)
+  // Inicializar ventana flotante de escritorio independiente al inicio
+  useEffect(() => {
+    void openFloatingIslandWindow();
+  }, []);
+
+  // Manejo de atajos globales: Esc, Ctrl+K (Command Palette), Ctrl+B (Sidebar), Ctrl+O (Org), Ctrl+N (Notif), Ctrl+I (Island)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ignorar eventos generados por mantener pulsada la tecla repetidamente
       if (e.repeat) return;
 
       if (e.key === "Escape") {
-        if (isCommandPaletteOpen) {
+        if (isIslandExpanded) {
+          setIslandExpanded(false);
+        } else if (isCommandPaletteOpen) {
           closeCommandPalette();
         } else if (isNotifOpen) {
           setIsNotifOpen(false);
@@ -112,6 +124,9 @@ export const Shell: React.FC = () => {
       } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "n") {
         e.preventDefault();
         toggleNotif();
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "i") {
+        e.preventDefault();
+        void toggleFloatingIslandWindow();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -120,6 +135,9 @@ export const Shell: React.FC = () => {
     isCommandPaletteOpen,
     closeCommandPalette,
     toggleCommandPalette,
+    isIslandExpanded,
+    setIslandExpanded,
+    toggleIslandExpanded,
     isFocusMode,
     exitFocusMode,
     toggleSidebar,

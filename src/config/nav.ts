@@ -1,12 +1,10 @@
 import {
-  BrainCircuit,
+  Calendar,
   FolderOpen,
   GraduationCap,
-  LayoutDashboard,
-  ListTree,
+  Home,
   Network,
-  Play,
-  Settings,
+  RotateCcw,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -17,12 +15,10 @@ export interface NavItem {
 }
 
 export const navItems: NavItem[] = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/academic", label: "Academic Hub", icon: GraduationCap },
-  { to: "/workspace", label: "Workspace OS", icon: BrainCircuit },
-  { to: "/graph", label: "Grafo Causal", icon: Network },
-  { to: "/files", label: "Archivos", icon: FolderOpen },
-  { to: "/methods", label: "Métodos", icon: ListTree },
-  { to: "/session", label: "Sesión", icon: Play },
-  { to: "/settings", label: "Configuración", icon: Settings },
+  { to: "/", label: "Inicio", icon: Home },
+  { to: "/workspace", label: "Estudiar", icon: GraduationCap },
+  { to: "/calendar", label: "Organización", icon: Calendar },
+  { to: "/files", label: "Biblioteca", icon: FolderOpen },
+  { to: "/methods", label: "Repasar", icon: RotateCcw },
+  { to: "/graph", label: "Progreso", icon: Network },
 ];

@@ -1,0 +1,4433 @@
+{
+  "metadata": {
+    "generator": "scripts/generate-fsrs-fixtures.mjs",
+    "generatedAt": "2026-09-24T12:00:00.000Z",
+    "referenceNow": 1790251200000,
+    "fsrsCanonicalWeights": [
+      0.40255,
+      1.18385,
+      3.173,
+      15.69105,
+      7.1949,
+      0.5345,
+      1.4604,
+      0.0046,
+      1.54575,
+      0.1192,
+      1.01925,
+      1.9395,
+      0.11,
+      0.29605,
+      0.22695,
+      0.5698,
+      2.85535
+    ],
+    "fsrsDecayFactorCurrent": 19,
+    "fsrsDecayFactorCanonical": 0.2345679012345679,
+    "totalInitialCases": 4,
+    "totalRetrievabilityCases": 90,
+    "totalIntervalCases": 120,
+    "totalPreviewScenarios": 9,
+    "totalLongSequences": 5,
+    "totalLeechCases": 13
+  },
+  "initialStates": [
+    {
+      "rating": 1,
+      "initialStability": 0.40255,
+      "initialDifficulty": 7.1949
+    },
+    {
+      "rating": 2,
+      "initialStability": 1.18385,
+      "initialDifficulty": 6.488305268471453
+    },
+    {
+      "rating": 3,
+      "initialStability": 3.173,
+      "initialDifficulty": 5.282434422319005
+    },
+    {
+      "rating": 4,
+      "initialStability": 15.69105,
+      "initialDifficulty": 3.2245015893713678
+    }
+  ],
+  "retrievabilityCases": [
+    {
+      "elapsedDays": 0,
+      "stability": 0.01,
+      "halfLife": 0.0015789473684210526,
+      "fsrsRetrievability": 1,
+      "leechR": 1,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 0.25,
+      "stability": 0.01,
+      "halfLife": 0.0015789473684210526,
+      "fsrsRetrievability": 0.045834924851410566,
+      "leechR": 0.14359163172354764,
+      "divergence": 0.09775670687213707,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 0.5,
+      "stability": 0.01,
+      "halfLife": 0.0015789473684210526,
+      "fsrsRetrievability": 0.032427221756276076,
+      "leechR": 0.10206207261596575,
+      "divergence": 0.06963485085968968,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 1,
+      "stability": 0.01,
+      "halfLife": 0.0015789473684210526,
+      "fsrsRetrievability": 0.02293553851298437,
+      "leechR": 0.07235746052924216,
+      "divergence": 0.049421922016257794,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 2,
+      "stability": 0.01,
+      "halfLife": 0.0015789473684210526,
+      "fsrsRetrievability": 0.01622000804188198,
+      "leechR": 0.051231551957855996,
+      "divergence": 0.03501154391597401,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 3,
+      "stability": 0.01,
+      "halfLife": 0.0015789473684210526,
+      "fsrsRetrievability": 0.013244161853017133,
+      "leechR": 0.04184869753186872,
+      "divergence": 0.028604535678851586,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 7,
+      "stability": 0.01,
+      "halfLife": 0.0015789473684210526,
+      "fsrsRetrievability": 0.008670773732430895,
+      "leechR": 0.02741012223434215,
+      "divergence": 0.01873934850191125,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 14,
+      "stability": 0.01,
+      "halfLife": 0.0015789473684210526,
+      "fsrsRetrievability": 0.006131278146343594,
+      "leechR": 0.01938552480500403,
+      "divergence": 0.013254246658660436,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 30,
+      "stability": 0.01,
+      "halfLife": 0.0015789473684210526,
+      "fsrsRetrievability": 0.004188502341829487,
+      "leechR": 0.013244161853017133,
+      "divergence": 0.009055659511187647,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 60,
+      "stability": 0.01,
+      "halfLife": 0.0015789473684210526,
+      "fsrsRetrievability": 0.002961731398773954,
+      "leechR": 0.009365447359589484,
+      "divergence": 0.00640371596081553,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 0,
+      "stability": 0.05,
+      "halfLife": 0.007894736842105263,
+      "fsrsRetrievability": 1,
+      "leechR": 1,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 0.25,
+      "stability": 0.05,
+      "halfLife": 0.007894736842105263,
+      "fsrsRetrievability": 0.10206207261596575,
+      "leechR": 0.14359163172354764,
+      "divergence": 0.04152955910758188,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 0.5,
+      "stability": 0.05,
+      "halfLife": 0.007894736842105263,
+      "fsrsRetrievability": 0.07235746052924216,
+      "leechR": 0.10206207261596575,
+      "divergence": 0.029704612086723592,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 1,
+      "stability": 0.05,
+      "halfLife": 0.007894736842105263,
+      "fsrsRetrievability": 0.051231551957855996,
+      "leechR": 0.07235746052924216,
+      "divergence": 0.021125908571386166,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 2,
+      "stability": 0.05,
+      "halfLife": 0.007894736842105263,
+      "fsrsRetrievability": 0.03624997167972069,
+      "leechR": 0.051231551957855996,
+      "divergence": 0.014981580278135308,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 3,
+      "stability": 0.05,
+      "halfLife": 0.007894736842105263,
+      "fsrsRetrievability": 0.02960446232086685,
+      "leechR": 0.04184869753186872,
+      "divergence": 0.012244235211001871,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 7,
+      "stability": 0.05,
+      "halfLife": 0.007894736842105263,
+      "fsrsRetrievability": 0.01938552480500403,
+      "leechR": 0.02741012223434215,
+      "divergence": 0.008024597429338119,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 14,
+      "stability": 0.05,
+      "halfLife": 0.007894736842105263,
+      "fsrsRetrievability": 0.01370892405550602,
+      "leechR": 0.01938552480500403,
+      "divergence": 0.005676600749498009,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 30,
+      "stability": 0.05,
+      "halfLife": 0.007894736842105263,
+      "fsrsRetrievability": 0.009365447359589484,
+      "leechR": 0.013244161853017133,
+      "divergence": 0.0038787144934276496,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 60,
+      "stability": 0.05,
+      "halfLife": 0.007894736842105263,
+      "fsrsRetrievability": 0.006622516556291391,
+      "leechR": 0.009365447359589484,
+      "divergence": 0.002742930803298093,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 0,
+      "stability": 0.08,
+      "halfLife": 0.01263157894736842,
+      "fsrsRetrievability": 1,
+      "leechR": 1,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 0.25,
+      "stability": 0.08,
+      "halfLife": 0.01263157894736842,
+      "fsrsRetrievability": 0.1286978904175574,
+      "leechR": 0.14359163172354764,
+      "divergence": 0.014893741305990249,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 0.5,
+      "stability": 0.08,
+      "halfLife": 0.01263157894736842,
+      "fsrsRetrievability": 0.09138233247699076,
+      "leechR": 0.10206207261596575,
+      "divergence": 0.010679740138974991,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 1,
+      "stability": 0.08,
+      "halfLife": 0.01263157894736842,
+      "fsrsRetrievability": 0.06475239082381762,
+      "leechR": 0.07235746052924216,
+      "divergence": 0.007605069705424544,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 2,
+      "stability": 0.08,
+      "halfLife": 0.01263157894736842,
+      "fsrsRetrievability": 0.045834924851410566,
+      "leechR": 0.051231551957855996,
+      "divergence": 0.00539662710644543,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 3,
+      "stability": 0.08,
+      "halfLife": 0.01263157894736842,
+      "fsrsRetrievability": 0.037437169976715014,
+      "leechR": 0.04184869753186872,
+      "divergence": 0.004411527555153706,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 7,
+      "stability": 0.08,
+      "halfLife": 0.01263157894736842,
+      "fsrsRetrievability": 0.02451820079294633,
+      "leechR": 0.02741012223434215,
+      "divergence": 0.002891921441395818,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 14,
+      "stability": 0.08,
+      "halfLife": 0.01263157894736842,
+      "fsrsRetrievability": 0.017339592129039343,
+      "leechR": 0.01938552480500403,
+      "divergence": 0.0020459326759646873,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 30,
+      "stability": 0.08,
+      "halfLife": 0.01263157894736842,
+      "fsrsRetrievability": 0.011846146275837934,
+      "leechR": 0.013244161853017133,
+      "divergence": 0.0013980155771791992,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 60,
+      "stability": 0.08,
+      "halfLife": 0.01263157894736842,
+      "fsrsRetrievability": 0.008376784248735919,
+      "leechR": 0.009365447359589484,
+      "divergence": 0.000988663110853565,
+      "hasStabilityFloorDivergence": true
+    },
+    {
+      "elapsedDays": 0,
+      "stability": 0.1,
+      "halfLife": 0.015789473684210527,
+      "fsrsRetrievability": 1,
+      "leechR": 1,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 0.25,
+      "stability": 0.1,
+      "halfLife": 0.015789473684210527,
+      "fsrsRetrievability": 0.14359163172354764,
+      "leechR": 0.14359163172354764,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 0.5,
+      "stability": 0.1,
+      "halfLife": 0.015789473684210527,
+      "fsrsRetrievability": 0.10206207261596575,
+      "leechR": 0.10206207261596575,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 1,
+      "stability": 0.1,
+      "halfLife": 0.015789473684210527,
+      "fsrsRetrievability": 0.07235746052924216,
+      "leechR": 0.07235746052924216,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 2,
+      "stability": 0.1,
+      "halfLife": 0.015789473684210527,
+      "fsrsRetrievability": 0.051231551957855996,
+      "leechR": 0.051231551957855996,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 3,
+      "stability": 0.1,
+      "halfLife": 0.015789473684210527,
+      "fsrsRetrievability": 0.04184869753186872,
+      "leechR": 0.04184869753186872,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 7,
+      "stability": 0.1,
+      "halfLife": 0.015789473684210527,
+      "fsrsRetrievability": 0.02741012223434215,
+      "leechR": 0.02741012223434215,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 14,
+      "stability": 0.1,
+      "halfLife": 0.015789473684210527,
+      "fsrsRetrievability": 0.01938552480500403,
+      "leechR": 0.01938552480500403,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 30,
+      "stability": 0.1,
+      "halfLife": 0.015789473684210527,
+      "fsrsRetrievability": 0.013244161853017133,
+      "leechR": 0.013244161853017133,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 60,
+      "stability": 0.1,
+      "halfLife": 0.015789473684210527,
+      "fsrsRetrievability": 0.009365447359589484,
+      "leechR": 0.009365447359589484,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 0,
+      "stability": 0.5,
+      "halfLife": 0.07894736842105263,
+      "fsrsRetrievability": 1,
+      "leechR": 1,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 0.25,
+      "stability": 0.5,
+      "halfLife": 0.07894736842105263,
+      "fsrsRetrievability": 0.3086066999241838,
+      "leechR": 0.3086066999241838,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 0.5,
+      "stability": 0.5,
+      "halfLife": 0.07894736842105263,
+      "fsrsRetrievability": 0.22360679774997896,
+      "leechR": 0.22360679774997896,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 1,
+      "stability": 0.5,
+      "halfLife": 0.07894736842105263,
+      "fsrsRetrievability": 0.16012815380508713,
+      "leechR": 0.16012815380508713,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 2,
+      "stability": 0.5,
+      "halfLife": 0.07894736842105263,
+      "fsrsRetrievability": 0.11396057645963795,
+      "leechR": 0.11396057645963795,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 3,
+      "stability": 0.5,
+      "halfLife": 0.07894736842105263,
+      "fsrsRetrievability": 0.09325048082403138,
+      "leechR": 0.09325048082403138,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 7,
+      "stability": 0.5,
+      "halfLife": 0.07894736842105263,
+      "fsrsRetrievability": 0.06119900613621046,
+      "leechR": 0.06119900613621046,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 14,
+      "stability": 0.5,
+      "halfLife": 0.07894736842105263,
+      "fsrsRetrievability": 0.043314808182421,
+      "leechR": 0.043314808182421,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 30,
+      "stability": 0.5,
+      "halfLife": 0.07894736842105263,
+      "fsrsRetrievability": 0.02960446232086685,
+      "leechR": 0.02960446232086685,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 60,
+      "stability": 0.5,
+      "halfLife": 0.07894736842105263,
+      "fsrsRetrievability": 0.020938104228425347,
+      "leechR": 0.020938104228425347,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 0,
+      "stability": 1,
+      "halfLife": 0.15789473684210525,
+      "fsrsRetrievability": 1,
+      "leechR": 1,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 0.25,
+      "stability": 1,
+      "halfLife": 0.15789473684210525,
+      "fsrsRetrievability": 0.41702882811414954,
+      "leechR": 0.41702882811414954,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 0.5,
+      "stability": 1,
+      "halfLife": 0.15789473684210525,
+      "fsrsRetrievability": 0.3086066999241838,
+      "leechR": 0.3086066999241838,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 1,
+      "stability": 1,
+      "halfLife": 0.15789473684210525,
+      "fsrsRetrievability": 0.22360679774997896,
+      "leechR": 0.22360679774997896,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 2,
+      "stability": 1,
+      "halfLife": 0.15789473684210525,
+      "fsrsRetrievability": 0.16012815380508713,
+      "leechR": 0.16012815380508713,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 3,
+      "stability": 1,
+      "halfLife": 0.15789473684210525,
+      "fsrsRetrievability": 0.13130643285972254,
+      "leechR": 0.13130643285972254,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 7,
+      "stability": 1,
+      "halfLife": 0.15789473684210525,
+      "fsrsRetrievability": 0.08638684255813601,
+      "leechR": 0.08638684255813601,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 14,
+      "stability": 1,
+      "halfLife": 0.15789473684210525,
+      "fsrsRetrievability": 0.06119900613621046,
+      "leechR": 0.06119900613621046,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 30,
+      "stability": 1,
+      "halfLife": 0.15789473684210525,
+      "fsrsRetrievability": 0.04184869753186872,
+      "leechR": 0.04184869753186872,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 60,
+      "stability": 1,
+      "halfLife": 0.15789473684210525,
+      "fsrsRetrievability": 0.02960446232086685,
+      "leechR": 0.02960446232086685,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 0,
+      "stability": 3.173,
+      "halfLife": 0.501,
+      "fsrsRetrievability": 1,
+      "leechR": 1,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 0.25,
+      "stability": 3.173,
+      "halfLife": 0.501,
+      "fsrsRetrievability": 0.6328345884249331,
+      "leechR": 0.6328345884249331,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 0.5,
+      "stability": 3.173,
+      "halfLife": 0.501,
+      "fsrsRetrievability": 0.5003746722144349,
+      "leechR": 0.5003746722144349,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 1,
+      "stability": 3.173,
+      "halfLife": 0.501,
+      "fsrsRetrievability": 0.3782882113752251,
+      "leechR": 0.3782882113752251,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 2,
+      "stability": 3.173,
+      "halfLife": 0.501,
+      "fsrsRetrievability": 0.2776059561911139,
+      "leechR": 0.2776059561911139,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 3,
+      "stability": 3.173,
+      "halfLife": 0.501,
+      "fsrsRetrievability": 0.22963294938446008,
+      "leechR": 0.22963294938446008,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 7,
+      "stability": 3.173,
+      "halfLife": 0.501,
+      "fsrsRetrievability": 0.15264744283055268,
+      "leechR": 0.15264744283055268,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 14,
+      "stability": 3.173,
+      "halfLife": 0.501,
+      "fsrsRetrievability": 0.10857236264538797,
+      "leechR": 0.10857236264538797,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 30,
+      "stability": 3.173,
+      "halfLife": 0.501,
+      "fsrsRetrievability": 0.07440329584495504,
+      "leechR": 0.07440329584495504,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 60,
+      "stability": 3.173,
+      "halfLife": 0.501,
+      "fsrsRetrievability": 0.05268403829784713,
+      "leechR": 0.05268403829784713,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 0,
+      "stability": 15.69,
+      "halfLife": 2.477368421052631,
+      "fsrsRetrievability": 1,
+      "leechR": 1,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 0.25,
+      "stability": 15.69,
+      "halfLife": 2.477368421052631,
+      "fsrsRetrievability": 0.8761349921455253,
+      "leechR": 0.8761349921455253,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 0.5,
+      "stability": 15.69,
+      "halfLife": 2.477368421052631,
+      "fsrsRetrievability": 0.7892187382169025,
+      "leechR": 0.7892187382169025,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 1,
+      "stability": 15.69,
+      "halfLife": 2.477368421052631,
+      "fsrsRetrievability": 0.6725263762280246,
+      "leechR": 0.6725263762280246,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 2,
+      "stability": 15.69,
+      "halfLife": 2.477368421052631,
+      "fsrsRetrievability": 0.5405859696091596,
+      "leechR": 0.5405859696091596,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 3,
+      "stability": 15.69,
+      "halfLife": 2.477368421052631,
+      "fsrsRetrievability": 0.4645945782750896,
+      "leechR": 0.4645945782750896,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 7,
+      "stability": 15.69,
+      "halfLife": 2.477368421052631,
+      "fsrsRetrievability": 0.3248408147276232,
+      "leechR": 0.3248408147276232,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 14,
+      "stability": 15.69,
+      "halfLife": 2.477368421052631,
+      "fsrsRetrievability": 0.2360074741396211,
+      "leechR": 0.2360074741396211,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 30,
+      "stability": 15.69,
+      "halfLife": 2.477368421052631,
+      "fsrsRetrievability": 0.16367319767746177,
+      "leechR": 0.16367319767746177,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 60,
+      "stability": 15.69,
+      "halfLife": 2.477368421052631,
+      "fsrsRetrievability": 0.11651740241057092,
+      "leechR": 0.11651740241057092,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 0,
+      "stability": 50,
+      "halfLife": 7.894736842105263,
+      "fsrsRetrievability": 1,
+      "leechR": 1,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 0.25,
+      "stability": 50,
+      "halfLife": 7.894736842105263,
+      "fsrsRetrievability": 0.9556369651349932,
+      "leechR": 0.9556369651349932,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 0.5,
+      "stability": 50,
+      "halfLife": 7.894736842105263,
+      "fsrsRetrievability": 0.9166984970282113,
+      "leechR": 0.9166984970282113,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 1,
+      "stability": 50,
+      "halfLife": 7.894736842105263,
+      "fsrsRetrievability": 0.8512565307587486,
+      "leechR": 0.8512565307587486,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 2,
+      "stability": 50,
+      "halfLife": 7.894736842105263,
+      "fsrsRetrievability": 0.753778361444409,
+      "leechR": 0.753778361444409,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 3,
+      "stability": 50,
+      "halfLife": 7.894736842105263,
+      "fsrsRetrievability": 0.6835859270246633,
+      "leechR": 0.6835859270246633,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 7,
+      "stability": 50,
+      "halfLife": 7.894736842105263,
+      "fsrsRetrievability": 0.5227083734893166,
+      "leechR": 0.5227083734893166,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 14,
+      "stability": 50,
+      "halfLife": 7.894736842105263,
+      "fsrsRetrievability": 0.397778642087865,
+      "leechR": 0.397778642087865,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 30,
+      "stability": 50,
+      "halfLife": 7.894736842105263,
+      "fsrsRetrievability": 0.2839809171235324,
+      "leechR": 0.2839809171235324,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    },
+    {
+      "elapsedDays": 60,
+      "stability": 50,
+      "halfLife": 7.894736842105263,
+      "fsrsRetrievability": 0.20498001542269695,
+      "leechR": 0.20498001542269695,
+      "divergence": 0,
+      "hasStabilityFloorDivergence": false
+    }
+  ],
+  "intervalCases": [
+    {
+      "stability": 0.1,
+      "desiredRetention": 0.7,
+      "rawInterval": 0.005477980665950591,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 0.1,
+      "desiredRetention": 0.8,
+      "rawInterval": 0.0029605263157894725,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 0.1,
+      "desiredRetention": 0.85,
+      "rawInterval": 0.0020214897104352584,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 0.1,
+      "desiredRetention": 0.9,
+      "rawInterval": 0.0012345679012345674,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 0.1,
+      "desiredRetention": 0.95,
+      "rawInterval": 0.0005685960052485789,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 0.1,
+      "desiredRetention": 0.97,
+      "rawInterval": 0.00033059053202141365,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 0.5,
+      "desiredRetention": 0.7,
+      "rawInterval": 0.027389903329752954,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 0.5,
+      "desiredRetention": 0.8,
+      "rawInterval": 0.014802631578947362,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 0.5,
+      "desiredRetention": 0.85,
+      "rawInterval": 0.01010744855217629,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 0.5,
+      "desiredRetention": 0.9,
+      "rawInterval": 0.006172839506172837,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 0.5,
+      "desiredRetention": 0.95,
+      "rawInterval": 0.0028429800262428943,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 0.5,
+      "desiredRetention": 0.97,
+      "rawInterval": 0.0016529526601070682,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 1,
+      "desiredRetention": 0.7,
+      "rawInterval": 0.05477980665950591,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 1,
+      "desiredRetention": 0.8,
+      "rawInterval": 0.029605263157894725,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 1,
+      "desiredRetention": 0.85,
+      "rawInterval": 0.02021489710435258,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 1,
+      "desiredRetention": 0.9,
+      "rawInterval": 0.012345679012345675,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 1,
+      "desiredRetention": 0.95,
+      "rawInterval": 0.005685960052485789,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 1,
+      "desiredRetention": 0.97,
+      "rawInterval": 0.0033059053202141365,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 2,
+      "desiredRetention": 0.7,
+      "rawInterval": 0.10955961331901182,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 2,
+      "desiredRetention": 0.8,
+      "rawInterval": 0.05921052631578945,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 2,
+      "desiredRetention": 0.85,
+      "rawInterval": 0.04042979420870516,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 2,
+      "desiredRetention": 0.9,
+      "rawInterval": 0.02469135802469135,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 2,
+      "desiredRetention": 0.95,
+      "rawInterval": 0.011371920104971577,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 2,
+      "desiredRetention": 0.97,
+      "rawInterval": 0.006611810640428273,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 3.173,
+      "desiredRetention": 0.7,
+      "rawInterval": 0.17381632653061227,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 3.173,
+      "desiredRetention": 0.8,
+      "rawInterval": 0.09393749999999997,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 3.173,
+      "desiredRetention": 0.85,
+      "rawInterval": 0.06414186851211075,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 3.173,
+      "desiredRetention": 0.9,
+      "rawInterval": 0.03917283950617283,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 3.173,
+      "desiredRetention": 0.95,
+      "rawInterval": 0.01804155124653741,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 3.173,
+      "desiredRetention": 0.97,
+      "rawInterval": 0.010489637581039456,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 5,
+      "desiredRetention": 0.7,
+      "rawInterval": 0.2738990332975295,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 5,
+      "desiredRetention": 0.8,
+      "rawInterval": 0.14802631578947362,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 5,
+      "desiredRetention": 0.85,
+      "rawInterval": 0.1010744855217629,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 5,
+      "desiredRetention": 0.9,
+      "rawInterval": 0.06172839506172837,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 5,
+      "desiredRetention": 0.95,
+      "rawInterval": 0.028429800262428945,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 5,
+      "desiredRetention": 0.97,
+      "rawInterval": 0.016529526601070682,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 10,
+      "desiredRetention": 0.7,
+      "rawInterval": 0.547798066595059,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 10,
+      "desiredRetention": 0.8,
+      "rawInterval": 0.29605263157894723,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 10,
+      "desiredRetention": 0.85,
+      "rawInterval": 0.2021489710435258,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 10,
+      "desiredRetention": 0.9,
+      "rawInterval": 0.12345679012345674,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 10,
+      "desiredRetention": 0.95,
+      "rawInterval": 0.05685960052485789,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 10,
+      "desiredRetention": 0.97,
+      "rawInterval": 0.033059053202141364,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 15.69,
+      "desiredRetention": 0.7,
+      "rawInterval": 0.8594951664876477,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 15.69,
+      "desiredRetention": 0.8,
+      "rawInterval": 0.46450657894736824,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 15.69,
+      "desiredRetention": 0.85,
+      "rawInterval": 0.317171735567292,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 15.69,
+      "desiredRetention": 0.9,
+      "rawInterval": 0.19370370370370366,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 15.69,
+      "desiredRetention": 0.95,
+      "rawInterval": 0.08921271322350204,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 15.69,
+      "desiredRetention": 0.97,
+      "rawInterval": 0.0518696544741598,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 20,
+      "desiredRetention": 0.7,
+      "rawInterval": 1.095596133190118,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 20,
+      "desiredRetention": 0.8,
+      "rawInterval": 0.5921052631578945,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 20,
+      "desiredRetention": 0.85,
+      "rawInterval": 0.4042979420870516,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 20,
+      "desiredRetention": 0.9,
+      "rawInterval": 0.24691358024691348,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 20,
+      "desiredRetention": 0.95,
+      "rawInterval": 0.11371920104971578,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 20,
+      "desiredRetention": 0.97,
+      "rawInterval": 0.06611810640428273,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 40.4999,
+      "desiredRetention": 0.7,
+      "rawInterval": 2.218576691729323,
+      "intervalDays": 2,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 40.4999,
+      "desiredRetention": 0.8,
+      "rawInterval": 1.1990101973684204,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 40.4999,
+      "desiredRetention": 0.85,
+      "rawInterval": 0.8187013112365691,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 40.4999,
+      "desiredRetention": 0.9,
+      "rawInterval": 0.49999876543209854,
+      "intervalDays": 1,
+      "isHalfBoundary": true
+    },
+    {
+      "stability": 40.4999,
+      "desiredRetention": 0.95,
+      "rawInterval": 0.23028081352966917,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 40.4999,
+      "desiredRetention": 0.97,
+      "rawInterval": 0.1338888348781405,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 40.5,
+      "desiredRetention": 0.7,
+      "rawInterval": 2.2185821697099897,
+      "intervalDays": 2,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 40.5,
+      "desiredRetention": 0.8,
+      "rawInterval": 1.1990131578947365,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 40.5,
+      "desiredRetention": 0.85,
+      "rawInterval": 0.8187033327262797,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 40.5,
+      "desiredRetention": 0.9,
+      "rawInterval": 0.4999999999999999,
+      "intervalDays": 1,
+      "isHalfBoundary": true
+    },
+    {
+      "stability": 40.5,
+      "desiredRetention": 0.95,
+      "rawInterval": 0.23028138212567448,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 40.5,
+      "desiredRetention": 0.97,
+      "rawInterval": 0.13388916546867255,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 40.5001,
+      "desiredRetention": 0.7,
+      "rawInterval": 2.2185876476906556,
+      "intervalDays": 2,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 40.5001,
+      "desiredRetention": 0.8,
+      "rawInterval": 1.1990161184210524,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 40.5001,
+      "desiredRetention": 0.85,
+      "rawInterval": 0.8187053542159901,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 40.5001,
+      "desiredRetention": 0.9,
+      "rawInterval": 0.5000012345679011,
+      "intervalDays": 1,
+      "isHalfBoundary": true
+    },
+    {
+      "stability": 40.5001,
+      "desiredRetention": 0.95,
+      "rawInterval": 0.23028195072167976,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 40.5001,
+      "desiredRetention": 0.97,
+      "rawInterval": 0.13388949605920458,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 81,
+      "desiredRetention": 0.7,
+      "rawInterval": 4.437164339419979,
+      "intervalDays": 4,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 81,
+      "desiredRetention": 0.8,
+      "rawInterval": 2.398026315789473,
+      "intervalDays": 2,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 81,
+      "desiredRetention": 0.85,
+      "rawInterval": 1.6374066654525594,
+      "intervalDays": 2,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 81,
+      "desiredRetention": 0.9,
+      "rawInterval": 0.9999999999999998,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 81,
+      "desiredRetention": 0.95,
+      "rawInterval": 0.46056276425134896,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 81,
+      "desiredRetention": 0.97,
+      "rawInterval": 0.2677783309373451,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 121.4999,
+      "desiredRetention": 0.7,
+      "rawInterval": 6.655741031149302,
+      "intervalDays": 7,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 121.4999,
+      "desiredRetention": 0.8,
+      "rawInterval": 3.597036513157893,
+      "intervalDays": 4,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 121.4999,
+      "desiredRetention": 0.85,
+      "rawInterval": 2.4561079766891285,
+      "intervalDays": 2,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 121.4999,
+      "desiredRetention": 0.9,
+      "rawInterval": 1.4999987654320983,
+      "intervalDays": 1,
+      "isHalfBoundary": true
+    },
+    {
+      "stability": 121.4999,
+      "desiredRetention": 0.95,
+      "rawInterval": 0.6908435777810181,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 121.4999,
+      "desiredRetention": 0.97,
+      "rawInterval": 0.4016671658154856,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 121.5,
+      "desiredRetention": 0.7,
+      "rawInterval": 6.655746509129968,
+      "intervalDays": 7,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 121.5,
+      "desiredRetention": 0.8,
+      "rawInterval": 3.597039473684209,
+      "intervalDays": 4,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 121.5,
+      "desiredRetention": 0.85,
+      "rawInterval": 2.456109998178839,
+      "intervalDays": 2,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 121.5,
+      "desiredRetention": 0.9,
+      "rawInterval": 1.4999999999999996,
+      "intervalDays": 1,
+      "isHalfBoundary": true
+    },
+    {
+      "stability": 121.5,
+      "desiredRetention": 0.95,
+      "rawInterval": 0.6908441463770234,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 121.5,
+      "desiredRetention": 0.97,
+      "rawInterval": 0.40166749640601757,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 121.5001,
+      "desiredRetention": 0.7,
+      "rawInterval": 6.6557519871106345,
+      "intervalDays": 7,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 121.5001,
+      "desiredRetention": 0.8,
+      "rawInterval": 3.597042434210525,
+      "intervalDays": 4,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 121.5001,
+      "desiredRetention": 0.85,
+      "rawInterval": 2.4561120196685495,
+      "intervalDays": 2,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 121.5001,
+      "desiredRetention": 0.9,
+      "rawInterval": 1.5000012345679008,
+      "intervalDays": 2,
+      "isHalfBoundary": true
+    },
+    {
+      "stability": 121.5001,
+      "desiredRetention": 0.95,
+      "rawInterval": 0.6908447149730287,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 121.5001,
+      "desiredRetention": 0.97,
+      "rawInterval": 0.4016678269965496,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 202.5,
+      "desiredRetention": 0.7,
+      "rawInterval": 11.092910848549947,
+      "intervalDays": 11,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 202.5,
+      "desiredRetention": 0.8,
+      "rawInterval": 5.995065789473681,
+      "intervalDays": 6,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 202.5,
+      "desiredRetention": 0.85,
+      "rawInterval": 4.093516663631398,
+      "intervalDays": 4,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 202.5,
+      "desiredRetention": 0.9,
+      "rawInterval": 2.499999999999999,
+      "intervalDays": 2,
+      "isHalfBoundary": true
+    },
+    {
+      "stability": 202.5,
+      "desiredRetention": 0.95,
+      "rawInterval": 1.1514069106283722,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 202.5,
+      "desiredRetention": 0.97,
+      "rawInterval": 0.6694458273433627,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 300,
+      "desiredRetention": 0.7,
+      "rawInterval": 16.433941997851772,
+      "intervalDays": 16,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 300,
+      "desiredRetention": 0.8,
+      "rawInterval": 8.881578947368418,
+      "intervalDays": 9,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 300,
+      "desiredRetention": 0.85,
+      "rawInterval": 6.064469131305775,
+      "intervalDays": 6,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 300,
+      "desiredRetention": 0.9,
+      "rawInterval": 3.7037037037037024,
+      "intervalDays": 4,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 300,
+      "desiredRetention": 0.95,
+      "rawInterval": 1.7057880157457368,
+      "intervalDays": 2,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 300,
+      "desiredRetention": 0.97,
+      "rawInterval": 0.9917715960642409,
+      "intervalDays": 1,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 1000,
+      "desiredRetention": 0.7,
+      "rawInterval": 54.77980665950591,
+      "intervalDays": 55,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 1000,
+      "desiredRetention": 0.8,
+      "rawInterval": 29.605263157894722,
+      "intervalDays": 30,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 1000,
+      "desiredRetention": 0.85,
+      "rawInterval": 20.21489710435258,
+      "intervalDays": 20,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 1000,
+      "desiredRetention": 0.9,
+      "rawInterval": 12.345679012345675,
+      "intervalDays": 12,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 1000,
+      "desiredRetention": 0.95,
+      "rawInterval": 5.685960052485789,
+      "intervalDays": 6,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 1000,
+      "desiredRetention": 0.97,
+      "rawInterval": 3.3059053202141366,
+      "intervalDays": 3,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 36500,
+      "desiredRetention": 0.7,
+      "rawInterval": 1999.4629430719656,
+      "intervalDays": 1999,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 36500,
+      "desiredRetention": 0.8,
+      "rawInterval": 1080.5921052631575,
+      "intervalDays": 1081,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 36500,
+      "desiredRetention": 0.85,
+      "rawInterval": 737.8437443088692,
+      "intervalDays": 738,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 36500,
+      "desiredRetention": 0.9,
+      "rawInterval": 450.61728395061715,
+      "intervalDays": 451,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 36500,
+      "desiredRetention": 0.95,
+      "rawInterval": 207.5375419157313,
+      "intervalDays": 208,
+      "isHalfBoundary": false
+    },
+    {
+      "stability": 36500,
+      "desiredRetention": 0.97,
+      "rawInterval": 120.66554418781598,
+      "intervalDays": 121,
+      "isHalfBoundary": false
+    }
+  ],
+  "previewCases": [
+    {
+      "scenario": "new_card_default",
+      "input": {
+        "currentS": 0.1,
+        "currentD": 5,
+        "elapsedDays": 0,
+        "isNew": true,
+        "now": 1790251200000,
+        "desiredRetention": 0.9,
+        "maxIntervalDays": 36500
+      },
+      "expected": {
+        "1": {
+          "rating": 1,
+          "nextStability": 0.40255,
+          "nextDifficulty": 7.1949,
+          "intervalDays": 0,
+          "nextDueDate": 1790251800000,
+          "label": "10 min"
+        },
+        "2": {
+          "rating": 2,
+          "nextStability": 1.18385,
+          "nextDifficulty": 6.488305268471453,
+          "intervalDays": 1,
+          "nextDueDate": 1790337600000,
+          "label": "1 día"
+        },
+        "3": {
+          "rating": 3,
+          "nextStability": 3.173,
+          "nextDifficulty": 5.282434422319005,
+          "intervalDays": 1,
+          "nextDueDate": 1790337600000,
+          "label": "1 día"
+        },
+        "4": {
+          "rating": 4,
+          "nextStability": 15.69105,
+          "nextDifficulty": 3.2245015893713678,
+          "intervalDays": 1,
+          "nextDueDate": 1790337600000,
+          "label": "1 día"
+        }
+      }
+    },
+    {
+      "scenario": "first_review_good",
+      "input": {
+        "currentS": 3.173,
+        "currentD": 5.2825,
+        "elapsedDays": 1,
+        "isNew": false,
+        "now": 1790251200000,
+        "desiredRetention": 0.9,
+        "maxIntervalDays": 36500
+      },
+      "expected": {
+        "1": {
+          "rating": 1,
+          "nextStability": 0.9790746281239335,
+          "nextDifficulty": 8.189864018342666,
+          "intervalDays": 0,
+          "nextDueDate": 1790251800000,
+          "label": "10 min"
+        },
+        "2": {
+          "rating": 2,
+          "nextStability": 40.5537414731969,
+          "nextDifficulty": 6.736181858342667,
+          "intervalDays": 1,
+          "nextDueDate": 1790337600000,
+          "label": "1 día"
+        },
+        "3": {
+          "rating": 3,
+          "nextStability": 68.77626688872745,
+          "nextDifficulty": 5.282499698342667,
+          "intervalDays": 1,
+          "nextDueDate": 1790337600000,
+          "label": "1 día"
+        },
+        "4": {
+          "rating": 4,
+          "nextStability": 190.49328811072795,
+          "nextDifficulty": 3.828817538342667,
+          "intervalDays": 2,
+          "nextDueDate": 1790424000000,
+          "label": "2 días"
+        }
+      }
+    },
+    {
+      "scenario": "review_after_10_days",
+      "input": {
+        "currentS": 15.69,
+        "currentD": 4.5,
+        "elapsedDays": 10,
+        "isNew": false,
+        "now": 1790251200000,
+        "desiredRetention": 0.9,
+        "maxIntervalDays": 36500
+      },
+      "expected": {
+        "1": {
+          "rating": 1,
+          "nextStability": 2.520228885477718,
+          "nextDifficulty": 7.410963518342667,
+          "intervalDays": 0,
+          "nextDueDate": 1790251800000,
+          "label": "10 min"
+        },
+        "2": {
+          "rating": 2,
+          "nextStability": 229.9601092654043,
+          "nextDifficulty": 5.957281358342668,
+          "intervalDays": 3,
+          "nextDueDate": 1790510400000,
+          "label": "3 días"
+        },
+        "3": {
+          "rating": 3,
+          "nextStability": 391.7344178052023,
+          "nextDifficulty": 4.503599198342667,
+          "intervalDays": 5,
+          "nextDueDate": 1790683200000,
+          "label": "5 días"
+        },
+        "4": {
+          "rating": 4,
+          "nextStability": 1089.4284283800846,
+          "nextDifficulty": 3.049917038342667,
+          "intervalDays": 13,
+          "nextDueDate": 1791374400000,
+          "label": "13 días"
+        }
+      }
+    },
+    {
+      "scenario": "severe_lapse_card",
+      "input": {
+        "currentS": 0.8,
+        "currentD": 8.5,
+        "elapsedDays": 2,
+        "isNew": false,
+        "now": 1790251200000,
+        "desiredRetention": 0.9,
+        "maxIntervalDays": 36500
+      },
+      "expected": {
+        "1": {
+          "rating": 1,
+          "nextStability": 0.3538207630086541,
+          "nextDifficulty": 10,
+          "intervalDays": 0,
+          "nextDueDate": 1790251800000,
+          "label": "10 min"
+        },
+        "2": {
+          "rating": 2,
+          "nextStability": 8.45287016791837,
+          "nextDifficulty": 9.938881358342668,
+          "intervalDays": 1,
+          "nextDueDate": 1790337600000,
+          "label": "1 día"
+        },
+        "3": {
+          "rating": 3,
+          "nextStability": 14.230800575497316,
+          "nextDifficulty": 8.485199198342666,
+          "intervalDays": 1,
+          "nextDueDate": 1790337600000,
+          "label": "1 día"
+        },
+        "4": {
+          "rating": 4,
+          "nextStability": 39.149636423246264,
+          "nextDifficulty": 7.031517038342668,
+          "intervalDays": 1,
+          "nextDueDate": 1790337600000,
+          "label": "1 día"
+        }
+      }
+    },
+    {
+      "scenario": "same_day_review_elapsed_zero",
+      "input": {
+        "currentS": 4.2,
+        "currentD": 5,
+        "elapsedDays": 0,
+        "isNew": false,
+        "now": 1790251200000,
+        "desiredRetention": 0.9,
+        "maxIntervalDays": 36500
+      },
+      "expected": {
+        "1": {
+          "rating": 1,
+          "nextStability": 1.0223218066765023,
+          "nextDifficulty": 7.908663518342667,
+          "intervalDays": 0,
+          "nextDueDate": 1790251800000,
+          "label": "10 min"
+        },
+        "2": {
+          "rating": 2,
+          "nextStability": 4.2,
+          "nextDifficulty": 6.454981358342668,
+          "intervalDays": 1,
+          "nextDueDate": 1790337600000,
+          "label": "1 día"
+        },
+        "3": {
+          "rating": 3,
+          "nextStability": 4.2,
+          "nextDifficulty": 5.001299198342667,
+          "intervalDays": 1,
+          "nextDueDate": 1790337600000,
+          "label": "1 día"
+        },
+        "4": {
+          "rating": 4,
+          "nextStability": 4.2,
+          "nextDifficulty": 3.547617038342667,
+          "intervalDays": 1,
+          "nextDueDate": 1790337600000,
+          "label": "1 día"
+        }
+      }
+    },
+    {
+      "scenario": "high_retention_target_097",
+      "input": {
+        "currentS": 12,
+        "currentD": 4,
+        "elapsedDays": 5,
+        "isNew": false,
+        "now": 1790251200000,
+        "desiredRetention": 0.97,
+        "maxIntervalDays": 36500
+      },
+      "expected": {
+        "1": {
+          "rating": 1,
+          "nextStability": 2.20160119377932,
+          "nextDifficulty": 6.913263518342667,
+          "intervalDays": 0,
+          "nextDueDate": 1790251800000,
+          "label": "10 min"
+        },
+        "2": {
+          "rating": 2,
+          "nextStability": 173.93552780154874,
+          "nextDifficulty": 5.459581358342668,
+          "intervalDays": 1,
+          "nextDueDate": 1790337600000,
+          "label": "1 día"
+        },
+        "3": {
+          "rating": 3,
+          "nextStability": 296.1971354888535,
+          "nextDifficulty": 4.005899198342667,
+          "intervalDays": 1,
+          "nextDueDate": 1790337600000,
+          "label": "1 día"
+        },
+        "4": {
+          "rating": 4,
+          "nextStability": 823.4822908180979,
+          "nextDifficulty": 2.552217038342667,
+          "intervalDays": 3,
+          "nextDueDate": 1790510400000,
+          "label": "3 días"
+        }
+      }
+    },
+    {
+      "scenario": "low_retention_target_070",
+      "input": {
+        "currentS": 12,
+        "currentD": 4,
+        "elapsedDays": 5,
+        "isNew": false,
+        "now": 1790251200000,
+        "desiredRetention": 0.7,
+        "maxIntervalDays": 36500
+      },
+      "expected": {
+        "1": {
+          "rating": 1,
+          "nextStability": 2.20160119377932,
+          "nextDifficulty": 6.913263518342667,
+          "intervalDays": 0,
+          "nextDueDate": 1790251800000,
+          "label": "10 min"
+        },
+        "2": {
+          "rating": 2,
+          "nextStability": 173.93552780154874,
+          "nextDifficulty": 5.459581358342668,
+          "intervalDays": 10,
+          "nextDueDate": 1791115200000,
+          "label": "10 días"
+        },
+        "3": {
+          "rating": 3,
+          "nextStability": 296.1971354888535,
+          "nextDifficulty": 4.005899198342667,
+          "intervalDays": 16,
+          "nextDueDate": 1791633600000,
+          "label": "16 días"
+        },
+        "4": {
+          "rating": 4,
+          "nextStability": 823.4822908180979,
+          "nextDifficulty": 2.552217038342667,
+          "intervalDays": 45,
+          "nextDueDate": 1794139200000,
+          "label": "45 días"
+        }
+      }
+    },
+    {
+      "scenario": "difficulty_boundary_max",
+      "input": {
+        "currentS": 1,
+        "currentD": 10,
+        "elapsedDays": 3,
+        "isNew": false,
+        "now": 1790251200000,
+        "desiredRetention": 0.9,
+        "maxIntervalDays": 36500
+      },
+      "expected": {
+        "1": {
+          "rating": 1,
+          "nextStability": 0.417660271162933,
+          "nextDifficulty": 10,
+          "intervalDays": 0,
+          "nextDueDate": 1790251800000,
+          "label": "10 min"
+        },
+        "2": {
+          "rating": 2,
+          "nextStability": 4.806631183363539,
+          "nextDifficulty": 10,
+          "intervalDays": 1,
+          "nextDueDate": 1790337600000,
+          "label": "1 día"
+        },
+        "3": {
+          "rating": 3,
+          "nextStability": 7.680644407447418,
+          "nextDifficulty": 9.978299198342667,
+          "intervalDays": 1,
+          "nextDueDate": 1790337600000,
+          "label": "1 día"
+        },
+        "4": {
+          "rating": 4,
+          "nextStability": 20.075578008804985,
+          "nextDifficulty": 8.524617038342667,
+          "intervalDays": 1,
+          "nextDueDate": 1790337600000,
+          "label": "1 día"
+        }
+      }
+    },
+    {
+      "scenario": "difficulty_boundary_min",
+      "input": {
+        "currentS": 25,
+        "currentD": 1,
+        "elapsedDays": 7,
+        "isNew": false,
+        "now": 1790251200000,
+        "desiredRetention": 0.9,
+        "maxIntervalDays": 36500
+      },
+      "expected": {
+        "1": {
+          "rating": 1,
+          "nextStability": 3.6102237042048193,
+          "nextDifficulty": 3.927063518342667,
+          "intervalDays": 0,
+          "nextDueDate": 1790251800000,
+          "label": "10 min"
+        },
+        "2": {
+          "rating": 2,
+          "nextStability": 410.8870260938605,
+          "nextDifficulty": 2.473381358342667,
+          "intervalDays": 5,
+          "nextDueDate": 1790683200000,
+          "label": "5 días"
+        },
+        "3": {
+          "rating": 3,
+          "nextStability": 702.2324080271333,
+          "nextDifficulty": 1.0196991983426673,
+          "intervalDays": 9,
+          "nextDueDate": 1791028800000,
+          "label": "9 días"
+        },
+        "4": {
+          "rating": 4,
+          "nextStability": 1958.7355562602752,
+          "nextDifficulty": 1,
+          "intervalDays": 24,
+          "nextDueDate": 1792324800000,
+          "label": "24 días"
+        }
+      }
+    }
+  ],
+  "longSequences": [
+    {
+      "cardId": "card_1_all_good",
+      "totalReviews": 22,
+      "finalCard": {
+        "id": "card_1_all_good",
+        "state": "review",
+        "stability": 7909449.195886251,
+        "difficulty": 5.282434422319005,
+        "reps": 22,
+        "lapses": 0,
+        "lastReview": 18433310400000,
+        "dueDate": 21586910400000,
+        "halfLife": 1248860.3993504606
+      },
+      "steps": [
+        {
+          "step": 1,
+          "rating": 3,
+          "elapsedDays": 0,
+          "currentR": 1,
+          "stateBefore": "new",
+          "stateAfter": "review",
+          "stabilityBefore": 0.1,
+          "stabilityAfter": 3.173,
+          "difficultyBefore": 5,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 1,
+          "lapsesAfter": 0,
+          "scheduledDays": 1,
+          "reviewTimestamp": 1790251200000,
+          "nextDueDate": 1790337600000
+        },
+        {
+          "step": 2,
+          "rating": 3,
+          "elapsedDays": 1,
+          "currentR": 0.3782882113752251,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 3.173,
+          "stabilityAfter": 68.7770193347455,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 2,
+          "lapsesAfter": 0,
+          "scheduledDays": 1,
+          "reviewTimestamp": 1790337600000,
+          "nextDueDate": 1790424000000
+        },
+        {
+          "step": 3,
+          "rating": 3,
+          "elapsedDays": 1,
+          "currentR": 0.8851793227917027,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 68.7770193347455,
+          "stabilityAfter": 207.1029318888025,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 3,
+          "lapsesAfter": 0,
+          "scheduledDays": 3,
+          "reviewTimestamp": 1790424000000,
+          "nextDueDate": 1790683200000
+        },
+        {
+          "step": 4,
+          "rating": 3,
+          "elapsedDays": 3,
+          "currentR": 0.885536593166495,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 207.1029318888025,
+          "stabilityAfter": 571.140528118598,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 4,
+          "lapsesAfter": 0,
+          "scheduledDays": 7,
+          "reviewTimestamp": 1790683200000,
+          "nextDueDate": 1791288000000
+        },
+        {
+          "step": 5,
+          "rating": 3,
+          "elapsedDays": 7,
+          "currentR": 0.9006204800353625,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 571.140528118598,
+          "stabilityAfter": 1337.477417913292,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 5,
+          "lapsesAfter": 0,
+          "scheduledDays": 17,
+          "reviewTimestamp": 1791288000000,
+          "nextDueDate": 1792756800000
+        },
+        {
+          "step": 6,
+          "rating": 3,
+          "elapsedDays": 17,
+          "currentR": 0.8974840564624768,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 1337.477417913292,
+          "stabilityAfter": 3012.860884912866,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 6,
+          "lapsesAfter": 0,
+          "scheduledDays": 37,
+          "reviewTimestamp": 1792756800000,
+          "nextDueDate": 1795953600000
+        },
+        {
+          "step": 7,
+          "rating": 3,
+          "elapsedDays": 37,
+          "currentR": 0.9004504435745939,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 3012.860884912866,
+          "stabilityAfter": 6334.450647664455,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 7,
+          "lapsesAfter": 0,
+          "scheduledDays": 78,
+          "reviewTimestamp": 1795953600000,
+          "nextDueDate": 1802692800000
+        },
+        {
+          "step": 8,
+          "rating": 3,
+          "elapsedDays": 78,
+          "currentR": 0.9002221267775887,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 6334.450647664455,
+          "stabilityAfter": 12741.421838819308,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 8,
+          "lapsesAfter": 0,
+          "scheduledDays": 157,
+          "reviewTimestamp": 1802692800000,
+          "nextDueDate": 1816257600000
+        },
+        {
+          "step": 9,
+          "rating": 3,
+          "elapsedDays": 157,
+          "currentR": 0.9001639250108968,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 12741.421838819308,
+          "stabilityAfter": 24605.93163703981,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 9,
+          "lapsesAfter": 0,
+          "scheduledDays": 304,
+          "reviewTimestamp": 1816257600000,
+          "nextDueDate": 1842523200000
+        },
+        {
+          "step": 10,
+          "rating": 3,
+          "elapsedDays": 304,
+          "currentR": 0.8999372231288157,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 24605.93163703981,
+          "stabilityAfter": 45840.22557023864,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 10,
+          "lapsesAfter": 0,
+          "scheduledDays": 566,
+          "reviewTimestamp": 1842523200000,
+          "nextDueDate": 1891425600000
+        },
+        {
+          "step": 11,
+          "rating": 3,
+          "elapsedDays": 566,
+          "currentR": 0.8999892298766813,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 45840.22557023864,
+          "stabilityAfter": 82551.4276854726,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 11,
+          "lapsesAfter": 0,
+          "scheduledDays": 1019,
+          "reviewTimestamp": 1891425600000,
+          "nextDueDate": 1979467200000
+        },
+        {
+          "step": 12,
+          "rating": 3,
+          "elapsedDays": 1019,
+          "currentR": 0.9000128718537413,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 82551.4276854726,
+          "stabilityAfter": 144170.54759748423,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 12,
+          "lapsesAfter": 0,
+          "scheduledDays": 1780,
+          "reviewTimestamp": 1979467200000,
+          "nextDueDate": 2133259200000
+        },
+        {
+          "step": 13,
+          "rating": 3,
+          "elapsedDays": 1780,
+          "currentR": 0.8999943943275661,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 144170.54759748423,
+          "stabilityAfter": 244883.96805324432,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 13,
+          "lapsesAfter": 0,
+          "scheduledDays": 3023,
+          "reviewTimestamp": 2133259200000,
+          "nextDueDate": 2394446400000
+        },
+        {
+          "step": 14,
+          "rating": 3,
+          "elapsedDays": 3023,
+          "currentR": 0.9000073209791616,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 244883.96805324432,
+          "stabilityAfter": 405461.99309612234,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 14,
+          "lapsesAfter": 0,
+          "scheduledDays": 5006,
+          "reviewTimestamp": 2394446400000,
+          "nextDueDate": 2826964800000
+        },
+        {
+          "step": 15,
+          "rating": 3,
+          "elapsedDays": 5006,
+          "currentR": 0.8999949376933019,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 405461.99309612234,
+          "stabilityAfter": 655858.8616096645,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 15,
+          "lapsesAfter": 0,
+          "scheduledDays": 8097,
+          "reviewTimestamp": 2826964800000,
+          "nextDueDate": 3526545600000
+        },
+        {
+          "step": 16,
+          "rating": 3,
+          "elapsedDays": 8097,
+          "currentR": 0.9000002426858887,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 655858.8616096645,
+          "stabilityAfter": 1038303.66117541,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 16,
+          "lapsesAfter": 0,
+          "scheduledDays": 12819,
+          "reviewTimestamp": 3526545600000,
+          "nextDueDate": 4634107200000
+        },
+        {
+          "step": 17,
+          "rating": 3,
+          "elapsedDays": 12819,
+          "currentR": 0.8999970900084808,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 1038303.66117541,
+          "stabilityAfter": 1611515.4155565624,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 17,
+          "lapsesAfter": 0,
+          "scheduledDays": 19895,
+          "reviewTimestamp": 4634107200000,
+          "nextDueDate": 6353035200000
+        },
+        {
+          "step": 18,
+          "rating": 3,
+          "elapsedDays": 19895,
+          "currentR": 0.9000010831626061,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 1611515.4155565624,
+          "stabilityAfter": 2455725.322420578,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 18,
+          "lapsesAfter": 0,
+          "scheduledDays": 30318,
+          "reviewTimestamp": 6353035200000,
+          "nextDueDate": 8972510400000
+        },
+        {
+          "step": 19,
+          "rating": 3,
+          "elapsedDays": 30318,
+          "currentR": 0.899998862280029,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 2455725.322420578,
+          "stabilityAfter": 3679210.83439012,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 19,
+          "lapsesAfter": 0,
+          "scheduledDays": 36500,
+          "reviewTimestamp": 8972510400000,
+          "nextDueDate": 12126110400000
+        },
+        {
+          "step": 20,
+          "rating": 3,
+          "elapsedDays": 36500,
+          "currentR": 0.9172800718377451,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 3679210.83439012,
+          "stabilityAfter": 5111287.41722404,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 20,
+          "lapsesAfter": 0,
+          "scheduledDays": 36500,
+          "reviewTimestamp": 12126110400000,
+          "nextDueDate": 15279710400000
+        },
+        {
+          "step": 21,
+          "rating": 3,
+          "elapsedDays": 36500,
+          "currentR": 0.9383654124670829,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 5111287.41722404,
+          "stabilityAfter": 6521268.82091243,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 21,
+          "lapsesAfter": 0,
+          "scheduledDays": 36500,
+          "reviewTimestamp": 15279710400000,
+          "nextDueDate": 18433310400000
+        },
+        {
+          "step": 22,
+          "rating": 3,
+          "elapsedDays": 36500,
+          "currentR": 0.950724841362294,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 6521268.82091243,
+          "stabilityAfter": 7909449.195886251,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 22,
+          "lapsesAfter": 0,
+          "scheduledDays": 36500,
+          "reviewTimestamp": 18433310400000,
+          "nextDueDate": 21586910400000
+        }
+      ]
+    },
+    {
+      "cardId": "card_2_alternating",
+      "totalReviews": 22,
+      "finalCard": {
+        "id": "card_2_alternating",
+        "state": "review",
+        "stability": 7081.139588758314,
+        "difficulty": 10,
+        "reps": 22,
+        "lapses": 0,
+        "lastReview": 1837166400000,
+        "dueDate": 1844683200000,
+        "halfLife": 1118.0746719092074
+      },
+      "steps": [
+        {
+          "step": 1,
+          "rating": 3,
+          "elapsedDays": 0,
+          "currentR": 1,
+          "stateBefore": "new",
+          "stateAfter": "review",
+          "stabilityBefore": 0.1,
+          "stabilityAfter": 3.173,
+          "difficultyBefore": 5,
+          "difficultyAfter": 5.282434422319005,
+          "repsAfter": 1,
+          "lapsesAfter": 0,
+          "scheduledDays": 1,
+          "reviewTimestamp": 1790251200000,
+          "nextDueDate": 1790337600000
+        },
+        {
+          "step": 2,
+          "rating": 2,
+          "elapsedDays": 1,
+          "currentR": 0.3782882113752251,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 3.173,
+          "stabilityAfter": 40.55417021693799,
+          "difficultyBefore": 5.282434422319005,
+          "difficultyAfter": 6.736116582319005,
+          "repsAfter": 2,
+          "lapsesAfter": 0,
+          "scheduledDays": 1,
+          "reviewTimestamp": 1790337600000,
+          "nextDueDate": 1790424000000
+        },
+        {
+          "step": 3,
+          "rating": 3,
+          "elapsedDays": 1,
+          "currentR": 0.8252046582742598,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 40.55417021693799,
+          "stabilityAfter": 142.30676301930743,
+          "difficultyBefore": 6.736116582319005,
+          "difficultyAfter": 6.729429644383004,
+          "repsAfter": 3,
+          "lapsesAfter": 0,
+          "scheduledDays": 2,
+          "reviewTimestamp": 1790424000000,
+          "nextDueDate": 1790596800000
+        },
+        {
+          "step": 4,
+          "rating": 2,
+          "elapsedDays": 2,
+          "currentR": 0.8883963420470578,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 142.30676301930743,
+          "stabilityAfter": 250.69303756039199,
+          "difficultyBefore": 6.729429644383004,
+          "difficultyAfter": 8.17645562636151,
+          "repsAfter": 4,
+          "lapsesAfter": 0,
+          "scheduledDays": 3,
+          "reviewTimestamp": 1790596800000,
+          "nextDueDate": 1790856000000
+        },
+        {
+          "step": 5,
+          "rating": 3,
+          "elapsedDays": 3,
+          "currentR": 0.9026352748619794,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 250.69303756039199,
+          "stabilityAfter": 430.0341505295442,
+          "difficultyBefore": 8.17645562636151,
+          "difficultyAfter": 8.163143128822913,
+          "repsAfter": 5,
+          "lapsesAfter": 0,
+          "scheduledDays": 5,
+          "reviewTimestamp": 1790856000000,
+          "nextDueDate": 1791288000000
+        },
+        {
+          "step": 6,
+          "rating": 2,
+          "elapsedDays": 5,
+          "currentR": 0.9050189992403813,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 430.0341505295442,
+          "stabilityAfter": 590.938910443905,
+          "difficultyBefore": 8.163143128822913,
+          "difficultyAfter": 9.603574028772995,
+          "repsAfter": 6,
+          "lapsesAfter": 0,
+          "scheduledDays": 7,
+          "reviewTimestamp": 1791288000000,
+          "nextDueDate": 1791892800000
+        },
+        {
+          "step": 7,
+          "rating": 3,
+          "elapsedDays": 7,
+          "currentR": 0.9034837247479314,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 590.938910443905,
+          "stabilityAfter": 777.9732678118954,
+          "difficultyBefore": 9.603574028772995,
+          "difficultyAfter": 9.583696786583307,
+          "repsAfter": 7,
+          "lapsesAfter": 0,
+          "scheduledDays": 10,
+          "reviewTimestamp": 1791892800000,
+          "nextDueDate": 1792756800000
+        },
+        {
+          "step": 8,
+          "rating": 2,
+          "elapsedDays": 10,
+          "currentR": 0.8965007460337975,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 777.9732678118954,
+          "stabilityAfter": 926.1832914012105,
+          "difficultyBefore": 9.583696786583307,
+          "difficultyAfter": 10,
+          "repsAfter": 8,
+          "lapsesAfter": 0,
+          "scheduledDays": 11,
+          "reviewTimestamp": 1792756800000,
+          "nextDueDate": 1793707200000
+        },
+        {
+          "step": 9,
+          "rating": 3,
+          "elapsedDays": 11,
+          "currentR": 0.9032656104388215,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 926.1832914012105,
+          "stabilityAfter": 1125.62906567032,
+          "difficultyBefore": 10,
+          "difficultyAfter": 9.978299198342667,
+          "repsAfter": 9,
+          "lapsesAfter": 0,
+          "scheduledDays": 14,
+          "reviewTimestamp": 1793707200000,
+          "nextDueDate": 1794916800000
+        },
+        {
+          "step": 10,
+          "rating": 2,
+          "elapsedDays": 14,
+          "currentR": 0.8993648375495611,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 1125.62906567032,
+          "stabilityAfter": 1269.3499914191284,
+          "difficultyBefore": 9.978299198342667,
+          "difficultyAfter": 10,
+          "repsAfter": 10,
+          "lapsesAfter": 0,
+          "scheduledDays": 16,
+          "reviewTimestamp": 1794916800000,
+          "nextDueDate": 1796299200000
+        },
+        {
+          "step": 11,
+          "rating": 3,
+          "elapsedDays": 16,
+          "currentR": 0.89821027981598,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 1269.3499914191284,
+          "stabilityAfter": 1547.099582085912,
+          "difficultyBefore": 10,
+          "difficultyAfter": 9.978299198342667,
+          "repsAfter": 11,
+          "lapsesAfter": 0,
+          "scheduledDays": 19,
+          "reviewTimestamp": 1796299200000,
+          "nextDueDate": 1797940800000
+        },
+        {
+          "step": 12,
+          "rating": 2,
+          "elapsedDays": 19,
+          "currentR": 0.9004479552220732,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 1547.099582085912,
+          "stabilityAfter": 1735.1331348340739,
+          "difficultyBefore": 9.978299198342667,
+          "difficultyAfter": 10,
+          "repsAfter": 12,
+          "lapsesAfter": 0,
+          "scheduledDays": 21,
+          "reviewTimestamp": 1797940800000,
+          "nextDueDate": 1799755200000
+        },
+        {
+          "step": 13,
+          "rating": 3,
+          "elapsedDays": 21,
+          "currentR": 0.9016866656648386,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 1735.1331348340739,
+          "stabilityAfter": 2087.7875198035485,
+          "difficultyBefore": 10,
+          "difficultyAfter": 9.978299198342667,
+          "repsAfter": 13,
+          "lapsesAfter": 0,
+          "scheduledDays": 26,
+          "reviewTimestamp": 1799755200000,
+          "nextDueDate": 1802001600000
+        },
+        {
+          "step": 14,
+          "rating": 2,
+          "elapsedDays": 26,
+          "currentR": 0.8992550803016003,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 2087.7875198035485,
+          "stabilityAfter": 2335.7173757607543,
+          "difficultyBefore": 9.978299198342667,
+          "difficultyAfter": 10,
+          "repsAfter": 14,
+          "lapsesAfter": 0,
+          "scheduledDays": 29,
+          "reviewTimestamp": 1802001600000,
+          "nextDueDate": 1804507200000
+        },
+        {
+          "step": 15,
+          "rating": 3,
+          "elapsedDays": 29,
+          "currentR": 0.8995141771371303,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 2335.7173757607543,
+          "stabilityAfter": 2804.564076556168,
+          "difficultyBefore": 10,
+          "difficultyAfter": 9.978299198342667,
+          "repsAfter": 15,
+          "lapsesAfter": 0,
+          "scheduledDays": 35,
+          "reviewTimestamp": 1804507200000,
+          "nextDueDate": 1807531200000
+        },
+        {
+          "step": 16,
+          "rating": 2,
+          "elapsedDays": 35,
+          "currentR": 0.8990735622355867,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 2804.564076556168,
+          "stabilityAfter": 3126.7092326950738,
+          "difficultyBefore": 9.978299198342667,
+          "difficultyAfter": 10,
+          "repsAfter": 16,
+          "lapsesAfter": 0,
+          "scheduledDays": 39,
+          "reviewTimestamp": 1807531200000,
+          "nextDueDate": 1810900800000
+        },
+        {
+          "step": 17,
+          "rating": 3,
+          "elapsedDays": 39,
+          "currentR": 0.8991183049013998,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 3126.7092326950738,
+          "stabilityAfter": 3735.3990428497705,
+          "difficultyBefore": 10,
+          "difficultyAfter": 9.978299198342667,
+          "repsAfter": 17,
+          "lapsesAfter": 0,
+          "scheduledDays": 46,
+          "reviewTimestamp": 1810900800000,
+          "nextDueDate": 1814875200000
+        },
+        {
+          "step": 18,
+          "rating": 2,
+          "elapsedDays": 46,
+          "currentR": 0.9002152129971593,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 3735.3990428497705,
+          "stabilityAfter": 4145.1204231068905,
+          "difficultyBefore": 9.978299198342667,
+          "difficultyAfter": 10,
+          "repsAfter": 18,
+          "lapsesAfter": 0,
+          "scheduledDays": 51,
+          "reviewTimestamp": 1814875200000,
+          "nextDueDate": 1819281600000
+        },
+        {
+          "step": 19,
+          "rating": 3,
+          "elapsedDays": 51,
+          "currentR": 0.9002913986627167,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 4145.1204231068905,
+          "stabilityAfter": 4915.856842701105,
+          "difficultyBefore": 10,
+          "difficultyAfter": 9.978299198342667,
+          "repsAfter": 19,
+          "lapsesAfter": 0,
+          "scheduledDays": 61,
+          "reviewTimestamp": 1819281600000,
+          "nextDueDate": 1824552000000
+        },
+        {
+          "step": 20,
+          "rating": 2,
+          "elapsedDays": 61,
+          "currentR": 0.8995630111987825,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 4915.856842701105,
+          "stabilityAfter": 5441.282102278599,
+          "difficultyBefore": 9.978299198342667,
+          "difficultyAfter": 10,
+          "repsAfter": 20,
+          "lapsesAfter": 0,
+          "scheduledDays": 67,
+          "reviewTimestamp": 1824552000000,
+          "nextDueDate": 1830340800000
+        },
+        {
+          "step": 21,
+          "rating": 3,
+          "elapsedDays": 67,
+          "currentR": 0.9002245016241507,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 5441.282102278599,
+          "stabilityAfter": 6421.428956568458,
+          "difficultyBefore": 10,
+          "difficultyAfter": 9.978299198342667,
+          "repsAfter": 21,
+          "lapsesAfter": 0,
+          "scheduledDays": 79,
+          "reviewTimestamp": 1830340800000,
+          "nextDueDate": 1837166400000
+        },
+        {
+          "step": 22,
+          "rating": 2,
+          "elapsedDays": 79,
+          "currentR": 0.9002987856455429,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 6421.428956568458,
+          "stabilityAfter": 7081.139588758314,
+          "difficultyBefore": 9.978299198342667,
+          "difficultyAfter": 10,
+          "repsAfter": 22,
+          "lapsesAfter": 0,
+          "scheduledDays": 87,
+          "reviewTimestamp": 1837166400000,
+          "nextDueDate": 1844683200000
+        }
+      ]
+    },
+    {
+      "cardId": "card_3_early_lapse",
+      "totalReviews": 22,
+      "finalCard": {
+        "id": "card_3_early_lapse",
+        "state": "review",
+        "stability": 977290.7320837064,
+        "difficulty": 1.1631246643609074,
+        "reps": 22,
+        "lapses": 3,
+        "lastReview": 2269168200000,
+        "dueDate": 3311584200000,
+        "halfLife": 154309.0629605852
+      },
+      "steps": [
+        {
+          "step": 1,
+          "rating": 1,
+          "elapsedDays": 0,
+          "currentR": 1,
+          "stateBefore": "new",
+          "stateAfter": "learning",
+          "stabilityBefore": 0.1,
+          "stabilityAfter": 0.40255,
+          "difficultyBefore": 5,
+          "difficultyAfter": 7.1949,
+          "repsAfter": 1,
+          "lapsesAfter": 1,
+          "scheduledDays": 0,
+          "reviewTimestamp": 1790251200000,
+          "nextDueDate": 1790251800000
+        },
+        {
+          "step": 2,
+          "rating": 3,
+          "elapsedDays": 0.006944444444444444,
+          "currentR": 0.8678373107785808,
+          "stateBefore": "learning",
+          "stateAfter": "review",
+          "stabilityBefore": 0.40255,
+          "stabilityAfter": 1.5575212953517659,
+          "difficultyBefore": 7.1949,
+          "difficultyAfter": 7.186102658342667,
+          "repsAfter": 2,
+          "lapsesAfter": 1,
+          "scheduledDays": 1,
+          "reviewTimestamp": 1790251800000,
+          "nextDueDate": 1790338200000
+        },
+        {
+          "step": 3,
+          "rating": 3,
+          "elapsedDays": 1,
+          "currentR": 0.27525272187376215,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 1.5575212953517659,
+          "stabilityAfter": 30.45627144371973,
+          "difficultyBefore": 7.186102658342667,
+          "difficultyAfter": 7.177345784456958,
+          "repsAfter": 3,
+          "lapsesAfter": 1,
+          "scheduledDays": 1,
+          "reviewTimestamp": 1790338200000,
+          "nextDueDate": 1790424600000
+        },
+        {
+          "step": 4,
+          "rating": 1,
+          "elapsedDays": 1,
+          "currentR": 0.784743417641663,
+          "stateBefore": "review",
+          "stateAfter": "relearning",
+          "stabilityBefore": 30.45627144371973,
+          "stabilityAfter": 2.9117679991673344,
+          "difficultyBefore": 7.177345784456958,
+          "difficultyAfter": 10,
+          "repsAfter": 4,
+          "lapsesAfter": 2,
+          "scheduledDays": 0,
+          "reviewTimestamp": 1790424600000,
+          "nextDueDate": 1790425200000
+        },
+        {
+          "step": 5,
+          "rating": 3,
+          "elapsedDays": 0.006944444444444444,
+          "currentR": 0.9780849456887957,
+          "stateBefore": "relearning",
+          "stateAfter": "review",
+          "stabilityBefore": 2.9117679991673344,
+          "stabilityAfter": 3.183426110900547,
+          "difficultyBefore": 10,
+          "difficultyAfter": 9.978299198342667,
+          "repsAfter": 5,
+          "lapsesAfter": 2,
+          "scheduledDays": 1,
+          "reviewTimestamp": 1790425200000,
+          "nextDueDate": 1790511600000
+        },
+        {
+          "step": 6,
+          "rating": 4,
+          "elapsedDays": 1,
+          "currentR": 0.37882015403176483,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 3.183426110900547,
+          "stabilityAfter": 36.71511513393018,
+          "difficultyBefore": 9.978299198342667,
+          "difficultyAfter": 8.503016060372957,
+          "repsAfter": 6,
+          "lapsesAfter": 2,
+          "scheduledDays": 1,
+          "reviewTimestamp": 1790511600000,
+          "nextDueDate": 1790598000000
+        },
+        {
+          "step": 7,
+          "rating": 3,
+          "elapsedDays": 1,
+          "currentR": 0.811775483587714,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 36.71511513393018,
+          "stabilityAfter": 95.91539797093338,
+          "difficultyBefore": 8.503016060372957,
+          "difficultyAfter": 8.48820138483791,
+          "repsAfter": 7,
+          "lapsesAfter": 2,
+          "scheduledDays": 1,
+          "reviewTimestamp": 1790598000000,
+          "nextDueDate": 1790684400000
+        },
+        {
+          "step": 8,
+          "rating": 4,
+          "elapsedDays": 1,
+          "currentR": 0.9135978183885499,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 95.91539797093338,
+          "stabilityAfter": 268.3685077067125,
+          "difficultyBefore": 8.48820138483791,
+          "difficultyAfter": 7.019772696810322,
+          "repsAfter": 8,
+          "lapsesAfter": 2,
+          "scheduledDays": 3,
+          "reviewTimestamp": 1790684400000,
+          "nextDueDate": 1790943600000
+        },
+        {
+          "step": 9,
+          "rating": 3,
+          "elapsedDays": 3,
+          "currentR": 0.9081927233336072,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 268.3685077067125,
+          "stabilityAfter": 520.7636786722309,
+          "difficultyBefore": 7.019772696810322,
+          "difficultyAfter": 7.011780940747662,
+          "repsAfter": 9,
+          "lapsesAfter": 2,
+          "scheduledDays": 6,
+          "reviewTimestamp": 1790943600000,
+          "nextDueDate": 1791462000000
+        },
+        {
+          "step": 10,
+          "rating": 4,
+          "elapsedDays": 6,
+          "currentR": 0.9057624430120472,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 520.7636786722309,
+          "stabilityAfter": 1851.5097353190874,
+          "difficultyBefore": 7.011780940747662,
+          "difficultyAfter": 5.55014378676289,
+          "repsAfter": 10,
+          "lapsesAfter": 2,
+          "scheduledDays": 23,
+          "reviewTimestamp": 1791462000000,
+          "nextDueDate": 1793449200000
+        },
+        {
+          "step": 11,
+          "rating": 1,
+          "elapsedDays": 23,
+          "currentR": 0.8994698652273742,
+          "stateBefore": "review",
+          "stateAfter": "relearning",
+          "stabilityBefore": 1851.5097353190874,
+          "stabilityAfter": 13.602299739707028,
+          "difficultyBefore": 5.55014378676289,
+          "difficultyAfter": 8.456276643686447,
+          "repsAfter": 11,
+          "lapsesAfter": 3,
+          "scheduledDays": 0,
+          "reviewTimestamp": 1793449200000,
+          "nextDueDate": 1793449800000
+        },
+        {
+          "step": 12,
+          "rating": 3,
+          "elapsedDays": 0.006944444444444444,
+          "currentR": 0.9951849235169333,
+          "stateBefore": "relearning",
+          "stateAfter": "review",
+          "stabilityBefore": 13.602299739707028,
+          "stabilityAfter": 14.187381253836257,
+          "difficultyBefore": 8.456276643686447,
+          "difficultyAfter": 8.441676969468157,
+          "repsAfter": 12,
+          "lapsesAfter": 3,
+          "scheduledDays": 1,
+          "reviewTimestamp": 1793449800000,
+          "nextDueDate": 1793536200000
+        },
+        {
+          "step": 13,
+          "rating": 3,
+          "elapsedDays": 1,
+          "currentR": 0.6538296746482718,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 14.187381253836257,
+          "stabilityAfter": 66.70433184446183,
+          "difficultyBefore": 8.441676969468157,
+          "difficultyAfter": 8.42714445375127,
+          "repsAfter": 13,
+          "lapsesAfter": 3,
+          "scheduledDays": 1,
+          "reviewTimestamp": 1793536200000,
+          "nextDueDate": 1793622600000
+        },
+        {
+          "step": 14,
+          "rating": 4,
+          "elapsedDays": 1,
+          "currentR": 0.8822174270157433,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 66.70433184446183,
+          "stabilityAfter": 244.44685764214907,
+          "difficultyBefore": 8.42714445375127,
+          "difficultyAfter": 6.958996627606681,
+          "repsAfter": 14,
+          "lapsesAfter": 3,
+          "scheduledDays": 3,
+          "reviewTimestamp": 1793622600000,
+          "nextDueDate": 1793881800000
+        },
+        {
+          "step": 15,
+          "rating": 3,
+          "elapsedDays": 3,
+          "currentR": 0.9005064935864858,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 244.44685764214907,
+          "stabilityAfter": 501.24681226304625,
+          "difficultyBefore": 6.958996627606681,
+          "difficultyAfter": 6.951284441462358,
+          "repsAfter": 15,
+          "lapsesAfter": 3,
+          "scheduledDays": 6,
+          "reviewTimestamp": 1793881800000,
+          "nextDueDate": 1794400200000
+        },
+        {
+          "step": 16,
+          "rating": 4,
+          "elapsedDays": 6,
+          "currentR": 0.9026120471513097,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 501.24681226304625,
+          "stabilityAfter": 1853.355605826923,
+          "difficultyBefore": 6.951284441462358,
+          "difficultyAfter": 5.4899255713742985,
+          "repsAfter": 16,
+          "lapsesAfter": 3,
+          "scheduledDays": 23,
+          "reviewTimestamp": 1794400200000,
+          "nextDueDate": 1796387400000
+        },
+        {
+          "step": 17,
+          "rating": 3,
+          "elapsedDays": 23,
+          "currentR": 0.8995554092604584,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 1853.355605826923,
+          "stabilityAfter": 3959.626797770216,
+          "difficultyBefore": 5.4899255713742985,
+          "difficultyAfter": 5.488971112088644,
+          "repsAfter": 17,
+          "lapsesAfter": 3,
+          "scheduledDays": 49,
+          "reviewTimestamp": 1796387400000,
+          "nextDueDate": 1800621000000
+        },
+        {
+          "step": 18,
+          "rating": 4,
+          "elapsedDays": 49,
+          "currentR": 0.8997976732157893,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 3959.626797770216,
+          "stabilityAfter": 15669.20834109565,
+          "difficultyBefore": 5.488971112088644,
+          "difficultyAfter": 4.034338883315704,
+          "repsAfter": 18,
+          "lapsesAfter": 3,
+          "scheduledDays": 193,
+          "reviewTimestamp": 1800621000000,
+          "nextDueDate": 1817296200000
+        },
+        {
+          "step": 19,
+          "rating": 3,
+          "elapsedDays": 193,
+          "currentR": 0.9001976381247069,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 15669.20834109565,
+          "stabilityAfter": 33005.98059343035,
+          "difficultyBefore": 4.034338883315704,
+          "difficultyAfter": 4.0400801227951195,
+          "repsAfter": 19,
+          "lapsesAfter": 3,
+          "scheduledDays": 407,
+          "reviewTimestamp": 1817296200000,
+          "nextDueDate": 1852461000000
+        },
+        {
+          "step": 20,
+          "rating": 4,
+          "elapsedDays": 407,
+          "currentR": 0.9001009938708985,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 33005.98059343035,
+          "stabilityAfter": 128437.21571387142,
+          "difficultyBefore": 4.0400801227951195,
+          "difficultyAfter": 2.5921127925729293,
+          "repsAfter": 20,
+          "lapsesAfter": 3,
+          "scheduledDays": 1586,
+          "reviewTimestamp": 1852461000000,
+          "nextDueDate": 1989491400000
+        },
+        {
+          "step": 21,
+          "rating": 3,
+          "elapsedDays": 1586,
+          "currentR": 0.8999808390593257,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 128437.21571387142,
+          "stabilityAfter": 262226.5360766732,
+          "difficultyBefore": 2.5921127925729293,
+          "difficultyAfter": 2.604488272069761,
+          "repsAfter": 21,
+          "lapsesAfter": 3,
+          "scheduledDays": 3237,
+          "reviewTimestamp": 1989491400000,
+          "nextDueDate": 2269168200000
+        },
+        {
+          "step": 22,
+          "rating": 4,
+          "elapsedDays": 3237,
+          "currentR": 0.9000096305092808,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 262226.5360766732,
+          "stabilityAfter": 977290.7320837064,
+          "difficultyBefore": 2.604488272069761,
+          "difficultyAfter": 1.1631246643609074,
+          "repsAfter": 22,
+          "lapsesAfter": 3,
+          "scheduledDays": 12065,
+          "reviewTimestamp": 2269168200000,
+          "nextDueDate": 3311584200000
+        }
+      ]
+    },
+    {
+      "cardId": "card_4_frequent_lapses",
+      "totalReviews": 22,
+      "finalCard": {
+        "id": "card_4_frequent_lapses",
+        "state": "relearning",
+        "stability": 0.1,
+        "difficulty": 10,
+        "reps": 22,
+        "lapses": 15,
+        "lastReview": 1790864400000,
+        "dueDate": 1790865000000,
+        "halfLife": 0.015789473684210527
+      },
+      "steps": [
+        {
+          "step": 1,
+          "rating": 1,
+          "elapsedDays": 0,
+          "currentR": 1,
+          "stateBefore": "new",
+          "stateAfter": "learning",
+          "stabilityBefore": 0.1,
+          "stabilityAfter": 0.40255,
+          "difficultyBefore": 5,
+          "difficultyAfter": 7.1949,
+          "repsAfter": 1,
+          "lapsesAfter": 1,
+          "scheduledDays": 0,
+          "reviewTimestamp": 1790251200000,
+          "nextDueDate": 1790251800000
+        },
+        {
+          "step": 2,
+          "rating": 2,
+          "elapsedDays": 0.006944444444444444,
+          "currentR": 0.8678373107785808,
+          "stateBefore": "learning",
+          "stateAfter": "review",
+          "stabilityBefore": 0.40255,
+          "stabilityAfter": 1.0606526440914363,
+          "difficultyBefore": 7.1949,
+          "difficultyAfter": 8.639784818342667,
+          "repsAfter": 2,
+          "lapsesAfter": 1,
+          "scheduledDays": 1,
+          "reviewTimestamp": 1790251800000,
+          "nextDueDate": 1790338200000
+        },
+        {
+          "step": 3,
+          "rating": 1,
+          "elapsedDays": 1,
+          "currentR": 0.22993975296847413,
+          "stateBefore": "review",
+          "stateAfter": "relearning",
+          "stabilityBefore": 1.0606526440914363,
+          "stabilityAfter": 0.43491099148480794,
+          "difficultyBefore": 8.639784818342667,
+          "difficultyAfter": 10,
+          "repsAfter": 3,
+          "lapsesAfter": 2,
+          "scheduledDays": 0,
+          "reviewTimestamp": 1790338200000,
+          "nextDueDate": 1790338800000
+        },
+        {
+          "step": 4,
+          "rating": 2,
+          "elapsedDays": 0.006944444444444444,
+          "currentR": 0.8759191755748247,
+          "stateBefore": "relearning",
+          "stateAfter": "review",
+          "stabilityBefore": 0.43491099148480794,
+          "stabilityAfter": 0.6080015811416273,
+          "difficultyBefore": 10,
+          "difficultyAfter": 10,
+          "repsAfter": 4,
+          "lapsesAfter": 2,
+          "scheduledDays": 1,
+          "reviewTimestamp": 1790338800000,
+          "nextDueDate": 1790425200000
+        },
+        {
+          "step": 5,
+          "rating": 1,
+          "elapsedDays": 1,
+          "currentR": 0.17609040313193128,
+          "stateBefore": "review",
+          "stateAfter": "relearning",
+          "stabilityBefore": 0.6080015811416273,
+          "stabilityAfter": 0.27405751891470953,
+          "difficultyBefore": 10,
+          "difficultyAfter": 10,
+          "repsAfter": 5,
+          "lapsesAfter": 3,
+          "scheduledDays": 0,
+          "reviewTimestamp": 1790425200000,
+          "nextDueDate": 1790425800000
+        },
+        {
+          "step": 6,
+          "rating": 1,
+          "elapsedDays": 0.006944444444444444,
+          "currentR": 0.8215931202335475,
+          "stateBefore": "relearning",
+          "stateAfter": "relearning",
+          "stabilityBefore": 0.27405751891470953,
+          "stabilityAfter": 0.11654375183234461,
+          "difficultyBefore": 10,
+          "difficultyAfter": 10,
+          "repsAfter": 6,
+          "lapsesAfter": 4,
+          "scheduledDays": 0,
+          "reviewTimestamp": 1790425800000,
+          "nextDueDate": 1790426400000
+        },
+        {
+          "step": 7,
+          "rating": 1,
+          "elapsedDays": 0.006944444444444444,
+          "currentR": 0.684843937665779,
+          "stateBefore": "relearning",
+          "stateAfter": "relearning",
+          "stabilityBefore": 0.11654375183234461,
+          "stabilityAfter": 0.1,
+          "difficultyBefore": 10,
+          "difficultyAfter": 10,
+          "repsAfter": 7,
+          "lapsesAfter": 5,
+          "scheduledDays": 0,
+          "reviewTimestamp": 1790426400000,
+          "nextDueDate": 1790427000000
+        },
+        {
+          "step": 8,
+          "rating": 2,
+          "elapsedDays": 0.006944444444444444,
+          "currentR": 0.6566107861974994,
+          "stateBefore": "relearning",
+          "stateAfter": "review",
+          "stabilityBefore": 0.1,
+          "stabilityAfter": 0.24740641095168137,
+          "difficultyBefore": 10,
+          "difficultyAfter": 10,
+          "repsAfter": 8,
+          "lapsesAfter": 5,
+          "scheduledDays": 1,
+          "reviewTimestamp": 1790427000000,
+          "nextDueDate": 1790513400000
+        },
+        {
+          "step": 9,
+          "rating": 1,
+          "elapsedDays": 1,
+          "currentR": 0.11337553939878933,
+          "stateBefore": "review",
+          "stateAfter": "relearning",
+          "stabilityBefore": 0.24740641095168137,
+          "stabilityAfter": 0.1245246710165798,
+          "difficultyBefore": 10,
+          "difficultyAfter": 10,
+          "repsAfter": 9,
+          "lapsesAfter": 6,
+          "scheduledDays": 0,
+          "reviewTimestamp": 1790513400000,
+          "nextDueDate": 1790514000000
+        },
+        {
+          "step": 10,
+          "rating": 1,
+          "elapsedDays": 0.006944444444444444,
+          "currentR": 0.6968032450522063,
+          "stateBefore": "relearning",
+          "stateAfter": "relearning",
+          "stabilityBefore": 0.1245246710165798,
+          "stabilityAfter": 0.1,
+          "difficultyBefore": 10,
+          "difficultyAfter": 10,
+          "repsAfter": 10,
+          "lapsesAfter": 7,
+          "scheduledDays": 0,
+          "reviewTimestamp": 1790514000000,
+          "nextDueDate": 1790514600000
+        },
+        {
+          "step": 11,
+          "rating": 1,
+          "elapsedDays": 0.006944444444444444,
+          "currentR": 0.6566107861974994,
+          "stateBefore": "relearning",
+          "stateAfter": "relearning",
+          "stabilityBefore": 0.1,
+          "stabilityAfter": 0.1,
+          "difficultyBefore": 10,
+          "difficultyAfter": 10,
+          "repsAfter": 11,
+          "lapsesAfter": 8,
+          "scheduledDays": 0,
+          "reviewTimestamp": 1790514600000,
+          "nextDueDate": 1790515200000
+        },
+        {
+          "step": 12,
+          "rating": 2,
+          "elapsedDays": 0.006944444444444444,
+          "currentR": 0.6566107861974994,
+          "stateBefore": "relearning",
+          "stateAfter": "review",
+          "stabilityBefore": 0.1,
+          "stabilityAfter": 0.24740641095168137,
+          "difficultyBefore": 10,
+          "difficultyAfter": 10,
+          "repsAfter": 12,
+          "lapsesAfter": 8,
+          "scheduledDays": 1,
+          "reviewTimestamp": 1790515200000,
+          "nextDueDate": 1790601600000
+        },
+        {
+          "step": 13,
+          "rating": 1,
+          "elapsedDays": 1,
+          "currentR": 0.11337553939878933,
+          "stateBefore": "review",
+          "stateAfter": "relearning",
+          "stabilityBefore": 0.24740641095168137,
+          "stabilityAfter": 0.1245246710165798,
+          "difficultyBefore": 10,
+          "difficultyAfter": 10,
+          "repsAfter": 13,
+          "lapsesAfter": 9,
+          "scheduledDays": 0,
+          "reviewTimestamp": 1790601600000,
+          "nextDueDate": 1790602200000
+        },
+        {
+          "step": 14,
+          "rating": 1,
+          "elapsedDays": 0.006944444444444444,
+          "currentR": 0.6968032450522063,
+          "stateBefore": "relearning",
+          "stateAfter": "relearning",
+          "stabilityBefore": 0.1245246710165798,
+          "stabilityAfter": 0.1,
+          "difficultyBefore": 10,
+          "difficultyAfter": 10,
+          "repsAfter": 14,
+          "lapsesAfter": 10,
+          "scheduledDays": 0,
+          "reviewTimestamp": 1790602200000,
+          "nextDueDate": 1790602800000
+        },
+        {
+          "step": 15,
+          "rating": 2,
+          "elapsedDays": 0.006944444444444444,
+          "currentR": 0.6566107861974994,
+          "stateBefore": "relearning",
+          "stateAfter": "review",
+          "stabilityBefore": 0.1,
+          "stabilityAfter": 0.24740641095168137,
+          "difficultyBefore": 10,
+          "difficultyAfter": 10,
+          "repsAfter": 15,
+          "lapsesAfter": 10,
+          "scheduledDays": 1,
+          "reviewTimestamp": 1790602800000,
+          "nextDueDate": 1790689200000
+        },
+        {
+          "step": 16,
+          "rating": 1,
+          "elapsedDays": 1,
+          "currentR": 0.11337553939878933,
+          "stateBefore": "review",
+          "stateAfter": "relearning",
+          "stabilityBefore": 0.24740641095168137,
+          "stabilityAfter": 0.1245246710165798,
+          "difficultyBefore": 10,
+          "difficultyAfter": 10,
+          "repsAfter": 16,
+          "lapsesAfter": 11,
+          "scheduledDays": 0,
+          "reviewTimestamp": 1790689200000,
+          "nextDueDate": 1790689800000
+        },
+        {
+          "step": 17,
+          "rating": 1,
+          "elapsedDays": 0.006944444444444444,
+          "currentR": 0.6968032450522063,
+          "stateBefore": "relearning",
+          "stateAfter": "relearning",
+          "stabilityBefore": 0.1245246710165798,
+          "stabilityAfter": 0.1,
+          "difficultyBefore": 10,
+          "difficultyAfter": 10,
+          "repsAfter": 17,
+          "lapsesAfter": 12,
+          "scheduledDays": 0,
+          "reviewTimestamp": 1790689800000,
+          "nextDueDate": 1790690400000
+        },
+        {
+          "step": 18,
+          "rating": 2,
+          "elapsedDays": 0.006944444444444444,
+          "currentR": 0.6566107861974994,
+          "stateBefore": "relearning",
+          "stateAfter": "review",
+          "stabilityBefore": 0.1,
+          "stabilityAfter": 0.24740641095168137,
+          "difficultyBefore": 10,
+          "difficultyAfter": 10,
+          "repsAfter": 18,
+          "lapsesAfter": 12,
+          "scheduledDays": 1,
+          "reviewTimestamp": 1790690400000,
+          "nextDueDate": 1790776800000
+        },
+        {
+          "step": 19,
+          "rating": 1,
+          "elapsedDays": 1,
+          "currentR": 0.11337553939878933,
+          "stateBefore": "review",
+          "stateAfter": "relearning",
+          "stabilityBefore": 0.24740641095168137,
+          "stabilityAfter": 0.1245246710165798,
+          "difficultyBefore": 10,
+          "difficultyAfter": 10,
+          "repsAfter": 19,
+          "lapsesAfter": 13,
+          "scheduledDays": 0,
+          "reviewTimestamp": 1790776800000,
+          "nextDueDate": 1790777400000
+        },
+        {
+          "step": 20,
+          "rating": 2,
+          "elapsedDays": 0.006944444444444444,
+          "currentR": 0.6968032450522063,
+          "stateBefore": "relearning",
+          "stateAfter": "review",
+          "stabilityBefore": 0.1245246710165798,
+          "stabilityAfter": 0.27904011013194563,
+          "difficultyBefore": 10,
+          "difficultyAfter": 10,
+          "repsAfter": 20,
+          "lapsesAfter": 13,
+          "scheduledDays": 1,
+          "reviewTimestamp": 1790777400000,
+          "nextDueDate": 1790863800000
+        },
+        {
+          "step": 21,
+          "rating": 1,
+          "elapsedDays": 1,
+          "currentR": 0.1203069214971344,
+          "stateBefore": "review",
+          "stateAfter": "relearning",
+          "stabilityBefore": 0.27904011013194563,
+          "stabilityAfter": 0.1389334424152844,
+          "difficultyBefore": 10,
+          "difficultyAfter": 10,
+          "repsAfter": 21,
+          "lapsesAfter": 14,
+          "scheduledDays": 0,
+          "reviewTimestamp": 1790863800000,
+          "nextDueDate": 1790864400000
+        },
+        {
+          "step": 22,
+          "rating": 1,
+          "elapsedDays": 0.006944444444444444,
+          "currentR": 0.7161708198887147,
+          "stateBefore": "relearning",
+          "stateAfter": "relearning",
+          "stabilityBefore": 0.1389334424152844,
+          "stabilityAfter": 0.1,
+          "difficultyBefore": 10,
+          "difficultyAfter": 10,
+          "repsAfter": 22,
+          "lapsesAfter": 15,
+          "scheduledDays": 0,
+          "reviewTimestamp": 1790864400000,
+          "nextDueDate": 1790865000000
+        }
+      ]
+    },
+    {
+      "cardId": "card_5_all_easy",
+      "totalReviews": 22,
+      "finalCard": {
+        "id": "card_5_all_easy",
+        "state": "review",
+        "stability": 89453696.0446119,
+        "difficulty": 1,
+        "reps": 22,
+        "lapses": 0,
+        "lastReview": 49057963200000,
+        "dueDate": 52211563200000,
+        "halfLife": 14124267.796517668
+      },
+      "steps": [
+        {
+          "step": 1,
+          "rating": 4,
+          "elapsedDays": 0,
+          "currentR": 1,
+          "stateBefore": "new",
+          "stateAfter": "review",
+          "stabilityBefore": 0.1,
+          "stabilityAfter": 15.69105,
+          "difficultyBefore": 5,
+          "difficultyAfter": 3.2245015893713678,
+          "repsAfter": 1,
+          "lapsesAfter": 0,
+          "scheduledDays": 1,
+          "reviewTimestamp": 1790251200000,
+          "nextDueDate": 1790337600000
+        },
+        {
+          "step": 2,
+          "rating": 4,
+          "elapsedDays": 1,
+          "currentR": 0.6725387009706365,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 15.69105,
+          "stabilityAfter": 482.09193765748614,
+          "difficultyBefore": 3.2245015893713678,
+          "difficultyAfter": 1.7802859204029269,
+          "repsAfter": 2,
+          "lapsesAfter": 0,
+          "scheduledDays": 6,
+          "reviewTimestamp": 1790337600000,
+          "nextDueDate": 1790856000000
+        },
+        {
+          "step": 3,
+          "rating": 4,
+          "elapsedDays": 6,
+          "currentR": 0.8993076967052761,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 482.09193765748614,
+          "stabilityAfter": 3563.4475744101014,
+          "difficultyBefore": 1.7802859204029269,
+          "difficultyAfter": 1,
+          "repsAfter": 3,
+          "lapsesAfter": 0,
+          "scheduledDays": 44,
+          "reviewTimestamp": 1790856000000,
+          "nextDueDate": 1794657600000
+        },
+        {
+          "step": 4,
+          "rating": 4,
+          "elapsedDays": 44,
+          "currentR": 0.8999867456042054,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 3563.4475744101014,
+          "stabilityAfter": 22888.44478724709,
+          "difficultyBefore": 1,
+          "difficultyAfter": 1,
+          "repsAfter": 4,
+          "lapsesAfter": 0,
+          "scheduledDays": 283,
+          "reviewTimestamp": 1794657600000,
+          "nextDueDate": 1819108800000
+        },
+        {
+          "step": 5,
+          "rating": 4,
+          "elapsedDays": 283,
+          "currentR": 0.8998709464422727,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 22888.44478724709,
+          "stabilityAfter": 122454.35194501086,
+          "difficultyBefore": 1,
+          "difficultyAfter": 1,
+          "repsAfter": 5,
+          "lapsesAfter": 0,
+          "scheduledDays": 1512,
+          "reviewTimestamp": 1819108800000,
+          "nextDueDate": 1949745600000
+        },
+        {
+          "step": 6,
+          "rating": 4,
+          "elapsedDays": 1512,
+          "currentR": 0.8999876780392871,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 122454.35194501086,
+          "stabilityAfter": 558082.0172032615,
+          "difficultyBefore": 1,
+          "difficultyAfter": 1,
+          "repsAfter": 6,
+          "lapsesAfter": 0,
+          "scheduledDays": 6890,
+          "reviewTimestamp": 1949745600000,
+          "nextDueDate": 2545041600000
+        },
+        {
+          "step": 7,
+          "rating": 4,
+          "elapsedDays": 6890,
+          "currentR": 0.8999987770117852,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 558082.0172032615,
+          "stabilityAfter": 2214876.6626178315,
+          "difficultyBefore": 1,
+          "difficultyAfter": 1,
+          "repsAfter": 7,
+          "lapsesAfter": 0,
+          "scheduledDays": 27344,
+          "reviewTimestamp": 2545041600000,
+          "nextDueDate": 4907563200000
+        },
+        {
+          "step": 8,
+          "rating": 4,
+          "elapsedDays": 27344,
+          "currentR": 0.9000004888103815,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 2214876.6626178315,
+          "stabilityAfter": 7793835.026276386,
+          "difficultyBefore": 1,
+          "difficultyAfter": 1,
+          "repsAfter": 8,
+          "lapsesAfter": 0,
+          "scheduledDays": 36500,
+          "reviewTimestamp": 4907563200000,
+          "nextDueDate": 8061163200000
+        },
+        {
+          "step": 9,
+          "rating": 4,
+          "elapsedDays": 36500,
+          "currentR": 0.9582744998610423,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 7793835.026276386,
+          "stabilityAfter": 14635700.074845877,
+          "difficultyBefore": 1,
+          "difficultyAfter": 1,
+          "repsAfter": 9,
+          "lapsesAfter": 0,
+          "scheduledDays": 36500,
+          "reviewTimestamp": 8061163200000,
+          "nextDueDate": 11214763200000
+        },
+        {
+          "step": 10,
+          "rating": 4,
+          "elapsedDays": 36500,
+          "currentR": 0.9771179785972289,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 14635700.074845877,
+          "stabilityAfter": 21108849.383494426,
+          "difficultyBefore": 1,
+          "difficultyAfter": 1,
+          "repsAfter": 10,
+          "lapsesAfter": 0,
+          "scheduledDays": 36500,
+          "reviewTimestamp": 11214763200000,
+          "nextDueDate": 14368363200000
+        },
+        {
+          "step": 11,
+          "rating": 4,
+          "elapsedDays": 36500,
+          "currentR": 0.9839672257716384,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 21108849.383494426,
+          "stabilityAfter": 27349087.35055669,
+          "difficultyBefore": 1,
+          "difficultyAfter": 1,
+          "repsAfter": 11,
+          "lapsesAfter": 0,
+          "scheduledDays": 36500,
+          "reviewTimestamp": 14368363200000,
+          "nextDueDate": 17521963200000
+        },
+        {
+          "step": 12,
+          "rating": 4,
+          "elapsedDays": 36500,
+          "currentR": 0.9875574702178949,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 27349087.35055669,
+          "stabilityAfter": 33421698.7293617,
+          "difficultyBefore": 1,
+          "difficultyAfter": 1,
+          "repsAfter": 12,
+          "lapsesAfter": 0,
+          "scheduledDays": 36500,
+          "reviewTimestamp": 17521963200000,
+          "nextDueDate": 20675563200000
+        },
+        {
+          "step": 13,
+          "rating": 4,
+          "elapsedDays": 36500,
+          "currentR": 0.9897837223775677,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 33421698.7293617,
+          "stabilityAfter": 39364221.79332591,
+          "difficultyBefore": 1,
+          "difficultyAfter": 1,
+          "repsAfter": 13,
+          "lapsesAfter": 0,
+          "scheduledDays": 36500,
+          "reviewTimestamp": 20675563200000,
+          "nextDueDate": 23829163200000
+        },
+        {
+          "step": 14,
+          "rating": 4,
+          "elapsedDays": 36500,
+          "currentR": 0.9913059481000721,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 39364221.79332591,
+          "stabilityAfter": 45200879.135167725,
+          "difficultyBefore": 1,
+          "difficultyAfter": 1,
+          "repsAfter": 14,
+          "lapsesAfter": 0,
+          "scheduledDays": 36500,
+          "reviewTimestamp": 23829163200000,
+          "nextDueDate": 26982763200000
+        },
+        {
+          "step": 15,
+          "rating": 4,
+          "elapsedDays": 36500,
+          "currentR": 0.9924158488697354,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 45200879.135167725,
+          "stabilityAfter": 50948535.288666666,
+          "difficultyBefore": 1,
+          "difficultyAfter": 1,
+          "repsAfter": 15,
+          "lapsesAfter": 0,
+          "scheduledDays": 36500,
+          "reviewTimestamp": 26982763200000,
+          "nextDueDate": 30136363200000
+        },
+        {
+          "step": 16,
+          "rating": 4,
+          "elapsedDays": 36500,
+          "currentR": 0.9932628137963536,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 50948535.288666666,
+          "stabilityAfter": 56619577.72632503,
+          "difficultyBefore": 1,
+          "difficultyAfter": 1,
+          "repsAfter": 16,
+          "lapsesAfter": 0,
+          "scheduledDays": 36500,
+          "reviewTimestamp": 30136363200000,
+          "nextDueDate": 33289963200000
+        },
+        {
+          "step": 17,
+          "rating": 4,
+          "elapsedDays": 36500,
+          "currentR": 0.9939314839664516,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 56619577.72632503,
+          "stabilityAfter": 62223474.083588764,
+          "difficultyBefore": 1,
+          "difficultyAfter": 1,
+          "repsAfter": 17,
+          "lapsesAfter": 0,
+          "scheduledDays": 36500,
+          "reviewTimestamp": 33289963200000,
+          "nextDueDate": 36443563200000
+        },
+        {
+          "step": 18,
+          "rating": 4,
+          "elapsedDays": 36500,
+          "currentR": 0.9944734975355191,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 62223474.083588764,
+          "stabilityAfter": 67767685.48954166,
+          "difficultyBefore": 1,
+          "difficultyAfter": 1,
+          "repsAfter": 18,
+          "lapsesAfter": 0,
+          "scheduledDays": 36500,
+          "reviewTimestamp": 36443563200000,
+          "nextDueDate": 39597163200000
+        },
+        {
+          "step": 19,
+          "rating": 4,
+          "elapsedDays": 36500,
+          "currentR": 0.9949221941900949,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 67767685.48954166,
+          "stabilityAfter": 73258236.72851543,
+          "difficultyBefore": 1,
+          "difficultyAfter": 1,
+          "repsAfter": 19,
+          "lapsesAfter": 0,
+          "scheduledDays": 36500,
+          "reviewTimestamp": 39597163200000,
+          "nextDueDate": 42750763200000
+        },
+        {
+          "step": 20,
+          "rating": 4,
+          "elapsedDays": 36500,
+          "currentR": 0.9953000864854822,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 73258236.72851543,
+          "stabilityAfter": 78700090.12674631,
+          "difficultyBefore": 1,
+          "difficultyAfter": 1,
+          "repsAfter": 20,
+          "lapsesAfter": 0,
+          "scheduledDays": 36500,
+          "reviewTimestamp": 42750763200000,
+          "nextDueDate": 45904363200000
+        },
+        {
+          "step": 21,
+          "rating": 4,
+          "elapsedDays": 36500,
+          "currentR": 0.9956229396259014,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 78700090.12674631,
+          "stabilityAfter": 84097400.69204837,
+          "difficultyBefore": 1,
+          "difficultyAfter": 1,
+          "repsAfter": 21,
+          "lapsesAfter": 0,
+          "scheduledDays": 36500,
+          "reviewTimestamp": 45904363200000,
+          "nextDueDate": 49057963200000
+        },
+        {
+          "step": 22,
+          "rating": 4,
+          "elapsedDays": 36500,
+          "currentR": 0.9959021319064264,
+          "stateBefore": "review",
+          "stateAfter": "review",
+          "stabilityBefore": 84097400.69204837,
+          "stabilityAfter": 89453696.0446119,
+          "difficultyBefore": 1,
+          "difficultyAfter": 1,
+          "repsAfter": 22,
+          "lapsesAfter": 0,
+          "scheduledDays": 36500,
+          "reviewTimestamp": 49057963200000,
+          "nextDueDate": 52211563200000
+        }
+      ]
+    }
+  ],
+  "leechCases": [
+    {
+      "lapses": 0,
+      "threshold": 6,
+      "isLeechSimple": false,
+      "isLeech": false,
+      "actionRecommendation": "reword",
+      "message": "Tarjeta en ciclo de aprendizaje normal."
+    },
+    {
+      "lapses": 1,
+      "threshold": 6,
+      "isLeechSimple": false,
+      "isLeech": false,
+      "actionRecommendation": "reword",
+      "message": "Tarjeta en ciclo de aprendizaje normal."
+    },
+    {
+      "lapses": 2,
+      "threshold": 6,
+      "isLeechSimple": false,
+      "isLeech": false,
+      "actionRecommendation": "reword",
+      "message": "Tarjeta en ciclo de aprendizaje normal."
+    },
+    {
+      "lapses": 3,
+      "threshold": 6,
+      "isLeechSimple": false,
+      "isLeech": false,
+      "actionRecommendation": "reword",
+      "message": "Tarjeta en ciclo de aprendizaje normal."
+    },
+    {
+      "lapses": 4,
+      "threshold": 6,
+      "isLeechSimple": false,
+      "isLeech": false,
+      "actionRecommendation": "reword",
+      "message": "Tarjeta en ciclo de aprendizaje normal."
+    },
+    {
+      "lapses": 5,
+      "threshold": 6,
+      "isLeechSimple": false,
+      "isLeech": false,
+      "actionRecommendation": "reword",
+      "message": "Tarjeta en ciclo de aprendizaje normal."
+    },
+    {
+      "lapses": 6,
+      "threshold": 6,
+      "isLeechSimple": true,
+      "isLeech": true,
+      "actionRecommendation": "split",
+      "message": "Esta tarjeta te falló 6 veces. Probablemente el problema sea la formulación de la tarjeta o una premisa conceptual, no tu memoria."
+    },
+    {
+      "lapses": 7,
+      "threshold": 6,
+      "isLeechSimple": true,
+      "isLeech": true,
+      "actionRecommendation": "split",
+      "message": "Esta tarjeta te falló 7 veces. Probablemente el problema sea la formulación de la tarjeta o una premisa conceptual, no tu memoria."
+    },
+    {
+      "lapses": 8,
+      "threshold": 6,
+      "isLeechSimple": true,
+      "isLeech": true,
+      "actionRecommendation": "audit",
+      "message": "Esta tarjeta te falló 8 veces. Probablemente el problema sea la formulación de la tarjeta o una premisa conceptual, no tu memoria."
+    },
+    {
+      "lapses": 9,
+      "threshold": 6,
+      "isLeechSimple": true,
+      "isLeech": true,
+      "actionRecommendation": "audit",
+      "message": "Esta tarjeta te falló 9 veces. Probablemente el problema sea la formulación de la tarjeta o una premisa conceptual, no tu memoria."
+    },
+    {
+      "lapses": 10,
+      "threshold": 6,
+      "isLeechSimple": true,
+      "isLeech": true,
+      "actionRecommendation": "suspend",
+      "message": "Esta tarjeta te falló 10 veces. Probablemente el problema sea la formulación de la tarjeta o una premisa conceptual, no tu memoria."
+    },
+    {
+      "lapses": 11,
+      "threshold": 6,
+      "isLeechSimple": true,
+      "isLeech": true,
+      "actionRecommendation": "suspend",
+      "message": "Esta tarjeta te falló 11 veces. Probablemente el problema sea la formulación de la tarjeta o una premisa conceptual, no tu memoria."
+    },
+    {
+      "lapses": 12,
+      "threshold": 6,
+      "isLeechSimple": true,
+      "isLeech": true,
+      "actionRecommendation": "suspend",
+      "message": "Esta tarjeta te falló 12 veces. Probablemente el problema sea la formulación de la tarjeta o una premisa conceptual, no tu memoria."
+    }
+  ],
+  "rmseCases": [
+    {
+      "name": "empty_logs",
+      "logs": [],
+      "expectedRmse": 0
+    },
+    {
+      "name": "batch_5_logs",
+      "logs": [
+        {
+          "rating": 3,
+          "stabilityBefore": 3.17,
+          "elapsedDays": 1
+        },
+        {
+          "rating": 3,
+          "stabilityBefore": 4.5,
+          "elapsedDays": 2
+        },
+        {
+          "rating": 1,
+          "stabilityBefore": 5,
+          "elapsedDays": 10
+        },
+        {
+          "rating": 4,
+          "stabilityBefore": 12,
+          "elapsedDays": 3
+        },
+        {
+          "rating": 2,
+          "stabilityBefore": 2,
+          "elapsedDays": 1.5
+        }
+      ],
+      "expectedRmse": 0.5934188776604276
+    },
+    {
+      "name": "batch_10_logs",
+      "logs": [
+        {
+          "rating": 3,
+          "stabilityBefore": 3.17,
+          "elapsedDays": 1
+        },
+        {
+          "rating": 3,
+          "stabilityBefore": 4.5,
+          "elapsedDays": 2
+        },
+        {
+          "rating": 1,
+          "stabilityBefore": 5,
+          "elapsedDays": 10
+        },
+        {
+          "rating": 4,
+          "stabilityBefore": 12,
+          "elapsedDays": 3
+        },
+        {
+          "rating": 2,
+          "stabilityBefore": 2,
+          "elapsedDays": 1.5
+        },
+        {
+          "rating": 1,
+          "stabilityBefore": 1,
+          "elapsedDays": 5
+        },
+        {
+          "rating": 3,
+          "stabilityBefore": 8,
+          "elapsedDays": 8
+        },
+        {
+          "rating": 3,
+          "stabilityBefore": 15,
+          "elapsedDays": 12
+        },
+        {
+          "rating": 4,
+          "stabilityBefore": 20,
+          "elapsedDays": 14
+        },
+        {
+          "rating": 1,
+          "stabilityBefore": 3,
+          "elapsedDays": 4
+        }
+      ],
+      "expectedRmse": 0.5931084353787021
+    }
+  ],
+  "loadBalancerScenarios": {
+    "postpone": {
+      "days": 3,
+      "maxCards": 4,
+      "now": 1790251200000,
+      "cards": [
+        {
+          "id": "c1",
+          "dueDate": 1790078400000
+        },
+        {
+          "id": "c2",
+          "dueDate": 1790164800000
+        },
+        {
+          "id": "c3",
+          "dueDate": 1790251200000
+        },
+        {
+          "id": "c4",
+          "dueDate": 1790337600000
+        },
+        {
+          "id": "c5",
+          "dueDate": 1790233200000
+        },
+        {
+          "id": "c6",
+          "dueDate": 1790208000000
+        }
+      ],
+      "expectedShiftBaseMs": 259200000,
+      "expectedCandidateIds": [
+        "c1",
+        "c2",
+        "c3",
+        "c5"
+      ]
+    },
+    "advance": {
+      "daysAhead": 2,
+      "maxCards": 3,
+      "now": 1790251200000,
+      "cards": [
+        {
+          "id": "c10",
+          "dueDate": 1790251199000
+        },
+        {
+          "id": "c11",
+          "dueDate": 1790294400000
+        },
+        {
+          "id": "c12",
+          "dueDate": 1790337600000
+        },
+        {
+          "id": "c13",
+          "dueDate": 1790380800000
+        },
+        {
+          "id": "c14",
+          "dueDate": 1790510400000
+        }
+      ],
+      "expectedCandidateIds": [
+        "c11",
+        "c12",
+        "c13"
+      ],
+      "expectedNewDueDate": 1790251140000
+    },
+    "balanceBuckets": {
+      "windowDays": 7,
+      "targetMaxPerDay": 2,
+      "now": 1790251200000,
+      "cards": [
+        {
+          "id": "b0_1",
+          "dueDate": 1790258400000
+        },
+        {
+          "id": "b0_2",
+          "dueDate": 1790265600000
+        },
+        {
+          "id": "b0_3",
+          "dueDate": 1790272800000
+        },
+        {
+          "id": "b0_4",
+          "dueDate": 1790280000000
+        },
+        {
+          "id": "b1_1",
+          "dueDate": 1790344800000
+        },
+        {
+          "id": "b3_1",
+          "dueDate": 1790517600000
+        },
+        {
+          "id": "b3_2",
+          "dueDate": 1790524800000
+        },
+        {
+          "id": "b3_3",
+          "dueDate": 1790532000000
+        }
+      ]
+    },
+    "disperseSiblings": {
+      "now": 1790251200000,
+      "cards": [
+        {
+          "id": "sib_a1",
+          "conceptId": "concept_A",
+          "dueDate": 1790258400000
+        },
+        {
+          "id": "sib_a2",
+          "conceptId": "concept_A",
+          "dueDate": 1790269200000
+        },
+        {
+          "id": "sib_a3",
+          "conceptId": "concept_A",
+          "dueDate": 1790283600000
+        },
+        {
+          "id": "sib_b1",
+          "conceptId": "concept_B",
+          "dueDate": 1790287200000
+        },
+        {
+          "id": "sib_b2",
+          "conceptId": "concept_B",
+          "dueDate": 1790467200000
+        },
+        {
+          "id": "sib_c1",
+          "conceptId": "concept_C",
+          "dueDate": 1790265600000
+        }
+      ],
+      "expectedDispersedIds": [
+        "sib_a2"
+      ]
+    }
+  }
+}

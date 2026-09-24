@@ -23,6 +23,7 @@ import { StudyTipsWidget } from "../components/study-tips/StudyTipsWidget";
 import { CourseProgressCard } from "../components/progress/CourseProgressCard";
 import { DailyStudyRecommendationCard } from "../features/study-engine/components/DailyStudyRecommendationCard";
 import { PanelGuide } from "../components/guide/PanelGuide";
+import { OnboardingWelcomeCard } from "../components/onboarding/OnboardingWelcomeCard";
 import { Skeleton, SkeletonText } from "../components/ui/Skeleton";
 import { motion, AnimatePresence } from "motion/react";
 import { DURATION, EASE_EXPO_OUT } from "../lib/motion-tokens";
@@ -211,6 +212,9 @@ export const DashboardPage: React.FC = () => {
           </Link>
         </div>
       </div>
+
+      {/* Onboarding para estudiantes nuevos sin datos */}
+      <OnboardingWelcomeCard />
 
       {/* Fila Superior: Métricas Clave Limpias (Sin gráficos pesados) */}
       <div className="flex items-center justify-between px-1">

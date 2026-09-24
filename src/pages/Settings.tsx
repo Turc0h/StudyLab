@@ -12,7 +12,15 @@ import {
   AlertTriangle,
   Cpu,
   RefreshCw,
+  Gamepad2,
+  Clock,
+  Sparkles,
+  Bell,
+  Calendar,
+  ExternalLink,
+  EyeOff,
 } from "lucide-react";
+import { openFloatingIslandWindow, hideMainWindow } from "../platform/islandWindow";
 import { checkOllamaStatus, type OllamaStatus } from "../platform/ai/ollamaClient";
 import type { ReactNode } from "react";
 import { useState, useEffect } from "react";
@@ -24,12 +32,15 @@ import { Surface } from "../components/ui/Surface";
 import { Switch } from "../components/ui/Switch";
 import { Progress } from "../components/ui/Progress";
 import { BACKEND_URL } from "../config/env";
+import { clsx } from "clsx";
 import { resetAllLocalData } from "../db/db";
 import { ambientTracks } from "../features/ambient-sound/tracks";
 import { useGoogleCalendarStatus } from "../features/google-calendar/useGoogleCalendar";
 import { useThemeStore } from "../stores/useThemeStore";
 import { useNotificationStore } from "../stores/useNotificationStore";
 import { useContextEngineStore } from "../stores/useContextEngineStore";
+import { useDateFormatStore, formatDateWithPattern } from "../stores/useDateFormatStore";
+import { useDynamicIslandStore, type IslandReminderFrequency } from "../stores/useDynamicIslandStore";
 import {
   getStorageEstimate,
   requestStoragePersistence,
@@ -78,6 +89,23 @@ export function Settings() {
     reducedMotion,
     setReducedMotion,
   } = useThemeStore();
+  const { dateFormat, setDateFormat } = useDateFormatStore();
+  const {
+    enabled: islandEnabled,
+    setEnabled: setIslandEnabled,
+    gameMode: islandGameMode,
+    setGameMode: setIslandGameMode,
+    showClock: islandShowClock,
+    setShowClock: setIslandShowClock,
+    showTimer: islandShowTimer,
+    setShowTimer: setIslandShowTimer,
+    showReminders: islandShowReminders,
+    setShowReminders: setIslandShowReminders,
+    reminderFrequency: islandReminderFrequency,
+    setReminderFrequency: setIslandReminderFrequency,
+    triggerAlert: triggerIslandAlert,
+  } = useDynamicIslandStore();
+  const [testAlertSuccess, setTestAlertSuccess] = useState(false);
   const notifPreferences = useNotificationStore((s) => s.preferences);
   const updateNotifPreferences = useNotificationStore((s) => s.updatePreferences);
   const {
@@ -338,6 +366,49 @@ export function Settings() {
             onChange={setReducedMotion}
             label="Animaciones reducidas (modo prefers-reduced-motion: transiciones instantáneas)"
           />
+        </SettingsSection>
+
+        <SettingsSection
+          title="Formato de Fecha y Región"
+          description="Personaliza cómo se muestran e ingresan las fechas en el calendario, vencimientos y notificaciones."
+        >
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <span className="text-sm font-medium text-text-primary">Formato de Fecha</span>
+                <p className="text-xs text-text-secondary mt-0.5">
+                  Vista previa de hoy:{" "}
+                  <span className="text-accent-primary font-mono font-semibold px-2 py-0.5 rounded bg-accent-primary/10 border border-accent-primary/20">
+                    {formatDateWithPattern(Date.now(), dateFormat)}
+                  </span>
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                <Button
+                  variant={dateFormat === "DD/MM/YYYY" ? "primary" : "secondary"}
+                  size="sm"
+                  onClick={() => setDateFormat("DD/MM/YYYY")}
+                >
+                  DD/MM/YYYY (Día/Mes/Año)
+                </Button>
+                <Button
+                  variant={dateFormat === "MM/DD/YYYY" ? "primary" : "secondary"}
+                  size="sm"
+                  onClick={() => setDateFormat("MM/DD/YYYY")}
+                >
+                  MM/DD/YYYY (EE.UU.)
+                </Button>
+                <Button
+                  variant={dateFormat === "YYYY-MM-DD" ? "primary" : "secondary"}
+                  size="sm"
+                  onClick={() => setDateFormat("YYYY-MM-DD")}
+                >
+                  YYYY-MM-DD (ISO)
+                </Button>
+              </div>
+            </div>
+          </div>
         </SettingsSection>
 
         <SettingsSection
@@ -813,6 +884,214 @@ export function Settings() {
               <span className="text-xs font-mono text-success">
                 ✓ Se eliminaron {purgedCount} registros antiguos de telemetría de tecleo. Privacidad asegurada.
               </span>
+            )}
+          </div>
+        </SettingsSection>
+
+        {/* Sección de Formato de Fecha y Región */}
+        <SettingsSection
+          title="Formato de Fecha y Región"
+          description="Elegí cómo querés visualizar y cargar las fechas en los calendarios, vencimientos de materias y agendas de examen."
+        >
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <span className="text-sm font-medium text-text-primary flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-accent-primary" />
+                  Patrón de Fecha Predeterminado
+                </span>
+                <p className="text-xs text-text-secondary mt-0.5">
+                  Por defecto configurado en DD/MM/YYYY para Argentina y Latinoamérica.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                {(["DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD"] as const).map((fmt) => (
+                  <button
+                    key={fmt}
+                    type="button"
+                    onClick={() => setDateFormat(fmt)}
+                    className={clsx(
+                      "px-3 py-1.5 rounded-md text-xs font-mono font-medium transition-all cursor-pointer border",
+                      dateFormat === fmt
+                        ? "bg-accent-primary text-white border-accent-primary shadow-sm"
+                        : "bg-bg-surface-2 text-text-secondary border-border-subtle hover:text-text-primary hover:border-accent-primary"
+                    )}
+                  >
+                    {fmt} {fmt === "DD/MM/YYYY" && "(Regional)"}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-border-subtle bg-bg-surface-2 p-3 flex items-center justify-between text-xs">
+              <span className="text-text-muted">Vista previa con la fecha de hoy:</span>
+              <span className="font-mono font-bold text-accent-primary bg-accent-primary/10 px-2.5 py-1 rounded">
+                {formatDateWithPattern(new Date(), dateFormat)}
+              </span>
+            </div>
+          </div>
+        </SettingsSection>
+
+        {/* Sección de Isla Dinámica Estudiantil */}
+        <SettingsSection
+          title="Isla Dinámica Estudiantil (Dynamic Island)"
+          description="Cápsula flotante interactiva superior para ver el temporizador de estudio, el reloj y recordatorios inteligentes con animaciones suaves (Atajo: Ctrl+I / Cmd+I)."
+        >
+          <div className="space-y-4">
+            {/* Switch Principal Habilitar */}
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-sm font-medium text-text-primary flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-accent-primary" />
+                  Habilitar Isla Dinámica en Pantalla
+                </span>
+                <p className="text-xs text-text-secondary mt-0.5">
+                  Muestra la píldora interactiva centrada en la parte superior de la aplicación.
+                </p>
+              </div>
+              <Switch checked={islandEnabled} onChange={setIslandEnabled} />
+            </div>
+
+            {islandEnabled && (
+              <div className="rounded-xl border border-border-subtle bg-bg-surface-2 p-4 space-y-4">
+                {/* Modo Juego / No Molestar */}
+                <div className="flex items-center justify-between pb-3 border-b border-border-subtle">
+                  <div>
+                    <span className="text-xs font-semibold text-text-primary flex items-center gap-1.5">
+                      <Gamepad2 className="h-3.5 w-3.5 text-rose-400" />
+                      Modo "No Molestar / Juego"
+                    </span>
+                    <p className="text-[11px] text-text-muted mt-0.5">
+                      Oculta la isla por completo para no distraer ni consumir recursos visuales. Solo se muestra si surge una alerta urgente o examen inmediato.
+                    </p>
+                  </div>
+                  <Switch checked={islandGameMode} onChange={setIslandGameMode} />
+                </div>
+
+                {/* Opciones de contenido visibles */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pb-3 border-b border-border-subtle">
+                  <div className="flex items-center justify-between p-2.5 rounded-lg bg-bg-surface-1 border border-border-subtle">
+                    <span className="text-xs text-text-secondary flex items-center gap-1.5">
+                      <Clock className="h-3.5 w-3.5 text-accent-primary" />
+                      Reloj Digital
+                    </span>
+                    <Switch checked={islandShowClock} onChange={setIslandShowClock} />
+                  </div>
+
+                  <div className="flex items-center justify-between p-2.5 rounded-lg bg-bg-surface-1 border border-border-subtle">
+                    <span className="text-xs text-text-secondary flex items-center gap-1.5">
+                      <Clock className="h-3.5 w-3.5 text-accent-primary" />
+                      Temporizador
+                    </span>
+                    <Switch checked={islandShowTimer} onChange={setIslandShowTimer} />
+                  </div>
+
+                  <div className="flex items-center justify-between p-2.5 rounded-lg bg-bg-surface-1 border border-border-subtle">
+                    <span className="text-xs text-text-secondary flex items-center gap-1.5">
+                      <Bell className="h-3.5 w-3.5 text-accent-primary" />
+                      Recordatorios
+                    </span>
+                    <Switch checked={islandShowReminders} onChange={setIslandShowReminders} />
+                  </div>
+                </div>
+
+                {/* Frecuencia de Recordatorios Periódicos */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div>
+                    <span className="text-xs font-semibold text-text-primary">
+                      Frecuencia de Recordatorios Inteligentes
+                    </span>
+                    <p className="text-[11px] text-text-muted mt-0.5">
+                      Intervalo para avisos de descanso visual (regla 20-20-20), hidratación y postura activa.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {([15, 30, 45, 60, 0] as const).map((freq) => (
+                      <button
+                        key={freq}
+                        type="button"
+                        onClick={() => setIslandReminderFrequency(freq as IslandReminderFrequency)}
+                        className={clsx(
+                          "px-2.5 py-1 rounded text-xs font-mono font-medium transition-all cursor-pointer border",
+                          islandReminderFrequency === freq
+                            ? "bg-accent-primary text-white border-accent-primary shadow-xs"
+                            : "bg-bg-surface-1 text-text-secondary border-border-subtle hover:text-text-primary"
+                        )}
+                      >
+                        {freq === 0 ? "Desactivado" : `${freq}m`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Botón para probar la animación y alerta */}
+                <div className="flex items-center justify-between pt-2">
+                  <span className="text-[11px] text-text-muted">
+                    Podés disparar una alerta de prueba para ver la expansión animada de la isla en vivo:
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      triggerIslandAlert({
+                        title: "¡Examen de Álgebra en 2 días!",
+                        subtitle: "Recordatorio StudyLab en la Isla Dinámica.",
+                        level: "warning",
+                      });
+                      setTestAlertSuccess(true);
+                      setTimeout(() => setTestAlertSuccess(false), 3000);
+                    }}
+                    className="text-xs gap-1.5 cursor-pointer shrink-0"
+                  >
+                    <Sparkles className="h-3.5 w-3.5 text-accent-primary" />
+                    <span>{testAlertSuccess ? "¡Alerta enviada!" : "Probar Alerta en Isla"}</span>
+                  </Button>
+                </div>
+
+                {/* Desprender al Escritorio (Modo Flotante Independiente) */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t border-border-subtle">
+                  <div>
+                    <span className="text-xs font-semibold text-text-primary flex items-center gap-1.5">
+                      <ExternalLink className="h-3.5 w-3.5 text-cyan-400" />
+                      Modo Flotante en el Escritorio (Always-on-Top)
+                    </span>
+                    <p className="text-[11px] text-text-muted mt-0.5">
+                      Abre la Isla Dinámica en una pequeña ventana transparente e independiente que permanece visible en tu pantalla de Windows incluso al minimizar la aplicación.
+                    </p>
+                  </div>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => void openFloatingIslandWindow()}
+                    className="text-xs gap-1.5 cursor-pointer shrink-0"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5 text-cyan-400" />
+                    <span>Abrir en Escritorio</span>
+                  </Button>
+                </div>
+
+                {/* Ocultar en Íconos Ocultos (Bandeja de Sistema) */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t border-border-subtle">
+                  <div>
+                    <span className="text-xs font-semibold text-text-primary flex items-center gap-1.5">
+                      <EyeOff className="h-3.5 w-3.5 text-accent-primary" />
+                      Segundo Plano e Íconos Ocultos (Bandeja del Sistema)
+                    </span>
+                    <p className="text-[11px] text-text-muted mt-0.5">
+                      Oculta la ventana principal de StudyLab en los íconos ocultos de Windows (junto al reloj). Al cerrar la ventana o pulsar este botón, la aplicación no se cierra: sigue funcionando en segundo plano y la Isla Flotante permanece en tu pantalla.
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => void hideMainWindow()}
+                    className="text-xs gap-1.5 cursor-pointer shrink-0"
+                  >
+                    <EyeOff className="h-3.5 w-3.5 text-accent-primary" />
+                    <span>Ocultar a Íconos Ocultos</span>
+                  </Button>
+                </div>
+              </div>
             )}
           </div>
         </SettingsSection>

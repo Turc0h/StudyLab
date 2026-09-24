@@ -1,0 +1,1218 @@
+{
+  "version": "1.0",
+  "generatedAt": "2026-09-24T17:19:11.773Z",
+  "triageCases": [
+    {
+      "input": {
+        "urgency": "urgent",
+        "material": "logical",
+        "mastery": "advanced",
+        "energy": "high"
+      },
+      "expected": {
+        "topMatches": [
+          {
+            "methodId": "practice-testing",
+            "score": 155,
+            "matchPercentage": 91,
+            "rationale": "Bajo presión temporal (inminente), las pruebas simuladas con corrección inmediata calibran con rigor tu umbral real de examen y eliminan la falsa fluidez.",
+            "keyBenefit": "Exposición a condiciones de evaluación de cátedra y auditoría de tiempos."
+          },
+          {
+            "methodId": "feynman",
+            "score": 130,
+            "matchPercentage": 84,
+            "rationale": "Ideal para contenidos lógico-matemáticos: simplificar la explicación en términos llanos desmantela la ilusión de competencia y localiza la raíz del error.",
+            "keyBenefit": "Claridad conceptual absoluta y lenguaje despojado de jerga vacía."
+          },
+          {
+            "methodId": "blurting",
+            "score": 125,
+            "matchPercentage": 82,
+            "rationale": "El vaciado mental a ciegas sin apuntes es el método de choque más veloz para diagnosticar con precisión qué conceptos tenés fijados y qué lagunas críticas debés repasar.",
+            "keyBenefit": "Evocación pura sin pistas visuales y contraste directo contra el material."
+          }
+        ],
+        "diagnosticSummary": "Diagnóstico: Para una situación con menos de 24 horas para rendir, sobre materia lógica o computacional y con foco mental pleno, tu prioridad pedagógica es maximizar la eficiencia y proteger la memoria de trabajo.",
+        "cautionAlert": null
+      }
+    },
+    {
+      "input": {
+        "urgency": "urgent",
+        "material": "factual",
+        "mastery": "intermediate",
+        "energy": "low"
+      },
+      "expected": {
+        "topMatches": [
+          {
+            "methodId": "active-recall",
+            "score": 110,
+            "matchPercentage": 78,
+            "rationale": "Forzar la recuperación sináptica activa genera huellas mnémicas hasta 3 veces más resistentes al olvido que la relectura pasiva tradicional.",
+            "keyBenefit": "Máxima eficiencia por minuto de estudio invertido."
+          },
+          {
+            "methodId": "leitner",
+            "score": 105,
+            "matchPercentage": 76,
+            "rationale": "La distribución física en 5 compartimentos separa de forma quirúrgica lo que ya dominás de lo que falla, multiplicando la frecuencia sobre las dificultades reales.",
+            "keyBenefit": "Economía cognitiva: el tiempo se concentra exclusivamente en lo que te cuesta."
+          },
+          {
+            "methodId": "chunking",
+            "score": 105,
+            "matchPercentage": 76,
+            "rationale": "Comprimir los datos en 4±1 paquetes estructurados evita el desbordamiento de la memoria de trabajo y permite recordar catálogos extensos.",
+            "keyBenefit": "Alivio inmediato de la sobrecarga cognitiva en temas densos."
+          }
+        ],
+        "diagnosticSummary": "Diagnóstico: Para una situación con menos de 24 horas para rendir, sobre contenido de alta memorización fáctica y con fatiga mental o estudio nocturno, tu prioridad pedagógica es maximizar la eficiencia y proteger la memoria de trabajo.",
+        "cautionAlert": "¡Alerta de Fatiga Extrema! Intentar sesiones masivas de última hora con baja energía produce ilusión de competencia y bloqueo sináptico. Te recomendamos repasar los simulacros o activar Consolidación por Sueño."
+      }
+    },
+    {
+      "input": {
+        "urgency": "urgent",
+        "material": "doctrinal",
+        "mastery": "initial",
+        "energy": "medium"
+      },
+      "expected": {
+        "topMatches": [
+          {
+            "methodId": "sq3r",
+            "score": 115,
+            "matchPercentage": 79,
+            "rationale": "Inspeccionar, Preguntar, Leer, Recitar y Repasar transforma la lectura de manuales densos en una investigación activa.",
+            "keyBenefit": "Lectura intencional y retención del argumento central."
+          },
+          {
+            "methodId": "cornell",
+            "score": 105,
+            "matchPercentage": 76,
+            "rationale": "El formato tripartito (notas, columna de señales y síntesis) convierte los apuntes brutos en un instrumento inmediato de autoevaluación activa.",
+            "keyBenefit": "Toma de apuntes autoevaluable sin necesidad de resumir dos veces."
+          },
+          {
+            "methodId": "segmentation-principle",
+            "score": 105,
+            "matchPercentage": 76,
+            "rationale": "Fraccionar clases grabadas o textos largos en tramos de 3 a 5 minutos con pausas de síntesis de 60 segundos evita la saturación de procesamiento.",
+            "keyBenefit": "Asimilación sinérgica paso a paso al abordar temas desde cero."
+          }
+        ],
+        "diagnosticSummary": "Diagnóstico: Para una situación con menos de 24 horas para rendir, sobre textos doctrinales densos y con ritmo cognitivo sostenido, tu prioridad pedagógica es maximizar la eficiencia y proteger la memoria de trabajo.",
+        "cautionAlert": "¡Precaución por tiempo crítico! Al ser la primera vez que ves el tema, concentrate en el Principio de Segmentación o Feynman básico en vez de intentar abarcar todo el manual."
+      }
+    },
+    {
+      "input": {
+        "urgency": "medium",
+        "material": "logical",
+        "mastery": "intermediate",
+        "energy": "medium"
+      },
+      "expected": {
+        "topMatches": [
+          {
+            "methodId": "interleaving",
+            "score": 135,
+            "matchPercentage": 85,
+            "rationale": "Alternar temas o problemas de diferente categoría entrena la discriminación estratégica de qué fórmula o principio aplicar en cada caso.",
+            "keyBenefit": "Alineación total con exámenes donde las preguntas vienen desordenadas."
+          },
+          {
+            "methodId": "feynman",
+            "score": 120,
+            "matchPercentage": 81,
+            "rationale": "Ideal para contenidos lógico-matemáticos: simplificar la explicación en términos llanos desmantela la ilusión de competencia y localiza la raíz del error.",
+            "keyBenefit": "Claridad conceptual absoluta y lenguaje despojado de jerga vacía."
+          },
+          {
+            "methodId": "cornell",
+            "score": 115,
+            "matchPercentage": 79,
+            "rationale": "El formato tripartito (notas, columna de señales y síntesis) convierte los apuntes brutos en un instrumento inmediato de autoevaluación activa.",
+            "keyBenefit": "Toma de apuntes autoevaluable sin necesidad de resumir dos veces."
+          }
+        ],
+        "diagnosticSummary": "Diagnóstico: Para una situación con 2 a 7 días disponibles, sobre materia lógica o computacional y con ritmo cognitivo sostenido, tu prioridad pedagógica es maximizar la eficiencia y proteger la memoria de trabajo.",
+        "cautionAlert": null
+      }
+    },
+    {
+      "input": {
+        "urgency": "long",
+        "material": "factual",
+        "mastery": "advanced",
+        "energy": "high"
+      },
+      "expected": {
+        "topMatches": [
+          {
+            "methodId": "problem-based-learning",
+            "score": 115,
+            "matchPercentage": 79,
+            "rationale": "Afrontar un dilema real de cátedra sitúa los hechos e incógnitas en primer plano, forzando la deducción activa antes de consultar la bibliografía.",
+            "keyBenefit": "Transferencia directa a exámenes de caso clínico, jurídicos o de ingeniería."
+          },
+          {
+            "methodId": "spaced-repetition",
+            "score": 110,
+            "matchPercentage": 78,
+            "rationale": "El algoritmo adaptativo (FSRS) calcula el instante matemático exacto antes de que el olvido se produzca, consolidando memoria duradera a meses vista.",
+            "keyBenefit": "Retención a largo plazo con el mínimo esfuerzo sináptico necesario."
+          },
+          {
+            "methodId": "practice-testing",
+            "score": 110,
+            "matchPercentage": 78,
+            "rationale": "Bajo presión temporal (a corto plazo), las pruebas simuladas con corrección inmediata calibran con rigor tu umbral real de examen y eliminan la falsa fluidez.",
+            "keyBenefit": "Exposición a condiciones de evaluación de cátedra y auditoría de tiempos."
+          }
+        ],
+        "diagnosticSummary": "Diagnóstico: Para una situación con más de 2 semanas de horizonte, sobre contenido de alta memorización fáctica y con foco mental pleno, tu prioridad pedagógica es maximizar la eficiencia y proteger la memoria de trabajo.",
+        "cautionAlert": null
+      }
+    },
+    {
+      "input": {
+        "urgency": "long",
+        "material": "multimodal",
+        "mastery": "initial",
+        "energy": "low"
+      },
+      "expected": {
+        "topMatches": [
+          {
+            "methodId": "multisensory-learning",
+            "score": 130,
+            "matchPercentage": 84,
+            "rationale": "Activar simultáneamente la vista, el oído y el canal motor crea redundancia biológica, ideal para mantener la fijación cuando el nivel de energía es moderado o bajo.",
+            "keyBenefit": "Compensación multisensorial sin saturar un único canal de atención."
+          },
+          {
+            "methodId": "spaced-repetition",
+            "score": 120,
+            "matchPercentage": 81,
+            "rationale": "El algoritmo adaptativo (FSRS) calcula el instante matemático exacto antes de que el olvido se produzca, consolidando memoria duradera a meses vista.",
+            "keyBenefit": "Retención a largo plazo con el mínimo esfuerzo sináptico necesario."
+          },
+          {
+            "methodId": "segmentation-principle",
+            "score": 120,
+            "matchPercentage": 81,
+            "rationale": "Fraccionar clases grabadas o textos largos en tramos de 3 a 5 minutos con pausas de síntesis de 60 segundos evita la saturación de procesamiento.",
+            "keyBenefit": "Asimilación sinérgica paso a paso al abordar temas desde cero."
+          }
+        ],
+        "diagnosticSummary": "Diagnóstico: Para una situación con más de 2 semanas de horizonte, sobre conceptos abstractos o multimodales y con fatiga mental o estudio nocturno, tu prioridad pedagógica es maximizar la eficiencia y proteger la memoria de trabajo.",
+        "cautionAlert": null
+      }
+    }
+  ],
+  "examPlannerCases": [
+    {
+      "scenario": "1_dia",
+      "input": {
+        "examDateMs": 1727266400000,
+        "nowMs": 1727180000000,
+        "subjectId": "sub_test",
+        "subjectName": "Materia Prueba",
+        "availableMinutesPerDay": 90
+      },
+      "expected": {
+        "totalDays": 1,
+        "d1": 1,
+        "d2": 1,
+        "d3": 1,
+        "d4": 1,
+        "phases": [
+          {
+            "name": "Fase 1: Diagnóstico e Ingesta Conceptual",
+            "description": "Lectura activa de apuntes de cátedra, extracción de teoremas y construcción del Grafo.",
+            "startDayOffset": 0,
+            "endDayOffset": 1,
+            "targetMilestone": "100% de conceptos cargados y evaluados en Feynman preliminar.",
+            "completed": false
+          },
+          {
+            "name": "Fase 2: Resolución Profunda y Desarme de Errores",
+            "description": "Práctica de guías de trabajos prácticos, auditoría socrática y vaciado del Error Bank.",
+            "startDayOffset": 1,
+            "endDayOffset": 2,
+            "targetMilestone": "Cero errores repetidos en temas troncales y retención FSRS > 85%.",
+            "completed": false
+          },
+          {
+            "name": "Fase 3: Simulacros de Examen Cronometrados",
+            "description": "Simulacros en Modo Examen estricto, sin pistas, con tiempo límite y evaluación formal.",
+            "startDayOffset": 2,
+            "endDayOffset": 3,
+            "targetMilestone": "3 simulacros aprobados con calificación >= 7/10 en condiciones reales.",
+            "completed": false
+          },
+          {
+            "name": "Fase 4: Consolidación y Repaso de Retención",
+            "description": "Repasos ligeros de tarjetas FSRS con retención en riesgo. No aprender temas nuevos.",
+            "startDayOffset": 3,
+            "endDayOffset": 4,
+            "targetMilestone": "Dominio global consolidado y descanso mental previo a la mesa de examen.",
+            "completed": false
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "2_dias",
+      "input": {
+        "examDateMs": 1727352800000,
+        "nowMs": 1727180000000,
+        "subjectId": "sub_test",
+        "subjectName": "Materia Prueba",
+        "availableMinutesPerDay": 90
+      },
+      "expected": {
+        "totalDays": 2,
+        "d1": 1,
+        "d2": 1,
+        "d3": 1,
+        "d4": 1,
+        "phases": [
+          {
+            "name": "Fase 1: Diagnóstico e Ingesta Conceptual",
+            "description": "Lectura activa de apuntes de cátedra, extracción de teoremas y construcción del Grafo.",
+            "startDayOffset": 0,
+            "endDayOffset": 1,
+            "targetMilestone": "100% de conceptos cargados y evaluados en Feynman preliminar.",
+            "completed": false
+          },
+          {
+            "name": "Fase 2: Resolución Profunda y Desarme de Errores",
+            "description": "Práctica de guías de trabajos prácticos, auditoría socrática y vaciado del Error Bank.",
+            "startDayOffset": 1,
+            "endDayOffset": 2,
+            "targetMilestone": "Cero errores repetidos en temas troncales y retención FSRS > 85%.",
+            "completed": false
+          },
+          {
+            "name": "Fase 3: Simulacros de Examen Cronometrados",
+            "description": "Simulacros en Modo Examen estricto, sin pistas, con tiempo límite y evaluación formal.",
+            "startDayOffset": 2,
+            "endDayOffset": 3,
+            "targetMilestone": "3 simulacros aprobados con calificación >= 7/10 en condiciones reales.",
+            "completed": false
+          },
+          {
+            "name": "Fase 4: Consolidación y Repaso de Retención",
+            "description": "Repasos ligeros de tarjetas FSRS con retención en riesgo. No aprender temas nuevos.",
+            "startDayOffset": 3,
+            "endDayOffset": 4,
+            "targetMilestone": "Dominio global consolidado y descanso mental previo a la mesa de examen.",
+            "completed": false
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "3_dias",
+      "input": {
+        "examDateMs": 1727439200000,
+        "nowMs": 1727180000000,
+        "subjectId": "sub_test",
+        "subjectName": "Materia Prueba",
+        "availableMinutesPerDay": 90
+      },
+      "expected": {
+        "totalDays": 3,
+        "d1": 1,
+        "d2": 1,
+        "d3": 1,
+        "d4": 1,
+        "phases": [
+          {
+            "name": "Fase 1: Diagnóstico e Ingesta Conceptual",
+            "description": "Lectura activa de apuntes de cátedra, extracción de teoremas y construcción del Grafo.",
+            "startDayOffset": 0,
+            "endDayOffset": 1,
+            "targetMilestone": "100% de conceptos cargados y evaluados en Feynman preliminar.",
+            "completed": false
+          },
+          {
+            "name": "Fase 2: Resolución Profunda y Desarme de Errores",
+            "description": "Práctica de guías de trabajos prácticos, auditoría socrática y vaciado del Error Bank.",
+            "startDayOffset": 1,
+            "endDayOffset": 2,
+            "targetMilestone": "Cero errores repetidos en temas troncales y retención FSRS > 85%.",
+            "completed": false
+          },
+          {
+            "name": "Fase 3: Simulacros de Examen Cronometrados",
+            "description": "Simulacros en Modo Examen estricto, sin pistas, con tiempo límite y evaluación formal.",
+            "startDayOffset": 2,
+            "endDayOffset": 3,
+            "targetMilestone": "3 simulacros aprobados con calificación >= 7/10 en condiciones reales.",
+            "completed": false
+          },
+          {
+            "name": "Fase 4: Consolidación y Repaso de Retención",
+            "description": "Repasos ligeros de tarjetas FSRS con retención en riesgo. No aprender temas nuevos.",
+            "startDayOffset": 3,
+            "endDayOffset": 4,
+            "targetMilestone": "Dominio global consolidado y descanso mental previo a la mesa de examen.",
+            "completed": false
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "7_dias",
+      "input": {
+        "examDateMs": 1727784800000,
+        "nowMs": 1727180000000,
+        "subjectId": "sub_test",
+        "subjectName": "Materia Prueba",
+        "availableMinutesPerDay": 90
+      },
+      "expected": {
+        "totalDays": 7,
+        "d1": 2,
+        "d2": 3,
+        "d3": 1,
+        "d4": 1,
+        "phases": [
+          {
+            "name": "Fase 1: Diagnóstico e Ingesta Conceptual",
+            "description": "Lectura activa de apuntes de cátedra, extracción de teoremas y construcción del Grafo.",
+            "startDayOffset": 0,
+            "endDayOffset": 2,
+            "targetMilestone": "100% de conceptos cargados y evaluados en Feynman preliminar.",
+            "completed": false
+          },
+          {
+            "name": "Fase 2: Resolución Profunda y Desarme de Errores",
+            "description": "Práctica de guías de trabajos prácticos, auditoría socrática y vaciado del Error Bank.",
+            "startDayOffset": 2,
+            "endDayOffset": 5,
+            "targetMilestone": "Cero errores repetidos en temas troncales y retención FSRS > 85%.",
+            "completed": false
+          },
+          {
+            "name": "Fase 3: Simulacros de Examen Cronometrados",
+            "description": "Simulacros en Modo Examen estricto, sin pistas, con tiempo límite y evaluación formal.",
+            "startDayOffset": 5,
+            "endDayOffset": 6,
+            "targetMilestone": "3 simulacros aprobados con calificación >= 7/10 en condiciones reales.",
+            "completed": false
+          },
+          {
+            "name": "Fase 4: Consolidación y Repaso de Retención",
+            "description": "Repasos ligeros de tarjetas FSRS con retención en riesgo. No aprender temas nuevos.",
+            "startDayOffset": 6,
+            "endDayOffset": 7,
+            "targetMilestone": "Dominio global consolidado y descanso mental previo a la mesa de examen.",
+            "completed": false
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "11_dias",
+      "input": {
+        "examDateMs": 1728130400000,
+        "nowMs": 1727180000000,
+        "subjectId": "sub_test",
+        "subjectName": "Materia Prueba",
+        "availableMinutesPerDay": 90
+      },
+      "expected": {
+        "totalDays": 11,
+        "d1": 3,
+        "d2": 4,
+        "d3": 2,
+        "d4": 2,
+        "phases": [
+          {
+            "name": "Fase 1: Diagnóstico e Ingesta Conceptual",
+            "description": "Lectura activa de apuntes de cátedra, extracción de teoremas y construcción del Grafo.",
+            "startDayOffset": 0,
+            "endDayOffset": 3,
+            "targetMilestone": "100% de conceptos cargados y evaluados en Feynman preliminar.",
+            "completed": false
+          },
+          {
+            "name": "Fase 2: Resolución Profunda y Desarme de Errores",
+            "description": "Práctica de guías de trabajos prácticos, auditoría socrática y vaciado del Error Bank.",
+            "startDayOffset": 3,
+            "endDayOffset": 7,
+            "targetMilestone": "Cero errores repetidos en temas troncales y retención FSRS > 85%.",
+            "completed": false
+          },
+          {
+            "name": "Fase 3: Simulacros de Examen Cronometrados",
+            "description": "Simulacros en Modo Examen estricto, sin pistas, con tiempo límite y evaluación formal.",
+            "startDayOffset": 7,
+            "endDayOffset": 9,
+            "targetMilestone": "3 simulacros aprobados con calificación >= 7/10 en condiciones reales.",
+            "completed": false
+          },
+          {
+            "name": "Fase 4: Consolidación y Repaso de Retención",
+            "description": "Repasos ligeros de tarjetas FSRS con retención en riesgo. No aprender temas nuevos.",
+            "startDayOffset": 9,
+            "endDayOffset": 11,
+            "targetMilestone": "Dominio global consolidado y descanso mental previo a la mesa de examen.",
+            "completed": false
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "20_dias",
+      "input": {
+        "examDateMs": 1728908000000,
+        "nowMs": 1727180000000,
+        "subjectId": "sub_test",
+        "subjectName": "Materia Prueba",
+        "availableMinutesPerDay": 90
+      },
+      "expected": {
+        "totalDays": 20,
+        "d1": 6,
+        "d2": 8,
+        "d3": 4,
+        "d4": 2,
+        "phases": [
+          {
+            "name": "Fase 1: Diagnóstico e Ingesta Conceptual",
+            "description": "Lectura activa de apuntes de cátedra, extracción de teoremas y construcción del Grafo.",
+            "startDayOffset": 0,
+            "endDayOffset": 6,
+            "targetMilestone": "100% de conceptos cargados y evaluados en Feynman preliminar.",
+            "completed": false
+          },
+          {
+            "name": "Fase 2: Resolución Profunda y Desarme de Errores",
+            "description": "Práctica de guías de trabajos prácticos, auditoría socrática y vaciado del Error Bank.",
+            "startDayOffset": 6,
+            "endDayOffset": 14,
+            "targetMilestone": "Cero errores repetidos en temas troncales y retención FSRS > 85%.",
+            "completed": false
+          },
+          {
+            "name": "Fase 3: Simulacros de Examen Cronometrados",
+            "description": "Simulacros en Modo Examen estricto, sin pistas, con tiempo límite y evaluación formal.",
+            "startDayOffset": 14,
+            "endDayOffset": 18,
+            "targetMilestone": "3 simulacros aprobados con calificación >= 7/10 en condiciones reales.",
+            "completed": false
+          },
+          {
+            "name": "Fase 4: Consolidación y Repaso de Retención",
+            "description": "Repasos ligeros de tarjetas FSRS con retención en riesgo. No aprender temas nuevos.",
+            "startDayOffset": 18,
+            "endDayOffset": 20,
+            "targetMilestone": "Dominio global consolidado y descanso mental previo a la mesa de examen.",
+            "completed": false
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "hoy_mismo",
+      "input": {
+        "examDateMs": 1727180000000,
+        "nowMs": 1727180000000,
+        "subjectId": "sub_test",
+        "subjectName": "Materia Prueba",
+        "availableMinutesPerDay": 90
+      },
+      "expected": {
+        "totalDays": 1,
+        "d1": 1,
+        "d2": 1,
+        "d3": 1,
+        "d4": 1,
+        "phases": [
+          {
+            "name": "Fase 1: Diagnóstico e Ingesta Conceptual",
+            "description": "Lectura activa de apuntes de cátedra, extracción de teoremas y construcción del Grafo.",
+            "startDayOffset": 0,
+            "endDayOffset": 1,
+            "targetMilestone": "100% de conceptos cargados y evaluados en Feynman preliminar.",
+            "completed": false
+          },
+          {
+            "name": "Fase 2: Resolución Profunda y Desarme de Errores",
+            "description": "Práctica de guías de trabajos prácticos, auditoría socrática y vaciado del Error Bank.",
+            "startDayOffset": 1,
+            "endDayOffset": 2,
+            "targetMilestone": "Cero errores repetidos en temas troncales y retención FSRS > 85%.",
+            "completed": false
+          },
+          {
+            "name": "Fase 3: Simulacros de Examen Cronometrados",
+            "description": "Simulacros en Modo Examen estricto, sin pistas, con tiempo límite y evaluación formal.",
+            "startDayOffset": 2,
+            "endDayOffset": 3,
+            "targetMilestone": "3 simulacros aprobados con calificación >= 7/10 en condiciones reales.",
+            "completed": false
+          },
+          {
+            "name": "Fase 4: Consolidación y Repaso de Retención",
+            "description": "Repasos ligeros de tarjetas FSRS con retención en riesgo. No aprender temas nuevos.",
+            "startDayOffset": 3,
+            "endDayOffset": 4,
+            "targetMilestone": "Dominio global consolidado y descanso mental previo a la mesa de examen.",
+            "completed": false
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "fecha_pasada",
+      "input": {
+        "examDateMs": 1726748000000,
+        "nowMs": 1727180000000,
+        "subjectId": "sub_test",
+        "subjectName": "Materia Prueba",
+        "availableMinutesPerDay": 90
+      },
+      "expected": {
+        "totalDays": 1,
+        "d1": 1,
+        "d2": 1,
+        "d3": 1,
+        "d4": 1,
+        "phases": [
+          {
+            "name": "Fase 1: Diagnóstico e Ingesta Conceptual",
+            "description": "Lectura activa de apuntes de cátedra, extracción de teoremas y construcción del Grafo.",
+            "startDayOffset": 0,
+            "endDayOffset": 1,
+            "targetMilestone": "100% de conceptos cargados y evaluados en Feynman preliminar.",
+            "completed": false
+          },
+          {
+            "name": "Fase 2: Resolución Profunda y Desarme de Errores",
+            "description": "Práctica de guías de trabajos prácticos, auditoría socrática y vaciado del Error Bank.",
+            "startDayOffset": 1,
+            "endDayOffset": 2,
+            "targetMilestone": "Cero errores repetidos en temas troncales y retención FSRS > 85%.",
+            "completed": false
+          },
+          {
+            "name": "Fase 3: Simulacros de Examen Cronometrados",
+            "description": "Simulacros en Modo Examen estricto, sin pistas, con tiempo límite y evaluación formal.",
+            "startDayOffset": 2,
+            "endDayOffset": 3,
+            "targetMilestone": "3 simulacros aprobados con calificación >= 7/10 en condiciones reales.",
+            "completed": false
+          },
+          {
+            "name": "Fase 4: Consolidación y Repaso de Retención",
+            "description": "Repasos ligeros de tarjetas FSRS con retención en riesgo. No aprender temas nuevos.",
+            "startDayOffset": 3,
+            "endDayOffset": 4,
+            "targetMilestone": "Dominio global consolidado y descanso mental previo a la mesa de examen.",
+            "completed": false
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "hora_23_30_a_00_30",
+      "input": {
+        "examDateMs": 1727183600000,
+        "nowMs": 1727180000000,
+        "subjectId": "sub_test",
+        "subjectName": "Materia Prueba",
+        "availableMinutesPerDay": 90
+      },
+      "expected": {
+        "totalDays": 1,
+        "d1": 1,
+        "d2": 1,
+        "d3": 1,
+        "d4": 1,
+        "phases": [
+          {
+            "name": "Fase 1: Diagnóstico e Ingesta Conceptual",
+            "description": "Lectura activa de apuntes de cátedra, extracción de teoremas y construcción del Grafo.",
+            "startDayOffset": 0,
+            "endDayOffset": 1,
+            "targetMilestone": "100% de conceptos cargados y evaluados en Feynman preliminar.",
+            "completed": false
+          },
+          {
+            "name": "Fase 2: Resolución Profunda y Desarme de Errores",
+            "description": "Práctica de guías de trabajos prácticos, auditoría socrática y vaciado del Error Bank.",
+            "startDayOffset": 1,
+            "endDayOffset": 2,
+            "targetMilestone": "Cero errores repetidos en temas troncales y retención FSRS > 85%.",
+            "completed": false
+          },
+          {
+            "name": "Fase 3: Simulacros de Examen Cronometrados",
+            "description": "Simulacros en Modo Examen estricto, sin pistas, con tiempo límite y evaluación formal.",
+            "startDayOffset": 2,
+            "endDayOffset": 3,
+            "targetMilestone": "3 simulacros aprobados con calificación >= 7/10 en condiciones reales.",
+            "completed": false
+          },
+          {
+            "name": "Fase 4: Consolidación y Repaso de Retención",
+            "description": "Repasos ligeros de tarjetas FSRS con retención en riesgo. No aprender temas nuevos.",
+            "startDayOffset": 3,
+            "endDayOffset": 4,
+            "targetMilestone": "Dominio global consolidado y descanso mental previo a la mesa de examen.",
+            "completed": false
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "hora_00_30_a_23_30",
+      "input": {
+        "examDateMs": 1727349200000,
+        "nowMs": 1727180000000,
+        "subjectId": "sub_test",
+        "subjectName": "Materia Prueba",
+        "availableMinutesPerDay": 90
+      },
+      "expected": {
+        "totalDays": 2,
+        "d1": 1,
+        "d2": 1,
+        "d3": 1,
+        "d4": 1,
+        "phases": [
+          {
+            "name": "Fase 1: Diagnóstico e Ingesta Conceptual",
+            "description": "Lectura activa de apuntes de cátedra, extracción de teoremas y construcción del Grafo.",
+            "startDayOffset": 0,
+            "endDayOffset": 1,
+            "targetMilestone": "100% de conceptos cargados y evaluados en Feynman preliminar.",
+            "completed": false
+          },
+          {
+            "name": "Fase 2: Resolución Profunda y Desarme de Errores",
+            "description": "Práctica de guías de trabajos prácticos, auditoría socrática y vaciado del Error Bank.",
+            "startDayOffset": 1,
+            "endDayOffset": 2,
+            "targetMilestone": "Cero errores repetidos en temas troncales y retención FSRS > 85%.",
+            "completed": false
+          },
+          {
+            "name": "Fase 3: Simulacros de Examen Cronometrados",
+            "description": "Simulacros en Modo Examen estricto, sin pistas, con tiempo límite y evaluación formal.",
+            "startDayOffset": 2,
+            "endDayOffset": 3,
+            "targetMilestone": "3 simulacros aprobados con calificación >= 7/10 en condiciones reales.",
+            "completed": false
+          },
+          {
+            "name": "Fase 4: Consolidación y Repaso de Retención",
+            "description": "Repasos ligeros de tarjetas FSRS con retención en riesgo. No aprender temas nuevos.",
+            "startDayOffset": 3,
+            "endDayOffset": 4,
+            "targetMilestone": "Dominio global consolidado y descanso mental previo a la mesa de examen.",
+            "completed": false
+          }
+        ]
+      }
+    }
+  ],
+  "timeBudgetCases": [
+    {
+      "scenario": "20_con_cartas_y_gap",
+      "input": {
+        "budgetMinutes": 20,
+        "urgentCardsCount": 10,
+        "topConceptName": "Cálculo",
+        "primaryGapConceptName": "Integrales Impropias"
+      },
+      "expected": {
+        "totalMinutes": 20,
+        "headline": "Micro-sesión Relámpago de 20 min",
+        "targetFocus": "Frenar el olvido de tarjetas vencidas y reparar la premisa más urgente.",
+        "steps": [
+          {
+            "id": "step_fsrs_short",
+            "stepType": "fsrs_review",
+            "title": "Repaso Relámpago FSRS (10 min)",
+            "description": "Consolidar las 10 tarjetas más críticas de Cálculo antes de que caiga la curva de olvido.",
+            "allocatedMinutes": 10,
+            "actionUrl": "/methods",
+            "actionLabel": "Iniciar Repaso",
+            "badge": "Memoria"
+          },
+          {
+            "id": "step_gap_short",
+            "stepType": "feynman_gap",
+            "title": "Desarmar \"Integrales Impropias\" (10 min)",
+            "description": "Explicación sintética de 1 carilla en técnica Feynman para resolver la premisa errónea registrada en el Error Bank.",
+            "allocatedMinutes": 10,
+            "actionUrl": "/session",
+            "actionLabel": "Abrir Feynman",
+            "badge": "Laguna Crítica"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "20_sin_cartas_ni_gap",
+      "input": {
+        "budgetMinutes": 20,
+        "urgentCardsCount": 0
+      },
+      "expected": {
+        "totalMinutes": 20,
+        "headline": "Micro-sesión Relámpago de 20 min",
+        "targetFocus": "Frenar el olvido de tarjetas vencidas y reparar la premisa más urgente.",
+        "steps": [
+          {
+            "id": "step_rag_short",
+            "stepType": "rag_audit",
+            "title": "Auditoría RAG Exprés (20 min)",
+            "description": "Lectura activa de 2 páginas de apuntes en el visor con Catedrático Socrático.",
+            "allocatedMinutes": 20,
+            "actionUrl": "/workspace",
+            "actionLabel": "Ir al Visor",
+            "badge": "Lectura"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "45_con_cartas_y_gap",
+      "input": {
+        "budgetMinutes": 45,
+        "urgentCardsCount": 10,
+        "topConceptName": "Cálculo",
+        "primaryGapConceptName": "Integrales Impropias"
+      },
+      "expected": {
+        "totalMinutes": 45,
+        "headline": "Sesión Equilibrada de 45 min",
+        "targetFocus": "Equilibrio entre retención espaciada, comprensión formal y resolución práctica.",
+        "steps": [
+          {
+            "id": "step_fsrs_med",
+            "stepType": "fsrs_review",
+            "title": "Bloque de Consolidación FSRS (10 min)",
+            "description": "Limpieza del mazo espaciado para mantener retención > 85% en Cálculo.",
+            "allocatedMinutes": 10,
+            "actionUrl": "/methods",
+            "actionLabel": "Repasar FSRS",
+            "badge": "Retención"
+          },
+          {
+            "id": "step_gap_med",
+            "stepType": "feynman_gap",
+            "title": "Desarme Conceptual: \"Integrales Impropias\" (20 min)",
+            "description": "Redactar desarrollo formal en palabras propias y cotejar discrepancias contra la fuente oficial.",
+            "allocatedMinutes": 20,
+            "actionUrl": "/session",
+            "actionLabel": "Técnica Feynman",
+            "badge": "Comprensión"
+          },
+          {
+            "id": "step_exam_med",
+            "stepType": "exam_simulation",
+            "title": "Problemas de Aplicación / Simulacro (15 min)",
+            "description": "Poner a prueba el razonamiento formal en 1 o 2 ejercicios cronometrados sin mirar fórmulas.",
+            "allocatedMinutes": 15,
+            "actionUrl": "/workspace",
+            "actionLabel": "Ejercitar",
+            "badge": "Aplicación"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "45_con_cartas_sin_gap",
+      "input": {
+        "budgetMinutes": 45,
+        "urgentCardsCount": 10,
+        "topConceptName": "Cálculo"
+      },
+      "expected": {
+        "totalMinutes": 45,
+        "headline": "Sesión Equilibrada de 45 min",
+        "targetFocus": "Equilibrio entre retención espaciada, comprensión formal y resolución práctica.",
+        "steps": [
+          {
+            "id": "step_fsrs_med",
+            "stepType": "fsrs_review",
+            "title": "Bloque de Consolidación FSRS (10 min)",
+            "description": "Limpieza del mazo espaciado para mantener retención > 85% en Cálculo.",
+            "allocatedMinutes": 10,
+            "actionUrl": "/methods",
+            "actionLabel": "Repasar FSRS",
+            "badge": "Retención"
+          },
+          {
+            "id": "step_rag_med",
+            "stepType": "rag_audit",
+            "title": "Lectura Socrática y Apuntes (20 min)",
+            "description": "Avanzar en el texto de cátedra con extracción de teoremas y cloze directo.",
+            "allocatedMinutes": 20,
+            "actionUrl": "/workspace",
+            "actionLabel": "Abrir Cátedra",
+            "badge": "Teoría"
+          },
+          {
+            "id": "step_exam_med",
+            "stepType": "exam_simulation",
+            "title": "Problemas de Aplicación / Simulacro (15 min)",
+            "description": "Poner a prueba el razonamiento formal en 1 o 2 ejercicios cronometrados sin mirar fórmulas.",
+            "allocatedMinutes": 15,
+            "actionUrl": "/workspace",
+            "actionLabel": "Ejercitar",
+            "badge": "Aplicación"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "90_con_cartas_y_gap",
+      "input": {
+        "budgetMinutes": 90,
+        "urgentCardsCount": 10,
+        "topConceptName": "Cálculo",
+        "primaryGapConceptName": "Integrales Impropias"
+      },
+      "expected": {
+        "totalMinutes": 90,
+        "headline": "Bloque Profundo de Estudio (90 min)",
+        "targetFocus": "Ciclo cognitivo completo: Memoria -> Comprensión profunda -> Simulacro real -> Transferencia en Grafo.",
+        "steps": [
+          {
+            "id": "step_fsrs_long",
+            "stepType": "fsrs_review",
+            "title": "Fase 1: Vaciado Integral FSRS (12 min)",
+            "description": "Limpieza completa de tarjetas vencidas en todas las cátedras cursadas.",
+            "allocatedMinutes": 12,
+            "actionUrl": "/methods",
+            "actionLabel": "Repasar FSRS",
+            "badge": "Memoria"
+          },
+          {
+            "id": "step_gap_long",
+            "stepType": "feynman_gap",
+            "title": "Fase 2: Resolución de Lagunas y Error Bank (25 min)",
+            "description": "Desarmar \"Integrales Impropias\" y auditar hipótesis con el Catedrático Socrático.",
+            "allocatedMinutes": 25,
+            "actionUrl": "/session",
+            "actionLabel": "Abrir Feynman",
+            "badge": "Rigor Formal"
+          },
+          {
+            "id": "step_exam_long",
+            "stepType": "exam_simulation",
+            "title": "Fase 3: Simulacro Cronometrado en Modo Examen (30 min)",
+            "description": "Simular condiciones reales de parcial sin pistas, auditar resultado y registrar discrepancias.",
+            "allocatedMinutes": 30,
+            "actionUrl": "/workspace",
+            "actionLabel": "Simular Parcial",
+            "badge": "Simulacro"
+          },
+          {
+            "id": "step_polish_long",
+            "stepType": "rag_audit",
+            "title": "Fase 4: Consolidación y Síntesis en Grafo (23 min)",
+            "description": "Vincular los conceptos ejercitados al Grafo Causal y programar la próxima sesión.",
+            "allocatedMinutes": 23,
+            "actionUrl": "/knowledge-graph",
+            "actionLabel": "Ver Grafo",
+            "badge": "Transferencia"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "90_con_cartas_sin_gap",
+      "input": {
+        "budgetMinutes": 90,
+        "urgentCardsCount": 10,
+        "topConceptName": "Cálculo"
+      },
+      "expected": {
+        "totalMinutes": 90,
+        "headline": "Bloque Profundo de Estudio (90 min)",
+        "targetFocus": "Ciclo cognitivo completo: Memoria -> Comprensión profunda -> Simulacro real -> Transferencia en Grafo.",
+        "steps": [
+          {
+            "id": "step_fsrs_long",
+            "stepType": "fsrs_review",
+            "title": "Fase 1: Vaciado Integral FSRS (12 min)",
+            "description": "Limpieza completa de tarjetas vencidas en todas las cátedras cursadas.",
+            "allocatedMinutes": 12,
+            "actionUrl": "/methods",
+            "actionLabel": "Repasar FSRS",
+            "badge": "Memoria"
+          },
+          {
+            "id": "step_gap_long",
+            "stepType": "feynman_gap",
+            "title": "Fase 2: Resolución de Lagunas y Error Bank (25 min)",
+            "description": "Revisión de teoremas troncales y derivaciones algebraicas complejas.",
+            "allocatedMinutes": 25,
+            "actionUrl": "/session",
+            "actionLabel": "Abrir Feynman",
+            "badge": "Rigor Formal"
+          },
+          {
+            "id": "step_exam_long",
+            "stepType": "exam_simulation",
+            "title": "Fase 3: Simulacro Cronometrado en Modo Examen (30 min)",
+            "description": "Simular condiciones reales de parcial sin pistas, auditar resultado y registrar discrepancias.",
+            "allocatedMinutes": 30,
+            "actionUrl": "/workspace",
+            "actionLabel": "Simular Parcial",
+            "badge": "Simulacro"
+          },
+          {
+            "id": "step_polish_long",
+            "stepType": "rag_audit",
+            "title": "Fase 4: Consolidación y Síntesis en Grafo (23 min)",
+            "description": "Vincular los conceptos ejercitados al Grafo Causal y programar la próxima sesión.",
+            "allocatedMinutes": 23,
+            "actionUrl": "/knowledge-graph",
+            "actionLabel": "Ver Grafo",
+            "badge": "Transferencia"
+          }
+        ]
+      }
+    }
+  ],
+  "agendaCases": [
+    {
+      "scenario": "cards_plus_misconception_plus_bottleneck",
+      "input": {
+        "totalDueCards": 14,
+        "topConceptNames": [
+          "Álgebra Lineal"
+        ],
+        "gapSignals": [
+          {
+            "conceptId": "c_alg",
+            "conceptName": "Matrices Inversas",
+            "gapType": "persistent_misconception",
+            "explanation": "Confusión de determinante nulo"
+          }
+        ],
+        "bottleneckSignals": [
+          {
+            "conceptId": "c_calc",
+            "conceptName": "Límites",
+            "blockedDownstreamCount": 2,
+            "blockedConceptNames": [
+              "Derivadas",
+              "Integrales"
+            ]
+          }
+        ],
+        "totalConceptsRegistered": 10
+      },
+      "expected": {
+        "totalDebtMinutes": 59,
+        "urgentReviews": {
+          "cardCount": 14,
+          "estimatedMinutes": 14,
+          "conceptIds": [],
+          "topConceptNames": [
+            "Álgebra Lineal"
+          ]
+        },
+        "conceptualGaps": [
+          {
+            "conceptId": "c_alg",
+            "conceptName": "Matrices Inversas",
+            "reason": "Confusión de determinante nulo",
+            "suggestedAction": "feynman",
+            "estimatedMinutes": 20
+          }
+        ],
+        "bottleneckPrerequisites": [
+          {
+            "conceptId": "c_calc",
+            "conceptName": "Límites",
+            "blockedDownstreamCount": 2,
+            "blockedConceptNames": [
+              "Derivadas",
+              "Integrales"
+            ],
+            "estimatedMinutes": 25
+          }
+        ],
+        "headline": "Repasar 14 tarjeta(s) vencidas y desarmar la laguna en \"Matrices Inversas\"",
+        "rationale": "Tu curva de retención FSRS indica riesgo de olvido inminente en Álgebra Lineal (14 min). Además, registraste errores reiterados en \"Matrices Inversas\" que requieren una explicación Feynman breve (20 min). Deuda total acumulada: 59 min."
+      }
+    },
+    {
+      "scenario": "cards_plus_retention_decay",
+      "input": {
+        "totalDueCards": 8,
+        "topConceptNames": [
+          "Física I"
+        ],
+        "gapSignals": [
+          {
+            "conceptId": "c_fis",
+            "conceptName": "Cinemática",
+            "gapType": "retention_decay",
+            "explanation": "Retención cayó por debajo del 70%"
+          }
+        ],
+        "bottleneckSignals": [],
+        "totalConceptsRegistered": 8
+      },
+      "expected": {
+        "totalDebtMinutes": 23,
+        "urgentReviews": {
+          "cardCount": 8,
+          "estimatedMinutes": 8,
+          "conceptIds": [],
+          "topConceptNames": [
+            "Física I"
+          ]
+        },
+        "conceptualGaps": [
+          {
+            "conceptId": "c_fis",
+            "conceptName": "Cinemática",
+            "reason": "Retención cayó por debajo del 70%",
+            "suggestedAction": "socratic_audit",
+            "estimatedMinutes": 15
+          }
+        ],
+        "bottleneckPrerequisites": [],
+        "headline": "Repasar 8 tarjeta(s) vencidas y desarmar la laguna en \"Cinemática\"",
+        "rationale": "Tu curva de retención FSRS indica riesgo de olvido inminente en Física I (8 min). Además, registraste errores reiterados en \"Cinemática\" que requieren una explicación Feynman breve (15 min). Deuda total acumulada: 23 min."
+      }
+    },
+    {
+      "scenario": "cards_only",
+      "input": {
+        "totalDueCards": 5,
+        "topConceptNames": [
+          "Química"
+        ],
+        "gapSignals": [],
+        "bottleneckSignals": [],
+        "totalConceptsRegistered": 5
+      },
+      "expected": {
+        "totalDebtMinutes": 5,
+        "urgentReviews": {
+          "cardCount": 5,
+          "estimatedMinutes": 5,
+          "conceptIds": [],
+          "topConceptNames": [
+            "Química"
+          ]
+        },
+        "conceptualGaps": [],
+        "bottleneckPrerequisites": [],
+        "headline": "Consolidar memoria: 5 tarjeta(s) espaciadas pendientes",
+        "rationale": "No presentas lagunas conceptuales críticas abiertas. Dedica 5 minutos a limpiar el mazo para preservar la estabilidad de memoria a largo plazo."
+      }
+    },
+    {
+      "scenario": "bottleneck_only",
+      "input": {
+        "totalDueCards": 0,
+        "topConceptNames": [],
+        "gapSignals": [],
+        "bottleneckSignals": [
+          {
+            "conceptId": "c_log",
+            "conceptName": "Lógica Proposicional",
+            "blockedDownstreamCount": 3,
+            "blockedConceptNames": [
+              "Predicados",
+              "Demostraciones",
+              "Grafos"
+            ]
+          }
+        ],
+        "totalConceptsRegistered": 12
+      },
+      "expected": {
+        "totalDebtMinutes": 25,
+        "urgentReviews": {
+          "cardCount": 0,
+          "estimatedMinutes": 0,
+          "conceptIds": [],
+          "topConceptNames": []
+        },
+        "conceptualGaps": [],
+        "bottleneckPrerequisites": [
+          {
+            "conceptId": "c_log",
+            "conceptName": "Lógica Proposicional",
+            "blockedDownstreamCount": 3,
+            "blockedConceptNames": [
+              "Predicados",
+              "Demostraciones",
+              "Grafos"
+            ],
+            "estimatedMinutes": 25
+          }
+        ],
+        "headline": "Desbloquear cuello de botella: \"Lógica Proposicional\"",
+        "rationale": "Este concepto fundacional tiene dominio bajo y está frenando tu comprensión de Predicados, Demostraciones, Grafos. Dedica 25 minutos a auditar sus teoremas en el RAG."
+      }
+    },
+    {
+      "scenario": "clean_slate",
+      "input": {
+        "totalDueCards": 0,
+        "topConceptNames": [],
+        "gapSignals": [],
+        "bottleneckSignals": [],
+        "totalConceptsRegistered": 10
+      },
+      "expected": {
+        "totalDebtMinutes": 0,
+        "urgentReviews": {
+          "cardCount": 0,
+          "estimatedMinutes": 0,
+          "conceptIds": [],
+          "topConceptNames": []
+        },
+        "conceptualGaps": [],
+        "bottleneckPrerequisites": [],
+        "headline": "Todo al día. Momento ideal para avanzar materia o simular un examen",
+        "rationale": "Tu retención se encuentra en zona segura (>85%) y no hay deudas de estudio urgentes. Puedes avanzar con nuevas lecturas o poner a prueba tu dominio con un simulacro exprés."
+      }
+    },
+    {
+      "scenario": "empty_repository",
+      "input": {
+        "totalDueCards": 0,
+        "topConceptNames": [],
+        "gapSignals": [],
+        "bottleneckSignals": [],
+        "totalConceptsRegistered": 0
+      },
+      "expected": {
+        "totalDebtMinutes": 0,
+        "urgentReviews": {
+          "cardCount": 0,
+          "estimatedMinutes": 0,
+          "conceptIds": [],
+          "topConceptNames": []
+        },
+        "conceptualGaps": [],
+        "bottleneckPrerequisites": [],
+        "headline": "Carga tus primeros apuntes de cátedra en el visor",
+        "rationale": "El Cognitive OS necesita material bibliográfico para indexar conceptos, extraer teoremas y comenzar a calcular tu mapa de dominio 4D."
+      }
+    }
+  ]
+}

@@ -13,15 +13,18 @@ const OcrPage = lazy(() => import("./pages/OcrPage").then((m) => ({ default: m.O
 const BookScannerPage = lazy(() => import("./pages/BookScannerPage").then((m) => ({ default: m.BookScannerPage })));
 const AmbientPage = lazy(() => import("./pages/AmbientPage").then((m) => ({ default: m.AmbientPage })));
 const AcademicWorkspace = lazy(() => import("./pages/AcademicWorkspace"));
-const Workspace = lazy(() => import("./pages/Workspace").then((m) => ({ default: m.Workspace })));
 const KnowledgeGraph = lazy(() => import("./pages/KnowledgeGraph").then((m) => ({ default: m.KnowledgeGraph })));
 const Files = lazy(() => import("./pages/Files"));
 const Session = lazy(() => import("./pages/Session").then((m) => ({ default: m.Session })));
 const Settings = lazy(() => import("./pages/Settings").then((m) => ({ default: m.Settings })));
 const QaHubPage = lazy(() => import("./pages/QaHubPage").then((m) => ({ default: m.QaHubPage })));
 const StyleKit = lazy(() => import("./pages/style-kit/StyleKit").then((m) => ({ default: m.StyleKit })));
+const CalendarPage = lazy(() => import("./pages/CalendarPage").then((m) => ({ default: m.CalendarPage })));
 const ContextEngineDashboard = lazy(() =>
   import("./features/context-engine/ContextEngineDashboard").then((m) => ({ default: m.ContextEngineDashboard }))
+);
+const FloatingIslandWidget = lazy(() =>
+  import("./pages/FloatingIslandWidget").then((m) => ({ default: m.FloatingIslandWidget }))
 );
 
 function PageFallback() {
@@ -48,17 +51,20 @@ const router = createBrowserRouter([
       { path: "books", element: withSuspense(<BookScannerPage />) },
       { path: "ambient", element: withSuspense(<AmbientPage />) },
       { path: "academic", element: withSuspense(<AcademicWorkspace />) },
-      { path: "workspace", element: withSuspense(<Workspace />) },
+      { path: "workspace", element: withSuspense(<AcademicWorkspace />) },
       { path: "graph", element: withSuspense(<KnowledgeGraph />) },
       { path: "files", element: withSuspense(<Files />) },
       { path: "session", element: withSuspense(<Session />) },
       { path: "settings", element: withSuspense(<Settings />) },
       { path: "context", element: withSuspense(<ContextEngineDashboard />) },
+      { path: "calendar", element: withSuspense(<CalendarPage />) },
+      { path: "organization", element: withSuspense(<CalendarPage />) },
       { path: "qa", element: withSuspense(<QaHubPage />) },
       { path: "verificacion", element: withSuspense(<QaHubPage />) },
     ],
   },
   { path: "/kit", element: withSuspense(<StyleKit />) },
+  { path: "/island-widget", element: withSuspense(<FloatingIslandWidget />) },
 ]);
 
 function App() {

@@ -68,6 +68,7 @@ dependencies = [
  "tauri-build",
  "tauri-plugin-dialog",
  "tauri-plugin-sql",
+ "tokio",
  "tracing",
  "tracing-appender",
  "tracing-subscriber",

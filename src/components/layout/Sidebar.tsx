@@ -3,7 +3,6 @@ import { NavLink } from "react-router-dom";
 import { motion } from "motion/react";
 import {
   Home,
-  BookOpen,
   Play,
   GraduationCap,
   BrainCircuit,
@@ -19,6 +18,8 @@ import {
   PanelLeftClose,
   PanelLeft,
   Compass,
+  RotateCcw,
+  Calendar,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { useTutorialStore } from "../../stores/useTutorialStore";
@@ -32,37 +33,36 @@ export const Sidebar: React.FC = () => {
   const toggleSidebar = useThemeStore((s) => s.toggleSidebar);
   const contextEngineEnabled = useContextEngineStore((s) => s.contextEngineEnabled);
 
-  const academicItems = [
-    { to: "/academic", label: "Academic Hub", icon: GraduationCap },
-    { to: "/workspace", label: "Workspace OS", icon: BrainCircuit },
-    { to: "/graph", label: "Grafo Causal", icon: Network },
+  // Pilares Principales: Inicio (arriba) + Estudiar, Organización, Biblioteca, Repasar, Progreso
+  const primaryPillars = [
+    { to: "/workspace", label: "Estudiar", icon: GraduationCap },
+    { to: "/calendar", label: "Organización", icon: Calendar },
+    { to: "/files", label: "Biblioteca", icon: FolderOpen },
+    { to: "/methods", label: "Repasar", icon: RotateCcw },
+    { to: "/graph", label: "Progreso", icon: Network },
+  ];
+
+  const toolItems = [
+    { to: "/session", label: "Sesión Activa", icon: Play },
+    { to: "/pdf", label: "Anotador PDF", icon: FileText },
+    { to: "/ocr", label: "Extracción OCR", icon: ScanText },
+    { to: "/books", label: "Escanear Libros", icon: Library },
+    { to: "/ambient", label: "Sonido Ambiente", icon: Volume2 },
+    { to: "/academic", label: "Academic Hub", icon: BrainCircuit },
   ];
 
   if (contextEngineEnabled) {
-    academicItems.push({ to: "/context", label: "Motor Contexto", icon: Compass });
+    toolItems.push({ to: "/context", label: "Motor Contexto", icon: Compass });
   }
 
   const navSections = [
     {
-      title: "Principal",
-      items: [
-        { to: "/methods", label: "Métodos de Estudio", icon: BookOpen },
-        { to: "/session", label: "Sesión Activa", icon: Play },
-      ],
+      title: "Estudio Principal",
+      items: primaryPillars,
     },
     {
-      title: "Académico & OS",
-      items: academicItems,
-    },
-    {
-      title: "Documentos & Audio",
-      items: [
-        { to: "/files", label: "Archivos Cátedras", icon: FolderOpen },
-        { to: "/pdf", label: "Anotador PDF", icon: FileText },
-        { to: "/ocr", label: "Extracción OCR", icon: ScanText },
-        { to: "/books", label: "Escanear Libros", icon: Library },
-        { to: "/ambient", label: "Sonido Ambiente", icon: Volume2 },
-      ],
+      title: "Herramientas",
+      items: toolItems,
     },
     {
       title: "Sistema",
@@ -153,14 +153,16 @@ export const Sidebar: React.FC = () => {
         {/* Secciones de Navegación */}
         {navSections.map((section) => (
           <div key={section.title} className="space-y-1">
-            <motion.span
+            <motion.div
               initial={false}
               animate={{ opacity: !isCollapsed ? 1 : 0, height: !isCollapsed ? "auto" : 0 }}
               transition={{ duration: DURATION.fast, ease: EASE_EXPO_OUT }}
-              className="block px-2 pt-1 font-sans text-[10px] font-semibold uppercase tracking-wider text-text-muted overflow-hidden"
+              className="overflow-hidden whitespace-nowrap pointer-events-none"
             >
-              {section.title}
-            </motion.span>
+              <span className="block px-2 pt-1 font-sans text-[10px] font-semibold uppercase tracking-wider text-text-muted whitespace-nowrap truncate select-none">
+                {section.title}
+              </span>
+            </motion.div>
 
             {section.items.map(({ to, label, icon: Icon }) => (
               <NavLink

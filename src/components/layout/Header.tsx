@@ -1,13 +1,13 @@
 import React, { useMemo } from "react";
-import { Moon, Sun, HardDrive, Maximize2, Sparkles, PanelLeft, Pin, Bell, Search } from "lucide-react";
+import { Moon, Sun, HardDrive, Maximize2, Sparkles, Pin, Bell, Search, EyeOff } from "lucide-react";
 import { Badge } from "../ui/Badge";
 import { SyncStatusIndicator } from "./SyncStatusIndicator";
 import { useFocusModeStore } from "../../stores/useFocusModeStore";
 import { useGuideModeStore } from "../../stores/useGuideModeStore";
-import { useThemeStore } from "../../stores/useThemeStore";
 import { useOrganizationStore } from "../../stores/useOrganizationStore";
 import { useNotificationStore } from "../../stores/useNotificationStore";
 import { useCommandPaletteStore } from "../../stores/useCommandPaletteStore";
+import { hideMainWindow } from "../../platform/islandWindow";
 import { clsx } from "clsx";
 
 export interface HeaderProps {
@@ -26,8 +26,6 @@ export const Header: React.FC<HeaderProps> = ({
   const enterFocusMode = useFocusModeStore((s) => s.enterFocusMode);
   const isGuideMode = useGuideModeStore((s) => s.isGuideMode);
   const toggleGuideMode = useGuideModeStore((s) => s.toggleGuideMode);
-  const isSidebarCollapsed = useThemeStore((s) => s.sidebarCollapsed);
-  const toggleSidebar = useThemeStore((s) => s.toggleSidebar);
   const isOrganizationOpen = useOrganizationStore((s) => s.isOpen);
   const toggleOrganization = useOrganizationStore((s) => s.toggleOrganization);
   const isNotifOpen = useNotificationStore((s) => s.isOpen);
@@ -43,17 +41,6 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between border-b border-border-subtle bg-bg-primary/95 px-6 backdrop-blur-xs md:px-10">
       <div className="flex items-center gap-3">
-        {isSidebarCollapsed && (
-          <button
-            type="button"
-            onClick={toggleSidebar}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border-subtle bg-bg-elevated text-text-secondary hover:text-text-primary hover:border-accent-primary transition-colors cursor-pointer shadow-2xs"
-            title="Expandir menú lateral (Ctrl+B)"
-            aria-label="Expandir menú lateral"
-          >
-            <PanelLeft size={16} strokeWidth={1.75} />
-          </button>
-        )}
         <div>
           <h1 className="font-serif text-xl font-semibold text-text-primary">{title}</h1>
           {subtitle && <p className="text-xs text-text-muted">{subtitle}</p>}
@@ -74,6 +61,18 @@ export const Header: React.FC<HeaderProps> = ({
           <kbd className="hidden sm:inline-block rounded bg-bg-secondary px-1.5 py-0.5 text-[10px] font-mono text-text-muted border border-border-subtle">
             ⌘K
           </kbd>
+        </button>
+
+        {/* Botón Minimizar a Iconos Ocultos / Segundo Plano */}
+        <button
+          type="button"
+          onClick={() => void hideMainWindow()}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-border-subtle bg-bg-elevated text-xs font-sans text-text-secondary hover:text-text-primary hover:border-accent-primary transition-colors shadow-2xs cursor-pointer"
+          title="Ocultar StudyLab en iconos ocultos (la Isla Flotante seguirá en tu pantalla)"
+          aria-label="Minimizar en segundo plano"
+        >
+          <EyeOff className="h-3.5 w-3.5 text-accent-primary" />
+          <span className="hidden xl:inline">Segundo plano</span>
         </button>
 
         {/* Botón Modo Guía Interactivo */}

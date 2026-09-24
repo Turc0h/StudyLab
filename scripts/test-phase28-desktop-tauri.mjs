@@ -106,9 +106,11 @@ test("src-tauri/src/lib.rs conecta módulos nativos: filesystem, watcher, job_qu
 // -----------------------------------------------------------------------------
 console.log("\n[Test 4] Binario Nativo Compilado (.exe) y Distribución Frontend (dist/)");
 
-const exeFile = path.join(rootDir, "src-tauri", "target", "debug", "app.exe");
+const exeRelease = path.join(rootDir, "src-tauri", "target", "release", "app.exe");
+const exeDebug = path.join(rootDir, "src-tauri", "target", "debug", "app.exe");
+const exeFile = fs.existsSync(exeRelease) ? exeRelease : exeDebug;
 
-test("Binario ejecutable de Windows (app.exe) compilado con éxito en Rust target/debug", () => {
+test("Binario ejecutable de Windows (app.exe) compilado con éxito en Rust target", () => {
   assert.ok(fs.existsSync(exeFile), "El binario app.exe debe estar compilado");
   const stats = fs.statSync(exeFile);
   assert.ok(stats.size > 1000000, `El ejecutable debe tener un tamaño sustancial (actual: ${stats.size} bytes)`);
