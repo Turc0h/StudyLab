@@ -12,3 +12,6 @@ export * from "./nativeEvaluation";
 export * from "./nativeLearningState";
 export * from "./nativeStudyEngine";
 export * from "./nativeFsrs";
+export * from "./nativeStroke";
+export * from "./nativeSearch";
+export * from "./nativeDossier";

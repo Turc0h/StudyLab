@@ -122,27 +122,27 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
   };
 
   const getScoreColorClass = (score: number) => {
-    if (score >= 9.0) return "text-emerald-400";
-    if (score >= 7.0) return "text-cyan-400";
-    if (score >= 4.0) return "text-amber-400";
-    return "text-rose-400";
+    if (score >= 9.0) return "text-signal-ok font-semibold";
+    if (score >= 7.0) return "text-accent-primary font-semibold";
+    if (score >= 4.0) return "text-highlighter font-semibold";
+    return "text-rubric-red font-semibold";
   };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* ----------------- FASE 1: SETUP ----------------- */}
       {examState === "setup" && (
-        <Card className="border-border-subtle bg-bg-surface/90 backdrop-blur-md">
+        <Card className="border border-border-hairline bg-bg-surface-1 shadow-sm">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-primary/10 text-accent-primary border border-accent-primary/20">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-bg-surface-2 text-text-primary border border-border-hairline">
                 <FileText size={20} />
               </div>
               <div>
                 <CardTitle className="text-lg font-bold text-text-primary flex items-center gap-2">
                   Simulador de Exámenes a Desarrollo y Ensayos
-                  <Badge variant="accent" className="text-[10px] font-mono py-0">
-                    RÚBRICA DE CÁTEDRA
+                  <Badge variant="neutral" className="text-[11px] font-mono py-0">
+                    Rúbrica de Cátedra
                   </Badge>
                 </CardTitle>
                 <p className="text-xs text-text-tertiary">
@@ -154,13 +154,13 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
 
           <div className="p-5 pt-0 space-y-5">
             {/* Modalidad: Presets vs Personalizada */}
-            <div className="flex items-center gap-2 border-b border-border-subtle/60 pb-3">
+            <div className="flex items-center gap-2 border-b border-border-hairline pb-3">
               <button
                 type="button"
                 onClick={() => setIsCustomMode(false)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium font-mono transition-colors ${
                   !isCustomMode
-                    ? "bg-accent-primary/20 text-accent-primary border border-accent-primary/30"
+                    ? "bg-bg-surface-3 text-text-primary border border-border-hairline font-semibold"
                     : "text-text-tertiary hover:text-text-primary"
                 }`}
               >
@@ -171,7 +171,7 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
                 onClick={() => setIsCustomMode(true)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium font-mono transition-colors ${
                   isCustomMode
-                    ? "bg-accent-primary/20 text-accent-primary border border-accent-primary/30"
+                    ? "bg-bg-surface-3 text-text-primary border border-border-hairline font-semibold"
                     : "text-text-tertiary hover:text-text-primary"
                 }`}
               >
@@ -182,8 +182,8 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
             {!isCustomMode ? (
               /* Selector de Consignas Precargadas */
               <div className="space-y-3">
-                <label className="text-xs font-mono uppercase text-text-tertiary block">
-                  Selecciona la Consigna de Examen:
+                <label className="text-xs font-mono text-text-secondary block font-medium">
+                  Selecciona la consigna de examen:
                 </label>
                 <div className="grid gap-3 sm:grid-cols-2">
                   {PRESET_ESSAY_PROMPTS.map((p) => {
@@ -199,12 +199,12 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
                         }}
                         className={`text-left p-3 rounded-lg border transition-all ${
                           isSel
-                            ? "bg-accent-primary/10 border-accent-primary/40 shadow-sm"
-                            : "bg-bg-surface-2/60 border-border-subtle/60 hover:border-border-subtle"
+                            ? "bg-bg-surface-2 border-text-primary shadow-sm"
+                            : "bg-bg-surface-1 border-border-hairline hover:bg-bg-surface-2"
                         }`}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-mono uppercase text-cyan-400 font-semibold">
+                          <span className="text-[10px] font-mono text-text-secondary font-semibold">
                             {p.discipline}
                           </span>
                           <span className="text-[10px] font-mono text-text-tertiary flex items-center gap-1">
@@ -224,41 +224,41 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
               /* Formulario de Consigna Personalizada */
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs font-mono uppercase text-text-tertiary block mb-1">
-                    Título o Materia del Examen:
+                  <label className="text-xs font-mono text-text-secondary block mb-1 font-medium">
+                    Título o materia del examen:
                   </label>
                   <input
                     type="text"
                     value={customTitle}
                     onChange={(e) => setCustomTitle(e.target.value)}
                     placeholder="Ej. Final de Obligaciones Civiles - Responsabilidad Subjetiva"
-                    className="w-full rounded-lg bg-bg-surface-2 px-3 py-2 text-xs border border-border-subtle text-text-primary focus:outline-none focus:border-accent-primary"
+                    className="w-full rounded-lg bg-bg-surface-2 px-3 py-2 text-xs border border-border-hairline text-text-primary focus:outline-none focus:border-border-hairline"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-mono uppercase text-text-tertiary block mb-1">
-                    Consigna o Pregunta a Desarrollar:
+                  <label className="text-xs font-mono text-text-secondary block mb-1 font-medium">
+                    Consigna o pregunta a desarrollar:
                   </label>
                   <textarea
                     rows={3}
                     value={customPromptText}
                     onChange={(e) => setCustomPromptText(e.target.value)}
                     placeholder="Ej. Desarrolle los factores de atribución subjetivos y objetivos. Compare culpa y dolo con el riesgo creado..."
-                    className="w-full rounded-lg bg-bg-surface-2 px-3 py-2 text-xs border border-border-subtle text-text-primary focus:outline-none focus:border-accent-primary resize-none"
+                    className="w-full rounded-lg bg-bg-surface-2 px-3 py-2 text-xs border border-border-hairline text-text-primary focus:outline-none focus:border-border-hairline resize-none"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-mono uppercase text-text-tertiary block mb-1">
-                    Palabras Clave de Cátedra Requeridas (separadas por comas):
+                  <label className="text-xs font-mono text-text-secondary block mb-1 font-medium">
+                    Palabras clave de cátedra requeridas (separadas por comas):
                   </label>
                   <input
                     type="text"
                     value={customKeywords}
                     onChange={(e) => setCustomKeywords(e.target.value)}
                     placeholder="dolo, culpa, antijuridicidad, nexo causal, dano, imputabilidad"
-                    className="w-full rounded-lg bg-bg-surface-2 px-3 py-2 text-xs border border-border-subtle text-text-primary focus:outline-none focus:border-accent-primary"
+                    className="w-full rounded-lg bg-bg-surface-2 px-3 py-2 text-xs border border-border-hairline text-text-primary focus:outline-none focus:border-border-hairline"
                   />
                 </div>
               </div>
@@ -267,13 +267,13 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
             {/* Parámetros de Tiempo y Palabras */}
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 pt-2">
               <div>
-                <label className="text-[10px] font-mono uppercase text-text-tertiary block mb-1">
-                  Tiempo Límite:
+                <label className="text-[11px] font-mono text-text-secondary block mb-1 font-medium">
+                  Tiempo límite:
                 </label>
                 <select
                   value={timeLimitMinutes}
                   onChange={(e) => setTimeLimitMinutes(Number(e.target.value))}
-                  className="w-full rounded-lg bg-bg-surface-2 px-3 py-2 text-xs border border-border-subtle text-text-primary"
+                  className="w-full rounded-lg bg-bg-surface-2 px-3 py-2 text-xs border border-border-hairline text-text-primary"
                 >
                   <option value={10}>10 minutos (Flash)</option>
                   <option value={20}>20 minutos (Estándar)</option>
@@ -283,13 +283,13 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
               </div>
 
               <div>
-                <label className="text-[10px] font-mono uppercase text-text-tertiary block mb-1">
-                  Objetivo de Palabras:
+                <label className="text-[11px] font-mono text-text-secondary block mb-1 font-medium">
+                  Objetivo de palabras:
                 </label>
                 <select
                   value={targetWords}
                   onChange={(e) => setTargetWords(Number(e.target.value))}
-                  className="w-full rounded-lg bg-bg-surface-2 px-3 py-2 text-xs border border-border-subtle text-text-primary"
+                  className="w-full rounded-lg bg-bg-surface-2 px-3 py-2 text-xs border border-border-hairline text-text-primary"
                 >
                   <option value={200}>~200 palabras (Síntesis concisa)</option>
                   <option value={350}>~350 palabras (Pregunta estándar)</option>
@@ -300,13 +300,13 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
 
               {folders.length > 0 && (
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="text-[10px] font-mono uppercase text-text-tertiary block mb-1">
-                    Vincular a Cátedra:
+                  <label className="text-[11px] font-mono text-text-secondary block mb-1 font-medium">
+                    Vincular a cátedra:
                   </label>
                   <select
                     value={selectedFolderId}
                     onChange={(e) => setSelectedFolderId(e.target.value)}
-                    className="w-full rounded-lg bg-bg-surface-2 px-3 py-2 text-xs border border-border-subtle text-text-primary"
+                    className="w-full rounded-lg bg-bg-surface-2 px-3 py-2 text-xs border border-border-hairline text-text-primary"
                   >
                     <option value="">(Sin cátedra asignada)</option>
                     {folders.map((f) => (
@@ -320,14 +320,14 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
             </div>
 
             {/* Preview de la Consigna Activa */}
-            <div className="rounded-lg bg-bg-surface-2/40 p-3 border border-border-subtle text-xs">
+            <div className="rounded-lg bg-bg-surface-2 p-3 border border-border-hairline text-xs">
               <p className="font-semibold text-text-primary">{activePrompt.title}</p>
               <p className="text-text-secondary mt-1 leading-relaxed">{activePrompt.promptText}</p>
               {activePrompt.keywords.length > 0 && (
                 <div className="flex flex-wrap items-center gap-1 mt-2">
-                  <span className="text-[10px] font-mono text-text-tertiary uppercase mr-1">Términos requeridos:</span>
+                  <span className="text-[10px] font-mono text-text-tertiary mr-1">Términos requeridos:</span>
                   {activePrompt.keywords.map((kw) => (
-                    <span key={kw} className="rounded bg-accent-primary/10 text-accent-primary px-1.5 py-0.5 text-[10px] font-mono">
+                    <span key={kw} className="rounded bg-bg-surface-3 text-text-primary border border-border-hairline px-1.5 py-0.5 text-[10px] font-mono">
                       {kw}
                     </span>
                   ))}
@@ -346,12 +346,12 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
       {examState === "writing" && (
         <div className="space-y-4">
           {/* Header de Examen en Vivo */}
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-bg-surface/90 p-3.5 border border-border-subtle">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-bg-surface-1 p-3.5 border border-border-hairline shadow-sm">
             <div>
-              <span className="text-[10px] font-mono text-accent uppercase tracking-wider block">
-                EXAMEN EN PROGRESO
+              <span className="text-[11px] font-mono text-text-secondary block font-medium">
+                Examen en progreso
               </span>
-              <h3 className="text-sm font-bold text-text-primary">{activePrompt.title}</h3>
+              <h3 className="text-sm font-bold text-text-primary font-serif">{activePrompt.title}</h3>
             </div>
 
             <div className="flex items-center gap-3">
@@ -359,16 +359,16 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
               <div
                 className={`flex items-center gap-1.5 px-3 py-1 rounded-lg font-mono text-sm font-bold border ${
                   secondsRemaining < 120
-                    ? "bg-rose-500/10 text-rose-400 border-rose-500/30 animate-pulse"
-                    : "bg-bg-surface-2 text-text-primary border-border-subtle"
+                    ? "bg-rubric-red/10 text-rubric-red border-rubric-red/30"
+                    : "bg-bg-surface-2 text-text-primary border-border-hairline"
                 }`}
               >
-                <Clock size={15} className={secondsRemaining < 120 ? "text-rose-400" : "text-cyan-400"} />
+                <Clock size={15} className={secondsRemaining < 120 ? "text-rubric-red" : "text-text-tertiary"} />
                 <span>{formatTime(secondsRemaining)}</span>
               </div>
 
               {/* Contador de Palabras */}
-              <div className="flex items-center gap-1 px-3 py-1 rounded-lg bg-bg-surface-2 text-xs font-mono border border-border-subtle">
+              <div className="flex items-center gap-1 px-3 py-1 rounded-lg bg-bg-surface-2 text-xs font-mono border border-border-hairline">
                 <span className="text-text-primary font-bold">{currentWordCount}</span>
                 <span className="text-text-tertiary">/ {activePrompt.targetWords} palabras</span>
               </div>
@@ -380,39 +380,39 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
           </div>
 
           {/* Consigna Desplegable */}
-          <div className="rounded-lg bg-bg-surface-2/40 p-3 border border-border-subtle text-xs">
+          <div className="rounded-lg bg-bg-surface-2 p-3 border border-border-hairline text-xs">
             <p className="text-text-secondary leading-relaxed font-sans">{activePrompt.promptText}</p>
           </div>
 
           {/* Guía de Estructura Universitaria Colapsable */}
-          <div className="rounded-lg bg-bg-surface-2/30 border border-border-subtle overflow-hidden">
+          <div className="rounded-lg bg-bg-surface-1 border border-border-hairline overflow-hidden shadow-sm">
             <button
               type="button"
               onClick={() => setIsStructureOpen(!isStructureOpen)}
               className="w-full flex items-center justify-between p-2.5 text-xs font-mono text-text-tertiary hover:text-text-primary transition-colors"
             >
               <span className="flex items-center gap-1.5">
-                <GraduationCap size={13} className="text-accent" />
+                <GraduationCap size={13} className="text-text-secondary" />
                 Estructura de Ensayo Académico Sugerida
               </span>
               {isStructureOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             </button>
             {isStructureOpen && (
-              <div className="p-3 pt-0 grid grid-cols-2 gap-2 sm:grid-cols-4 text-[11px] border-t border-border-subtle/40 mt-1">
-                <div className="p-2 rounded bg-bg-surface-2/60">
-                  <span className="font-mono text-[10px] text-cyan-400 block font-bold">1. Tesis / Inicio</span>
+              <div className="p-3 pt-0 grid grid-cols-2 gap-2 sm:grid-cols-4 text-[11px] border-t border-border-hairline mt-1">
+                <div className="p-2 rounded bg-bg-surface-2 border border-border-hairline">
+                  <span className="font-mono text-[10px] text-text-primary block font-bold">1. Tesis / Inicio</span>
                   <span className="text-text-tertiary">Definición inicial y encuadre del problema.</span>
                 </div>
-                <div className="p-2 rounded bg-bg-surface-2/60">
-                  <span className="font-mono text-[10px] text-emerald-400 block font-bold">2. Fundamentación</span>
+                <div className="p-2 rounded bg-bg-surface-2 border border-border-hairline">
+                  <span className="font-mono text-[10px] text-accent-primary block font-bold">2. Fundamentación</span>
                   <span className="text-text-tertiary">Mecanismos, doctrina y conceptos de cátedra.</span>
                 </div>
-                <div className="p-2 rounded bg-bg-surface-2/60">
-                  <span className="font-mono text-[10px] text-amber-400 block font-bold">3. Casos Límites</span>
+                <div className="p-2 rounded bg-bg-surface-2 border border-border-hairline">
+                  <span className="font-mono text-[10px] text-text-secondary block font-bold">3. Casos Límites</span>
                   <span className="text-text-tertiary">Excepciones, contraejemplos u objeciones.</span>
                 </div>
-                <div className="p-2 rounded bg-bg-surface-2/60">
-                  <span className="font-mono text-[10px] text-purple-400 block font-bold">4. Conclusión</span>
+                <div className="p-2 rounded bg-bg-surface-2 border border-border-hairline">
+                  <span className="font-mono text-[10px] text-text-primary block font-bold">4. Conclusión</span>
                   <span className="text-text-tertiary">Síntesis integradora y juicio crítico final.</span>
                 </div>
               </div>
@@ -427,7 +427,7 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
               value={essayText}
               onChange={(e) => setEssayText(e.target.value)}
               placeholder="Comience aquí la redacción de su examen a desarrollo. Organice sus párrafos de forma lógica y use los términos teóricos pertinentes..."
-              className="w-full rounded-xl bg-bg-surface/95 p-4 font-serif text-sm leading-relaxed border border-border-subtle text-text-primary focus:outline-none focus:border-accent-primary shadow-inner resize-y"
+              className="w-full rounded-xl bg-bg-surface-1 p-4 font-serif text-sm leading-relaxed border border-border-hairline text-text-primary focus:outline-none focus:border-border-hairline shadow-inner resize-y"
             />
           </div>
 
@@ -437,7 +437,7 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
             <div className="flex-1 h-1.5 rounded-full bg-bg-surface-2 overflow-hidden">
               <div
                 className={`h-full transition-all duration-300 ${
-                  currentWordCount >= activePrompt.targetWords ? "bg-emerald-400" : "bg-cyan-500"
+                  currentWordCount >= activePrompt.targetWords ? "bg-signal-ok" : "bg-accent-primary"
                 }`}
                 style={{ width: `${Math.min(100, (currentWordCount / activePrompt.targetWords) * 100)}%` }}
               />
@@ -449,19 +449,19 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
 
       {/* ----------------- FASE 3: EVALUACIÓN Y RÚBRICA ----------------- */}
       {examState === "evaluated" && evaluation && (
-        <Card className="border-border-subtle bg-bg-surface/90 backdrop-blur-md">
+        <Card className="border border-border-hairline bg-bg-surface-1 shadow-sm">
           <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between pb-3">
             <div>
-              <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-wider block">
-                DICTAMEN Y EVALUACIÓN DE CÁTEDRA
+              <span className="text-[11px] font-mono text-text-secondary block font-medium">
+                Dictamen y evaluación de cátedra
               </span>
-              <CardTitle className="text-base font-bold text-text-primary">{activePrompt.title}</CardTitle>
+              <CardTitle className="text-base font-bold text-text-primary font-serif">{activePrompt.title}</CardTitle>
             </div>
 
             {/* Calificación Global */}
             <div className="flex items-center gap-3 self-start sm:self-auto">
               <div className="text-right">
-                <span className="text-[10px] font-mono uppercase text-text-tertiary block">Nota Final</span>
+                <span className="text-[10px] font-mono text-text-tertiary block">Nota final</span>
                 <span className={`text-2xl font-mono font-bold ${getScoreColorClass(evaluation.totalScore)}`}>
                   {evaluation.totalScore.toFixed(1)}{" "}
                   <span className="text-xs font-normal text-text-tertiary">/ 10</span>
@@ -487,40 +487,40 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
           <div className="p-5 pt-0 space-y-5">
             {/* Rúbrica en 4 Dimensiones */}
             <div className="grid gap-2 sm:grid-cols-2">
-              <div className="rounded-lg bg-bg-surface-2/60 p-3 border border-border-subtle/50">
+              <div className="rounded-lg bg-bg-surface-2 p-3 border border-border-hairline">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-semibold text-text-primary">Dominio Conceptual (35%)</span>
-                  <span className="font-mono font-bold text-cyan-400">{evaluation.conceptualScore.toFixed(1)}/10</span>
+                  <span className="font-mono font-bold text-text-primary">{evaluation.conceptualScore.toFixed(1)}/10</span>
                 </div>
                 <p className="text-[11px] text-text-tertiary mt-1">
                   Densidad de conceptos técnicos específicos utilizados de la disciplina.
                 </p>
               </div>
 
-              <div className="rounded-lg bg-bg-surface-2/60 p-3 border border-border-subtle/50">
+              <div className="rounded-lg bg-bg-surface-2 p-3 border border-border-hairline">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-semibold text-text-primary">Estructura & Cohesión (25%)</span>
-                  <span className="font-mono font-bold text-emerald-400">{evaluation.structureScore.toFixed(1)}/10</span>
+                  <span className="font-mono font-bold text-text-primary">{evaluation.structureScore.toFixed(1)}/10</span>
                 </div>
                 <p className="text-[11px] text-text-tertiary mt-1">
                   Articulación de tesis inicial, desarrollo y conclusión formal de cierre.
                 </p>
               </div>
 
-              <div className="rounded-lg bg-bg-surface-2/60 p-3 border border-border-subtle/50">
+              <div className="rounded-lg bg-bg-surface-2 p-3 border border-border-hairline">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-semibold text-text-primary">Rigor Crítico & Casos Límites (20%)</span>
-                  <span className="font-mono font-bold text-purple-400">{evaluation.criticalRigorScore.toFixed(1)}/10</span>
+                  <span className="font-mono font-bold text-text-primary">{evaluation.criticalRigorScore.toFixed(1)}/10</span>
                 </div>
                 <p className="text-[11px] text-text-tertiary mt-1">
                   Presencia de conectores causales, excepciones o contrastes de doctrina.
                 </p>
               </div>
 
-              <div className="rounded-lg bg-bg-surface-2/60 p-3 border border-border-subtle/50">
+              <div className="rounded-lg bg-bg-surface-2 p-3 border border-border-hairline">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-semibold text-text-primary">Claridad & Concisión (20%)</span>
-                  <span className="font-mono font-bold text-amber-400">{evaluation.clarityScore.toFixed(1)}/10</span>
+                  <span className="font-mono font-bold text-text-primary">{evaluation.clarityScore.toFixed(1)}/10</span>
                 </div>
                 <p className="text-[11px] text-text-tertiary mt-1">
                   Penalización por verborragia vacía y frases cliché sin peso conceptual.
@@ -532,15 +532,15 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
             <div
               className={`rounded-lg p-3 border text-xs flex items-start gap-3 ${
                 evaluation.fillerCount > 0
-                  ? "bg-amber-500/10 border-amber-500/25 text-amber-300"
-                  : "bg-emerald-500/10 border-emerald-500/25 text-emerald-300"
+                  ? "bg-system-notice-bg border-system-notice-border text-text-primary"
+                  : "bg-bg-surface-2 border-border-hairline text-text-primary"
               }`}
             >
               <div className="mt-0.5 shrink-0">
                 {evaluation.fillerCount > 0 ? (
-                  <AlertTriangle size={16} className="text-amber-400" />
+                  <AlertTriangle size={16} className="text-highlighter" />
                 ) : (
-                  <ShieldCheck size={16} className="text-emerald-400" />
+                  <ShieldCheck size={16} className="text-signal-ok" />
                 )}
               </div>
               <div>
@@ -560,8 +560,8 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
 
             {/* Cobertura de Conceptos Clave */}
             {activePrompt.keywords.length > 0 && (
-              <div className="rounded-lg bg-bg-surface-2/40 p-3 border border-border-subtle space-y-2">
-                <span className="text-[10px] font-mono uppercase text-text-tertiary block">
+              <div className="rounded-lg bg-bg-surface-2 p-3 border border-border-hairline space-y-2">
+                <span className="text-[11px] font-mono text-text-secondary block font-medium">
                   Cobertura de Conceptos Clave de Cátedra:
                 </span>
                 <div className="flex flex-wrap gap-1.5">
@@ -572,11 +572,11 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
                         key={kw}
                         className={`rounded px-2 py-0.5 text-xs font-mono border flex items-center gap-1 ${
                           included
-                            ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
-                            : "bg-bg-surface-2 text-text-tertiary border-border-subtle line-through opacity-60"
+                            ? "bg-bg-surface-1 text-text-primary border-border-hairline font-medium"
+                            : "bg-bg-surface-2 text-text-tertiary border-border-hairline line-through opacity-60"
                         }`}
                       >
-                        {included ? "✓" : "✗"} {kw}
+                        <span className={included ? "text-signal-ok font-bold" : ""}>{included ? "✓" : "✗"}</span> {kw}
                       </span>
                     );
                   })}
@@ -586,7 +586,7 @@ export const EssayExamMethod: React.FC<EssayExamMethodProps> = ({ onFinish }) =>
 
             {/* Devolución Pedagógica */}
             <div className="space-y-2">
-              <span className="text-xs font-mono uppercase text-text-tertiary block">
+              <span className="text-xs font-mono text-text-secondary block font-medium">
                 Observaciones y Sugerencias de Mejora:
               </span>
               <ul className="space-y-1.5">

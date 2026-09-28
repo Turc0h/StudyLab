@@ -5,9 +5,9 @@ import type { PostItRecord } from "../../db/db";
 import { db } from "../../db/db";
 
 const COLOR_CLASSES: Record<PostItRecord["color"], string> = {
-  accent: "bg-accent-muted border-accent/40",
-  warning: "bg-warning-muted border-warning/40",
-  success: "bg-success-muted border-success/40",
+  accent: "bg-[var(--color-page,var(--bg-surface-1))] border-[var(--color-rule,var(--border-hairline))] text-[var(--color-ink,var(--text-primary))]",
+  warning: "bg-amber-950/20 border-amber-800/40 text-text-primary",
+  success: "bg-stone-900/60 border-stone-700/60 text-text-primary",
 };
 
 function PostItNote({
@@ -83,7 +83,7 @@ function PostItNote({
           onPointerUp={handlePointerUp}
         >
           <GripVertical size={12} strokeWidth={2} className="shrink-0 text-text-tertiary" />
-          <span className="truncate text-[10px] font-medium tracking-wide text-text-tertiary uppercase">
+          <span className="truncate text-[10px] font-mono font-medium text-text-tertiary">
             Post-it
           </span>
         </div>

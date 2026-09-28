@@ -6,3 +6,6 @@ pub mod evaluation;
 pub mod learning_state;
 pub mod study_engine;
 pub mod fsrs;
+pub mod strokes;
+pub mod search;
+pub mod dossier;

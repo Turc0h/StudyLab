@@ -26,6 +26,9 @@ const ContextEngineDashboard = lazy(() =>
 const FloatingIslandWidget = lazy(() =>
   import("./pages/FloatingIslandWidget").then((m) => ({ default: m.FloatingIslandWidget }))
 );
+const BlackboardPage = lazy(() =>
+  import("./pages/BlackboardPage").then((m) => ({ default: m.BlackboardPage }))
+);
 
 function PageFallback() {
   return (
@@ -51,7 +54,7 @@ const router = createBrowserRouter([
       { path: "books", element: withSuspense(<BookScannerPage />) },
       { path: "ambient", element: withSuspense(<AmbientPage />) },
       { path: "academic", element: withSuspense(<AcademicWorkspace />) },
-      { path: "workspace", element: withSuspense(<AcademicWorkspace />) },
+      { path: "workspace", element: withSuspense(<MethodsPage />) },
       { path: "graph", element: withSuspense(<KnowledgeGraph />) },
       { path: "files", element: withSuspense(<Files />) },
       { path: "session", element: withSuspense(<Session />) },
@@ -59,6 +62,8 @@ const router = createBrowserRouter([
       { path: "context", element: withSuspense(<ContextEngineDashboard />) },
       { path: "calendar", element: withSuspense(<CalendarPage />) },
       { path: "organization", element: withSuspense(<CalendarPage />) },
+      { path: "blackboard", element: withSuspense(<BlackboardPage />) },
+      { path: "whiteboard", element: withSuspense(<BlackboardPage />) },
       { path: "qa", element: withSuspense(<QaHubPage />) },
       { path: "verificacion", element: withSuspense(<QaHubPage />) },
     ],

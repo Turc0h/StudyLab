@@ -291,8 +291,8 @@ export const MemoryPalaceMethod: React.FC<MemoryPalaceMethodProps> = ({ onSessio
                 {currentStation.stationNumber}
               </div>
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted">
-                  Punto de Anclaje Espacial
+                <span className="text-[10px] font-mono text-text-muted">
+                  Punto de anclaje espacial
                 </span>
                 <h3 className="font-serif text-lg font-bold text-text-primary">
                   {currentStation.locationName}
@@ -315,8 +315,8 @@ export const MemoryPalaceMethod: React.FC<MemoryPalaceMethodProps> = ({ onSessio
             {revealedCurrent ? (
               <div className="rounded-lg border border-accent-primary/30 bg-bg-elevated p-4 space-y-2 animate-in fade-in duration-200">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-accent-primary">
-                    Concepto Almacenado
+                  <span className="text-[10px] font-mono text-accent-primary">
+                    Concepto almacenado
                   </span>
                   <Badge variant="success">Solución Revelada</Badge>
                 </div>

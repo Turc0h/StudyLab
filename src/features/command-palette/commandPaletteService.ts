@@ -1,5 +1,6 @@
 import { db } from "../../db/db.ts";
 import { STUDY_METHODS_30_SEEDS } from "../../data/studyMethodsSeed.ts";
+import { searchAcademicChunksNative } from "../../platform/nativeSearch.ts";
 
 export type CommandPaletteCategory =
   | "methods"
@@ -306,6 +307,24 @@ export async function searchCommandPalette(
       keywords: ["matematica", "pizarra", "teoremas", "demostracion", "katex", "latex", "formulas", "nyquist", "calculo", "euler", "svd"],
       onSelect: () => actions.navigate("/methods?run=math-blackboard"),
     },
+    {
+      id: "action-split-screen",
+      title: "Atril Dividido: Lectura de Apuntes + Pizarra Virtual",
+      subtitle: "Estudio simultáneo en pantalla dividida (split-screen), proporciones 50/50 o 65/35 y foco Zen",
+      iconName: "Columns2",
+      badge: "Inmersivo",
+      keywords: ["split", "pantalla dividida", "atril", "pizarra", "apuntes", "lectura", "demostracion", "doble", "zen"],
+      onSelect: () => actions.navigate("/methods?run=split-screen"),
+    },
+    {
+      id: "action-blackboard",
+      title: "Pizarra Virtual Autónoma & Demostraciones (/blackboard)",
+      subtitle: "Lienzo libre para resolución matemática, esquemas conceptuales y optimizador nativo en Rust",
+      iconName: "PenTool",
+      badge: "Pizarra",
+      keywords: ["pizarra", "blackboard", "whiteboard", "dibujar", "tiza", "lienzo", "demostracion", "formulas", "esquemas"],
+      onSelect: () => actions.navigate("/blackboard"),
+    },
   ];
 
   // Evaluar Acciones del Sistema
@@ -479,6 +498,42 @@ export async function searchCommandPalette(
       }
     } catch (err) {
       console.warn("No se pudieron cargar conceptos para la paleta de comandos:", err);
+    }
+
+    // 6. Fragmentos Académicos FTS con aceleración nativa en Rust
+    try {
+      if (normQuery && db.academicChunks) {
+        const rawChunks = await db.academicChunks.limit(100).toArray();
+        if (rawChunks.length > 0) {
+          const nativeResults = await searchAcademicChunksNative(
+            query,
+            rawChunks.map((ch) => ({
+              id: ch.id,
+              title: ch.title || ch.hierarchyPath || "Fragmento de Apunte",
+              raw_content: ch.rawContent,
+              hierarchy_path: ch.hierarchyPath,
+              page_number: ch.pageNumber,
+            })),
+            6
+          );
+
+          for (const res of nativeResults) {
+            items.push({
+              id: `chunk-${res.id}`,
+              title: res.title,
+              subtitle: `Pág. ${res.page_number} • ${res.snippet}`,
+              category: "files",
+              categoryLabel: "Apuntes FTS",
+              iconName: "FileText",
+              badge: "FTS RUST",
+              score: Math.min(95, Math.round(res.score * 5)),
+              onSelect: () => actions.navigate(`/academic?chunk=${res.id}`),
+            });
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("Error en búsqueda FTS nativa:", err);
     }
   }
 

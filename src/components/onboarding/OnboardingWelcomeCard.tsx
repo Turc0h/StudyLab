@@ -5,7 +5,7 @@ import { Button } from "../ui/Button";
 import {
   FolderOpen,
   GraduationCap,
-  RotateCcw,
+  BrainCircuit,
   ArrowRight,
   Sparkles,
   X,
@@ -67,9 +67,9 @@ export const OnboardingWelcomeCard: React.FC = () => {
         <X size={16} />
       </button>
 
-      <div className="flex items-center gap-2 text-accent-primary font-sans text-xs font-semibold uppercase tracking-wider">
+      <div className="flex items-center gap-2 text-accent-primary font-sans text-xs font-semibold">
         <Sparkles size={14} />
-        <span>Primeros Pasos en StudyLab</span>
+        <span>Primeros pasos en StudyLab</span>
       </div>
 
       <h3 className="font-serif text-lg font-semibold text-text-primary mt-1">
@@ -109,11 +109,11 @@ export const OnboardingWelcomeCard: React.FC = () => {
             <span className="font-sans text-xs font-semibold text-text-primary">2. Estudiar</span>
           </div>
           <p className="font-sans text-[11px] text-text-muted mt-2">
-            Abre tu PDF o apuntes en el Workspace y consulta dudas con el Catedrático Socrático.
+            Aplica métodos de estudio probados (FSRS, Feynman, Leitner) y entrena tu memoria.
           </p>
-          <Link to="/workspace" className="mt-3">
+          <Link to="/methods" className="mt-3">
             <Button variant="outline" size="sm" className="w-full text-xs gap-1">
-              <span>Abrir Workspace</span>
+              <span>Ver Métodos</span>
               <ArrowRight size={12} />
             </Button>
           </Link>
@@ -123,16 +123,16 @@ export const OnboardingWelcomeCard: React.FC = () => {
         <div className="p-3 rounded-lg border border-border-subtle bg-bg-surface flex flex-col justify-between">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-md bg-accent-primary/10 text-accent-primary flex items-center justify-center shrink-0">
-              <RotateCcw size={15} />
+              <BrainCircuit size={15} />
             </div>
-            <span className="font-sans text-xs font-semibold text-text-primary">3. Repasar</span>
+            <span className="font-sans text-xs font-semibold text-text-primary">3. Academic Hub</span>
           </div>
           <p className="font-sans text-[11px] text-text-muted mt-2">
-            Consolida tu memoria con el mazo de repaso espaciado FSRS y técnicas cognitivas.
+            Carga tus PDFs universitarios, lee con citas y consulta dudas con el tutor socrático.
           </p>
-          <Link to="/methods" className="mt-3">
+          <Link to="/academic" className="mt-3">
             <Button variant="outline" size="sm" className="w-full text-xs gap-1">
-              <span>Ver Métodos</span>
+              <span>Abrir Academic Hub</span>
               <ArrowRight size={12} />
             </Button>
           </Link>

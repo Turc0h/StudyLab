@@ -21,7 +21,6 @@ import {
   GitBranch,
   ShieldCheck,
   RotateCcw,
-  Sparkles,
 } from "lucide-react";
 
 interface Feynman2RunnerProps {
@@ -214,7 +213,7 @@ export function Feynman2Runner({ initialConceptId, onFinish }: Feynman2RunnerPro
               onClick={handleAnalyze}
               className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-white shadow hover:opacity-90 disabled:opacity-50"
             >
-              <Sparkles className="h-3.5 w-3.5" />
+              <BrainCircuit className="h-3.5 w-3.5" />
               {isAnalyzing ? "Auditando..." : "Analizar con Feynman 2.0"}
             </button>
           </div>
@@ -227,19 +226,19 @@ export function Feynman2Runner({ initialConceptId, onFinish }: Feynman2RunnerPro
           {/* Top Score Bar */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="rounded-lg border border-border-subtle bg-bg-surface-2 p-3 text-center">
-              <span className="text-[11px] uppercase tracking-wider text-text-muted">Comprensión Cátedra (C)</span>
+              <span className="text-xs text-text-muted">Comprensión Cátedra (C)</span>
               <div className="mt-1 text-2xl font-bold text-primary">{analysisResult.comprehensionScore}%</div>
               <span className="text-[10px] text-text-muted">Impacta 30% en 4D Mastery</span>
             </div>
 
             <div className="rounded-lg border border-border-subtle bg-bg-surface-2 p-3 text-center">
-              <span className="text-[11px] uppercase tracking-wider text-text-muted">Índice de Simplicidad</span>
+              <span className="text-xs text-text-muted">Índice de Simplicidad</span>
               <div className="mt-1 text-2xl font-bold text-amber-500">{analysisResult.simplicityScore}%</div>
               <span className="text-[10px] text-text-muted">Penaliza jerga y tautologías</span>
             </div>
 
             <div className="rounded-lg border border-border-subtle bg-bg-surface-2 p-3 text-center">
-              <span className="text-[11px] uppercase tracking-wider text-text-muted">Diagnóstico Cualitativo</span>
+              <span className="text-xs text-text-muted">Diagnóstico Cualitativo</span>
               <div className="mt-1 text-sm font-semibold capitalize text-text-main">
                 {analysisResult.diagnosticCategory.replace("_", " ")}
               </div>
@@ -280,8 +279,8 @@ export function Feynman2Runner({ initialConceptId, onFinish }: Feynman2RunnerPro
 
           {/* Gaps / Brechas Detectadas */}
           <div className="flex flex-col gap-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-text-muted">
-              Brechas Detectadas y Acciones Pedagógicas ({analysisResult.gaps.length})
+            <h4 className="text-xs font-semibold text-text-muted">
+              Brechas detectadas y acciones pedagógicas ({analysisResult.gaps.length})
             </h4>
 
             {analysisResult.gaps.length === 0 ? (

@@ -24,11 +24,10 @@ import { ImageOcclusionViewer } from "../../image-occlusion/ImageOcclusionViewer
 import {
   CheckCircle,
   RotateCw,
-  Sparkles,
   ShieldAlert,
-  ArrowRight,
   AlertTriangle,
 } from "lucide-react";
+
 
 interface MetricBarProps {
   label: string;
@@ -287,29 +286,28 @@ export const AcademicCognitiveWidgets: React.FC<AcademicCognitiveWidgetsProps> =
                     size="sm"
                     onClick={() => void handleGenerateCardsForActiveChunk()}
                     disabled={generatingCards}
-                    className="text-xs bg-[--accent-ink] hover:bg-[--accent-ink-muted] text-white border-0 cursor-pointer"
+                    className="text-xs bg-accent-primary hover:bg-accent-hover text-white border-0 cursor-pointer"
                   >
-                    <Sparkles className="w-3.5 h-3.5 mr-1.5" />
-                    {generatingCards ? "Generando tarjetas..." : "Generar tarjetas desde el texto actual →"}
+                    {generatingCards ? "Generando tarjetas..." : "Generar tarjetas desde el texto actual"}
                   </Button>
                 )}
               </div>
             ) : (
               <>
-                <div className="bg-[--bg-panel-raised] p-3 rounded-xl border border-[--border-hairline] space-y-2.5">
+                <div className="bg-bg-panel-raised p-3 rounded-lg border border-border-hairline space-y-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-[--text-secondary] font-mono">Retención estimada R(t)</span>
-                    <span className="text-sm font-bold font-mono text-[--text-primary]">
+                    <span className="text-xs text-text-secondary font-mono">Retención estimada R(t)</span>
+                    <span className="text-sm font-bold font-mono text-text-primary">
                       {Math.round(currentR * 100)}%
                     </span>
                   </div>
-                  <div className="w-full bg-[--bg-panel] h-1.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-bg-panel h-1.5 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-[--accent-ink] rounded-full transition-all duration-300"
+                      className="h-full bg-accent-primary rounded-full transition-all duration-300"
                       style={{ width: `${Math.min(100, Math.max(0, currentR * 100))}%` }}
                     />
                   </div>
-                  <div className="pt-2 border-t border-[--border-hairline] space-y-1.5">
+                  <div className="pt-2 border-t border-border-hairline space-y-1.5">
                     <MetricBar
                       label="Estabilidad"
                       value={`${currentCard.stability.toFixed(1)}d`}
@@ -323,14 +321,13 @@ export const AcademicCognitiveWidgets: React.FC<AcademicCognitiveWidgetsProps> =
                   </div>
                 </div>
 
-                <div className="bg-[--bg-panel-raised] rounded-xl border border-[--border-hairline] p-3.5 shadow-sm relative flex flex-col min-h-[260px] justify-between">
-                  <div className="flex items-center justify-between pb-2 border-b border-[--border-hairline] text-[10px] font-mono text-[--text-secondary]">
-                    <span className="flex items-center gap-1 text-[--accent-ink]">
-                      <Sparkles className="w-3 h-3" />
-                      FSRS v4.5 Active
+                <div className="bg-bg-panel-raised rounded-lg border border-border-hairline p-3.5 relative flex flex-col min-h-[260px] justify-between">
+                  <div className="flex items-center justify-between pb-2 border-b border-border-hairline text-[10px] font-mono text-text-secondary">
+                    <span className="text-accent-primary font-medium">
+                      FSRS v5 Activo
                     </span>
                     <span>
-                      Card {currentCardIndex + 1} of {cards.length}
+                      Tarjeta {currentCardIndex + 1} de {cards.length}
                     </span>
                   </div>
 
@@ -341,19 +338,19 @@ export const AcademicCognitiveWidgets: React.FC<AcademicCognitiveWidgetsProps> =
                       <div className="my-2 p-2.5 rounded-lg border border-rose-500/30 bg-rose-950/20 text-rose-200 text-[11px] flex flex-col gap-1">
                         <div className="flex items-center gap-1.5 font-bold text-rose-300">
                           <AlertTriangle className="w-3.5 h-3.5" />
-                          <span>Tarjeta Dificultosa (Leech · {leech.lapses} fallos)</span>
+                          <span>Tarjeta Dificultosa ({leech.lapses} lapsos)</span>
                         </div>
                         <p className="text-[10px] text-rose-300/80 leading-snug">
                           {leech.message}
                         </p>
-                        <div className="flex items-center gap-1.5 mt-1 pt-1 border-t border-rose-500/20 text-[9px]">
-                          <span className="font-mono text-rose-400">Acción pedagógica:</span>
-                          <span className="font-bold uppercase tracking-wider text-rose-200">
+                        <div className="flex items-center gap-1.5 mt-1 pt-1 border-t border-rose-500/20 text-[10px]">
+                          <span className="font-mono text-rose-400">Acción sugerida:</span>
+                          <span className="font-medium text-rose-200">
                             {leech.actionRecommendation === "split"
-                              ? "Dividir en dos más chicas"
+                              ? "Dividir en conceptos atómicos"
                               : leech.actionRecommendation === "audit"
-                              ? "Auditar con Cátedra"
-                              : "Reformular"}
+                              ? "Auditar con la cátedra"
+                              : "Reformular enunciado"}
                           </span>
                         </div>
                       </div>
@@ -400,9 +397,9 @@ export const AcademicCognitiveWidgets: React.FC<AcademicCognitiveWidgetsProps> =
                             onClick={() =>
                               onNavigateToCitation?.(activeChunk.pageNumber, activeChunk.boundingBox)
                             }
-                            className="text-[9px] font-mono text-[--accent-ink] hover:underline flex items-center gap-0.5 cursor-pointer"
+                            className="text-[9px] font-mono text-[--accent-ink] hover:underline cursor-pointer"
                           >
-                            Auditar Fuente <ArrowRight className="w-2.5 h-2.5" />
+                            Auditar Fuente
                           </button>
                         </div>
                       )}
@@ -481,33 +478,33 @@ export const AcademicCognitiveWidgets: React.FC<AcademicCognitiveWidgetsProps> =
         {/* TAB 2: EXAM SIMULATOR & TRAP QUESTIONS */}
         {activeTab === "simulator" && (
           <div className="space-y-3">
-            <div className="bg-amber-950/20 border border-amber-500/30 rounded-xl p-3">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400 font-mono mb-1">
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-amber-500 font-mono mb-1">
                 <ShieldAlert className="w-3.5 h-3.5" />
                 {examTrapQuestion.title}
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed font-sans">
+              <p className="text-xs text-[--text-secondary] leading-relaxed font-sans">
                 {examTrapQuestion.prompt}
               </p>
             </div>
 
             <div className="space-y-2">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-[--text-secondary]">
                 Selecciona la justificación rigurosa:
               </div>
               {examTrapQuestion.options.map((opt, i) => {
                 const isSelected = selectedTrapOption === i;
                 const isCorrect = opt.correct;
-                let btnStyle = "border-slate-800 bg-slate-900/50 text-slate-300 hover:border-slate-700";
+                let btnStyle = "border-[--border-hairline] bg-[--bg-panel] text-[--text-secondary] hover:bg-[--bg-base] hover:text-[--text-primary]";
 
                 if (showTrapExplanation) {
                   if (isCorrect) {
-                    btnStyle = "border-emerald-500/60 bg-emerald-950/30 text-emerald-200";
+                    btnStyle = "border-emerald-600/60 bg-emerald-500/10 text-emerald-400";
                   } else if (isSelected) {
-                    btnStyle = "border-rose-500/60 bg-rose-950/30 text-rose-200";
+                    btnStyle = "border-rose-600/60 bg-rose-500/10 text-rose-400";
                   }
                 } else if (isSelected) {
-                  btnStyle = "border-amber-500/60 bg-amber-950/30 text-amber-200";
+                  btnStyle = "border-[--accent-ink] bg-[--accent-ink]/10 text-[--text-primary]";
                 }
 
                 return (
@@ -517,10 +514,10 @@ export const AcademicCognitiveWidgets: React.FC<AcademicCognitiveWidgetsProps> =
                       setSelectedTrapOption(i);
                       setShowTrapExplanation(true);
                     }}
-                    className={`w-full text-left p-2.5 rounded-lg border text-xs leading-relaxed transition-all ${btnStyle}`}
+                    className={`w-full text-left p-2.5 rounded-lg border text-xs leading-relaxed transition-colors cursor-pointer ${btnStyle}`}
                   >
                     <div className="flex items-start gap-2">
-                      <span className="font-mono text-[10px] text-slate-500">[{i + 1}]</span>
+                      <span className="font-mono text-[10px] text-[--text-secondary]">[{i + 1}]</span>
                       <span>{opt.text}</span>
                     </div>
                   </button>
@@ -529,25 +526,25 @@ export const AcademicCognitiveWidgets: React.FC<AcademicCognitiveWidgetsProps> =
             </div>
 
             {showTrapExplanation && (
-              <div className="p-3 bg-slate-900/90 rounded-xl border border-slate-800 text-xs space-y-2 animate-in fade-in duration-150">
+              <div className="p-3 bg-[--bg-panel] rounded-xl border border-[--border-hairline] text-xs space-y-2 animate-in fade-in duration-150">
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-[10px] text-cyan-400 font-bold">
+                  <span className="font-mono text-[10px] text-[--accent-ink] font-bold">
                     Auditoría de Cita Académica:
                   </span>
-                  <Badge variant="accent" className="text-[9px] border-cyan-500/40 text-cyan-400">
+                  <Badge variant="accent" className="text-[9px] border-[--accent-ink]/40 text-[--accent-ink]">
                     Cita Certificada
                   </Badge>
                 </div>
-                <p className="text-slate-300 font-mono text-[11px] bg-slate-950 p-2 rounded border border-slate-800">
+                <p className="text-[--text-primary] font-mono text-[11px] bg-[--bg-base] p-2 rounded border border-[--border-hairline]">
                   {examTrapQuestion.citationText}
                 </p>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => onNavigateToCitation?.(examTrapQuestion.page)}
-                  className="text-xs text-cyan-400 hover:text-cyan-300 p-0 h-auto font-mono flex items-center gap-1"
+                  className="text-xs text-[--accent-ink] hover:underline p-0 h-auto font-mono flex items-center gap-1 cursor-pointer"
                 >
-                  Ver demostración completa en visor PDF <ArrowRight className="w-3 h-3" />
+                  Ver demostración completa en visor PDF
                 </Button>
               </div>
             )}

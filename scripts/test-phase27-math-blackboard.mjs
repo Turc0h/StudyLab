@@ -126,6 +126,45 @@ test("CommandPalette.tsx importa Binary y lo registra en ICON_MAP", () => {
 });
 
 // -----------------------------------------------------------------------------
+// [Test 4] Motor de Pizarra Virtual y Laboratorio OCR (VirtualBlackboard & whiteboardEngine)
+// -----------------------------------------------------------------------------
+console.log("\n[Test 4] Motor de Pizarra Virtual y Reconocimiento de Trazos");
+
+const whiteboardEngineFile = path.join(rootDir, "src", "components", "whiteboard", "whiteboardEngine.ts");
+test("Existe src/components/whiteboard/whiteboardEngine.ts", () => {
+  assert.ok(fs.existsSync(whiteboardEngineFile), "whiteboardEngine.ts debe existir");
+});
+
+const wbEngineSrc = fs.readFileSync(whiteboardEngineFile, "utf-8");
+test("whiteboardEngine exporta algoritmos de suavizado EMA, RDP y heurística LaTeX", () => {
+  assert.ok(wbEngineSrc.includes("export function applyEmaFilter"), "Debe exportar applyEmaFilter");
+  assert.ok(wbEngineSrc.includes("export function beautifyStroke"), "Debe exportar beautifyStroke con RDP");
+  assert.ok(wbEngineSrc.includes("export function heuristicOcrToLatex"), "Debe exportar heuristicOcrToLatex");
+  assert.ok(wbEngineSrc.includes("recognizeWhiteboardCanvas"), "Debe exportar recognizeWhiteboardCanvas");
+});
+
+const virtualBlackboardFile = path.join(rootDir, "src", "components", "whiteboard", "VirtualBlackboard.tsx");
+test("Existe src/components/whiteboard/VirtualBlackboard.tsx", () => {
+  assert.ok(fs.existsSync(virtualBlackboardFile), "VirtualBlackboard.tsx debe existir");
+});
+
+const vbSrc = fs.readFileSync(virtualBlackboardFile, "utf-8");
+test("VirtualBlackboard encuadra el OCR como Laboratorio Experimental sin choque con ocre FSRS", () => {
+  assert.ok(vbSrc.includes("showExperimentalOcr"), "Debe contar con toggle desactivado por defecto");
+  assert.ok(vbSrc.includes("Lab OCR"), "Debe etiquetar el OCR como herramienta de laboratorio");
+  assert.ok(vbSrc.includes("Beta"), "Debe incluir badge visible de Beta");
+  assert.ok(vbSrc.includes("Laboratorio Experimental (Mejor Esfuerzo)"), "Debe comunicar expectativa realista en aviso");
+  // Asegurar que no use amber/ocre para el aviso de sistema
+  assert.ok(!vbSrc.includes("bg-amber-500/10 border border-amber-500/30 text-amber-300"), "No debe usar ocre FSRS en el aviso de sistema");
+});
+
+test("MathBlackboardMethod integra VirtualBlackboard en modo libre y paso guiado", () => {
+  assert.ok(uiSrc.includes("VirtualBlackboard"), "MathBlackboardMethod debe importar e instanciar VirtualBlackboard");
+  assert.ok(uiSrc.includes("Pizarra Libre"), "Debe ofrecer modo Pizarra Libre");
+  assert.ok(uiSrc.includes("Deducción Guiada"), "Debe ofrecer modo Deducción Guiada");
+});
+
+// -----------------------------------------------------------------------------
 // Resumen de la Suite
 // -----------------------------------------------------------------------------
 console.log("\n================================================================================");

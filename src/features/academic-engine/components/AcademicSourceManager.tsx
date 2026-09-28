@@ -43,25 +43,25 @@ export function AcademicSourceManager({
       <div className="flex items-center justify-between border-b border-border-subtle pb-3">
         <div className="flex items-center gap-2">
           <GraduationCap className="h-4 w-4 text-accent-primary" />
-          <h3 className="font-display font-bold text-xs uppercase tracking-wider text-text-primary">
-            Gestor de Fuentes
+          <h3 className="font-serif text-sm font-semibold text-text-primary">
+            Fuentes de Cátedra
           </h3>
         </div>
-        <span className="font-mono text-[10px] text-accent-primary bg-accent-primary/10 px-2 py-0.5 rounded border border-accent-primary/20">
-          {sources.length} Docs
+        <span className="font-mono text-[11px] text-text-secondary bg-bg-secondary px-2 py-0.5 rounded border border-border-subtle">
+          {sources.length} {sources.length === 1 ? "doc" : "docs"}
         </span>
       </div>
 
       {/* Filter by Career / Year */}
       {careers.length > 0 && (
         <div className="flex flex-col gap-1">
-          <label className="text-[10px] font-mono uppercase text-text-tertiary">
-            Filtrar por Carrera:
+          <label className="text-xs font-sans text-text-secondary">
+            Carrera o disciplina:
           </label>
           <select
             value={selectedCareer}
             onChange={(e) => setSelectedCareer(e.target.value)}
-            className="w-full rounded-lg border border-border-subtle bg-bg-surface-2 p-1.5 text-xs font-mono text-text-secondary focus:outline-hidden focus:border-accent-primary"
+            className="w-full rounded border border-border-subtle bg-bg-elevated p-1.5 text-xs text-text-primary focus:outline-hidden focus:border-accent-primary"
           >
             <option value="all">Todas las Carreras</option>
             {careers.map((c) => (
@@ -74,23 +74,23 @@ export function AcademicSourceManager({
       )}
 
       {/* Source Document Cards or Empty State */}
-      <div className="flex flex-col gap-2.5 flex-1 overflow-y-auto">
+      <div className="flex flex-col gap-2 flex-1 overflow-y-auto">
         {filteredSources.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-6 text-center border border-dashed border-border-subtle rounded-xl bg-bg-surface-2/30 my-auto">
-            <BookOpen className="h-8 w-8 text-text-tertiary/60 mb-2" />
-            <span className="font-display font-semibold text-xs text-text-secondary">
-              Sin fuentes académicas
+          <div className="flex flex-col items-center justify-center p-6 text-center border border-dashed border-border-subtle rounded-lg bg-bg-secondary/30 my-auto">
+            <BookOpen className="h-7 w-7 text-text-muted mb-2" />
+            <span className="font-serif font-semibold text-xs text-text-primary">
+              Sin documentos cargados
             </span>
-            <p className="text-[11px] text-text-tertiary mt-1 max-w-[200px] leading-snug">
-              Arrastrá tus PDFs, apuntes en Markdown o DOCX abajo para procesarlos localmente.
+            <p className="text-xs text-text-secondary mt-1 max-w-[200px] leading-relaxed">
+              Arrastrá tus PDFs o apuntes de cátedra para procesarlos en local.
             </p>
             {onLoadSample && (
               <button
                 type="button"
                 onClick={onLoadSample}
-                className="mt-3.5 px-2.5 py-1 text-[11px] font-mono rounded-lg border border-accent-primary/40 bg-accent-primary/10 text-accent-primary hover:bg-accent-primary/20 transition-all cursor-pointer"
+                className="mt-3.5 px-3 py-1 text-xs rounded border border-border-subtle bg-bg-elevated text-text-primary hover:border-accent-primary/60 transition-colors cursor-pointer"
               >
-                + Cargar material de cátedra de ejemplo
+                Cargar bibliografía de ejemplo
               </button>
             )}
           </div>
@@ -100,10 +100,10 @@ export function AcademicSourceManager({
             return (
               <div
                 key={source.id}
-                className={`relative group flex flex-col text-left p-3 rounded-xl border transition-all ${
+                className={`relative group flex flex-col text-left p-3 rounded-lg border transition-colors ${
                   isSelected
-                    ? "border-accent-primary bg-bg-surface-2 shadow-lg shadow-accent-primary/10 ring-1 ring-accent-primary"
-                    : "border-border-subtle bg-bg-surface-2/60 hover:bg-bg-surface-2 hover:border-border-subtle/80"
+                    ? "border-accent-primary bg-bg-elevated"
+                    : "border-border-subtle bg-bg-secondary/40 hover:bg-bg-elevated"
                 }`}
               >
                 <div
@@ -111,22 +111,20 @@ export function AcademicSourceManager({
                   onClick={() => onSelectSource(source)}
                 >
                   <div className="flex items-start justify-between gap-2 mb-1">
-                    <span className="font-display font-semibold text-xs text-text-primary line-clamp-2 leading-snug pr-5">
+                    <span className="font-serif font-medium text-xs text-text-primary line-clamp-2 leading-snug pr-5">
                       {source.title}
                     </span>
                     <FileText
-                      className={`h-4 w-4 shrink-0 ${
-                        isSelected ? "text-accent-primary" : "text-text-tertiary"
+                      className={`h-3.5 w-3.5 shrink-0 ${
+                        isSelected ? "text-accent-primary" : "text-text-muted"
                       }`}
                     />
                   </div>
 
                   {/* Metadata tags */}
-                  <div className="flex flex-wrap items-center gap-1.5 mt-1 text-[10px] font-mono text-text-tertiary">
-                    <span className="text-text-secondary">{source.professorId || "Cátedra"}</span>
-                    <span>·</span>
+                  <div className="flex flex-wrap items-center gap-2 mt-1.5 text-[11px] font-mono text-text-secondary">
+                    <span>{source.professorId || "Cátedra"}</span>
                     <span>{source.semester || "1C"}</span>
-                    <span>·</span>
                     <span>{source.pageCount} págs</span>
                   </div>
 

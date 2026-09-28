@@ -3,6 +3,7 @@ import { Card, CardTitle } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
 import { Input, Textarea } from "../ui/Input";
+import { SplitPanel } from "../shells";
 import { saveStudySession } from "../../lib/db";
 import { 
   ArrowRight, 
@@ -110,108 +111,105 @@ export const DualCodingMethod: React.FC<DualCodingMethodProps> = ({ onSessionFin
         />
       </div>
 
-      {/* Dual Layout: Verbal on Left, Visual on Right */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Columna Izquierda: Código Verbal */}
-        <div className="rounded-xl border border-sky-500/20 bg-sky-500/5 p-4 flex flex-col justify-between gap-3">
-          <div>
-            <div className="flex items-center justify-between border-b border-sky-500/20 pb-2">
-              <span className="font-serif text-sm font-bold text-sky-400">
-                Canal Verbal (Texto & Proposiciones)
-              </span>
-              <span className="text-[10px] text-text-muted">Canal lingüístico</span>
+      {/* Dual Layout: Resizable SplitPanel between Verbal and Visual Channels */}
+      <SplitPanel
+        defaultSplitRatio={50}
+        minRatio={30}
+        maxRatio={70}
+        showPresets
+        leftTitle="Canal Verbal (Texto & Proposiciones)"
+        leftBadge="Canal Lingüístico"
+        rightTitle="Canal Visual (Diagrama & Nodos)"
+        rightBadge="Canal Visuoespacial"
+        left={
+          <div className="flex flex-col h-full justify-between gap-3">
+            <div>
+              <p className="text-[11px] text-text-secondary">
+                Redacta con rigor la definición formal, relaciones lógicas y terminología exacta.
+              </p>
+              <Textarea
+                rows={14}
+                value={verbalExplanation}
+                onChange={(e) => setVerbalExplanation(e.target.value)}
+                placeholder="Desarrolla el texto explicativo completo..."
+                className="mt-3 bg-bg-secondary/70 text-xs leading-relaxed"
+              />
             </div>
-            <p className="text-[11px] text-text-secondary mt-2">
-              Redacta con rigor la definición formal, relaciones lógicas y terminología exacta.
-            </p>
-            <Textarea
-              rows={12}
-              value={verbalExplanation}
-              onChange={(e) => setVerbalExplanation(e.target.value)}
-              placeholder="Desarrolla el texto explicativo completo..."
-              className="mt-3 bg-bg-secondary/70 text-xs leading-relaxed"
-            />
           </div>
-        </div>
+        }
+        right={
+          <div className="flex flex-col h-full justify-between gap-4">
+            <div>
+              <p className="text-[11px] text-text-secondary">
+                Convierte las entidades en nodos secuenciales interconectados por trayectorias.
+              </p>
 
-        {/* Columna Derecha: Código Visual / Diagrama */}
-        <div className="rounded-xl border border-purple-500/20 bg-purple-500/5 p-4 flex flex-col justify-between gap-3">
-          <div>
-            <div className="flex items-center justify-between border-b border-purple-500/20 pb-2">
-              <span className="font-serif text-sm font-bold text-purple-400">
-                Canal Visual (Diagrama de Flujo & Nodos)
-              </span>
-              <span className="text-[10px] text-text-muted">Canal visuoespacial</span>
-            </div>
-            <p className="text-[11px] text-text-secondary mt-2">
-              Convierte las entidades en nodos secuenciales interconectados por trayectorias.
-            </p>
+              {/* Visual Canvas Rendering */}
+              <div className="space-y-2 mt-3 max-h-[300px] overflow-y-auto pr-1">
+                {elements.map((el, idx) => (
+                  <div key={el.id} className="space-y-1">
+                    <div className="rounded-lg border border-purple-500/30 bg-bg-elevated p-3 flex items-center justify-between shadow-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-500/20 font-mono text-[10px] font-bold text-purple-400">
+                          {idx + 1}
+                        </span>
+                        <strong className="text-xs font-semibold text-text-primary font-serif">
+                          {el.label}
+                        </strong>
+                      </div>
 
-            {/* Visual Canvas Rendering */}
-            <div className="space-y-2 mt-3 max-h-[300px] overflow-y-auto pr-1">
-              {elements.map((el, idx) => (
-                <div key={el.id} className="space-y-1">
-                  <div className="rounded-lg border border-purple-500/30 bg-bg-elevated p-3 flex items-center justify-between shadow-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-500/20 font-mono text-[10px] font-bold text-purple-400">
-                        {idx + 1}
-                      </span>
-                      <strong className="text-xs font-semibold text-text-primary font-serif">
-                        {el.label}
-                      </strong>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveElement(el.id)}
+                        className="text-text-muted hover:text-signal-danger transition-colors p-1"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveElement(el.id)}
-                      className="text-text-muted hover:text-rose-400 transition-colors p-1"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </button>
+                    {el.relationToNext && (
+                      <div className="flex items-center justify-center gap-1.5 text-[10px] font-mono text-purple-400/80 py-0.5">
+                        <ArrowRight className="h-3 w-3" />
+                        <span className="italic">{el.relationToNext}</span>
+                      </div>
+                    )}
                   </div>
+                ))}
+              </div>
+            </div>
 
-                  {el.relationToNext && (
-                    <div className="flex items-center justify-center gap-1.5 text-[10px] font-mono text-purple-400/80 py-0.5">
-                      <ArrowRight className="h-3 w-3" />
-                      <span className="italic">{el.relationToNext}</span>
-                    </div>
-                  )}
-                </div>
-              ))}
+            {/* Add Visual Node form */}
+            <div className="pt-3 border-t border-border-subtle space-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <Input
+                  placeholder="Nombre del nodo/caja..."
+                  value={newElementLabel}
+                  onChange={(e) => setNewElementLabel(e.target.value)}
+                  className="text-xs bg-bg-secondary"
+                />
+                <Input
+                  placeholder="Relación o flecha hacia siguiente..."
+                  value={newRelation}
+                  onChange={(e) => setNewRelation(e.target.value)}
+                  className="text-xs bg-bg-secondary"
+                />
+              </div>
+              <div className="flex justify-end">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleAddElement}
+                  disabled={!newElementLabel.trim()}
+                  className="text-xs flex items-center gap-1"
+                >
+                  <Plus className="h-3 w-3" />
+                  <span>Agregar Nodo Visual</span>
+                </Button>
+              </div>
             </div>
           </div>
-
-          {/* Add Visual Node form */}
-          <div className="pt-2 border-t border-purple-500/20 space-y-2">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <Input
-                placeholder="Nombre del nodo/caja..."
-                value={newElementLabel}
-                onChange={(e) => setNewElementLabel(e.target.value)}
-                className="text-xs bg-bg-secondary"
-              />
-              <Input
-                placeholder="Relación o flecha hacia siguiente..."
-                value={newRelation}
-                onChange={(e) => setNewRelation(e.target.value)}
-                className="text-xs bg-bg-secondary"
-              />
-            </div>
-            <div className="flex justify-end">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={handleAddElement}
-                disabled={!newElementLabel.trim()}
-                className="text-xs flex items-center gap-1"
-              >
-                <Plus className="h-3 w-3" />
-                <span>Agregar Nodo Visual</span>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+        }
+      />
     </Card>
   );
 };

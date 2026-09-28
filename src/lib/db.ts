@@ -31,7 +31,12 @@ export const dbInstance = new StudyLabDatabase();
 // --- Métodos Públicos de Servicio (Data Access Layer) ---
 
 export async function getStudySessions(): Promise<StudySession[]> {
-  return dbInstance.sessions.orderBy("completedAt").reverse().toArray();
+  try {
+    return await dbInstance.sessions.orderBy("completedAt").reverse().toArray();
+  } catch (err) {
+    console.warn("[StudyLabAcademicDB] Fallo al consultar sesiones en IndexedDB:", err);
+    return [];
+  }
 }
 
 export async function saveStudySession(session: StudySession): Promise<void> {

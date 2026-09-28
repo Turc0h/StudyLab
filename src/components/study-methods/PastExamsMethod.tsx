@@ -202,26 +202,28 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border-subtle pb-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border-hairline pb-4">
         <div>
-          <div className="flex items-center gap-2">
-            <GraduationCap className="h-6 w-6 text-indigo-400" />
-            <h1 className="font-serif text-2xl font-bold text-text-primary">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-border-hairline bg-bg-surface-2 text-text-primary">
+              <GraduationCap className="h-5 w-5" />
+            </div>
+            <h1 className="font-serif text-xl font-bold text-text-primary">
               Banco de Parciales Anteriores & Predictor Pareto High-Yield
             </h1>
           </div>
-          <p className="text-text-secondary text-sm mt-1">
-            Analizá parciales tomados por cátedras universitarias, predecí los temas con 80% de recurrencia y entrená con simulacros cronometrados.
+          <p className="text-text-secondary text-xs mt-1 font-sans">
+            Legajo histórico de evaluaciones de cátedra, cuantificación de recurrencia 80/20 y simulacros cronometrados de examen.
           </p>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex items-center bg-bg-surface-2 p-1 rounded-lg border border-border-subtle">
+        <div className="flex items-center bg-bg-surface-2 p-1 rounded-lg border border-border-hairline">
           <button
             onClick={() => setActiveTab("repository")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded transition-colors cursor-pointer ${
               activeTab === "repository"
-                ? "bg-indigo-500 text-white shadow-sm"
+                ? "bg-text-primary text-text-inverted font-medium"
                 : "text-text-secondary hover:text-text-primary"
             }`}
           >
@@ -230,9 +232,9 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
           </button>
           <button
             onClick={() => setActiveTab("pareto")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded transition-colors cursor-pointer ${
               activeTab === "pareto"
-                ? "bg-indigo-500 text-white shadow-sm"
+                ? "bg-text-primary text-text-inverted font-medium"
                 : "text-text-secondary hover:text-text-primary"
             }`}
           >
@@ -241,9 +243,9 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
           </button>
           <button
             onClick={() => setActiveTab("simulator")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded transition-colors cursor-pointer ${
               activeTab === "simulator"
-                ? "bg-indigo-500 text-white shadow-sm"
+                ? "bg-text-primary text-text-inverted font-medium"
                 : "text-text-secondary hover:text-text-primary"
             }`}
           >
@@ -254,18 +256,18 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
       </div>
 
       {/* Subject Filter Selector */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-bg-surface-2/60 p-3 rounded-lg border border-border-subtle">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-bg-surface-2/40 p-3 rounded-lg border border-border-hairline">
         <div className="flex items-center gap-2 overflow-x-auto py-1">
-          <Filter className="h-4 w-4 text-text-muted flex-shrink-0" />
-          <span className="text-xs font-medium text-text-secondary">Cátedra / Materia:</span>
+          <Filter className="h-4 w-4 text-text-tertiary flex-shrink-0" />
+          <span className="text-xs font-mono text-text-secondary">Cátedra:</span>
           {subjects.map((subj) => (
             <button
               key={subj}
               onClick={() => setSelectedSubject(subj)}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+              className={`px-3 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
                 selectedSubject === subj
-                  ? "bg-indigo-500 text-white shadow"
-                  : "bg-bg-surface-3 text-text-secondary hover:text-text-primary"
+                  ? "bg-text-primary text-text-inverted"
+                  : "bg-bg-surface-1 border border-border-hairline text-text-secondary hover:text-text-primary hover:bg-bg-surface-3"
               }`}
             >
               {subj}
@@ -278,18 +280,18 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
             size="sm"
             variant="outline"
             onClick={handleStartCompositeExam}
-            className="text-xs flex items-center gap-1.5 border-purple-500/40 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20"
+            className="text-xs font-mono flex items-center gap-1.5 border-border-hairline bg-bg-surface-1 text-text-primary hover:bg-bg-surface-2"
           >
-            <Sparkles className="h-3.5 w-3.5 text-purple-400" />
-            <span>Simulacro Compuesto High-Yield</span>
+            <Sparkles className="h-3.5 w-3.5 text-text-secondary" />
+            <span>Simulacro Pareto High-Yield</span>
           </Button>
           <Button
             size="sm"
             variant="outline"
             onClick={() => setIsAddingExam(true)}
-            className="text-xs flex items-center gap-1.5"
+            className="text-xs font-mono flex items-center gap-1.5 border-border-hairline bg-bg-surface-1 text-text-primary hover:bg-bg-surface-2"
           >
-            <PlusCircle className="h-3.5 w-3.5" />
+            <PlusCircle className="h-3.5 w-3.5 text-text-secondary" />
             <span>Cargar Parcial</span>
           </Button>
         </div>
@@ -444,36 +446,36 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
       {/* TAB 2: PARETO 80/20 HIGH-YIELD TOPIC FORECASTER */}
       {activeTab === "pareto" && (
         <div className="space-y-6">
-          {/* Pareto Law Metric Highlight */}
-          <Card className="p-5 border-indigo-500/30 bg-gradient-to-r from-indigo-950/30 via-bg-surface to-purple-950/20">
+          {/* Pareto Law Metric Highlight — Legajo 80/20 */}
+          <Card className="p-5 border border-border-hairline bg-bg-surface-1 shadow-sm">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1">
-                <span className="text-xs text-text-muted uppercase tracking-wider font-semibold">
+                <span className="font-mono text-xs text-text-secondary font-medium">
                   Concentración de Puntos (Pareto 80/20)
                 </span>
                 <div className="flex items-baseline gap-2">
-                  <span className="font-serif text-3xl font-extrabold text-indigo-400">
+                  <span className="font-serif text-3xl font-bold text-text-primary">
                     {paretoData.pointsShareTop20}%
                   </span>
                   <span className="text-xs text-text-secondary">de los puntos de examen</span>
                 </div>
-                <p className="text-xs text-text-muted">
-                  concentrados en apenas el top 20% de los temas de la cátedra.
+                <p className="text-xs text-text-tertiary">
+                  concentrados en apenas el top 20% de los temas evaluados por la cátedra.
                 </p>
               </div>
 
               <div className="space-y-1">
-                <span className="text-xs text-text-muted uppercase tracking-wider font-semibold">
+                <span className="font-mono text-xs text-text-secondary font-medium">
                   Temas Críticos High-Yield
                 </span>
                 <div className="flex items-baseline gap-2">
-                  <span className="font-serif text-3xl font-extrabold text-emerald-400">
+                  <span className="font-serif text-3xl font-bold text-text-primary">
                     {paretoData.highYieldTopics.length}
                   </span>
                   <span className="text-xs text-text-secondary">de {paretoData.totalTopics} temas totales</span>
                 </div>
-                <p className="text-xs text-text-muted">
-                  Aparecen en más del 70% de los parciales analizados.
+                <p className="text-xs text-text-tertiary">
+                  Presentes en más del 70% de las mesas examinadoras analizadas.
                 </p>
               </div>
 
@@ -481,33 +483,33 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
                 <Button
                   variant="primary"
                   onClick={handleStartCompositeExam}
-                  className="w-full text-xs flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500"
+                  className="w-full text-xs font-mono flex items-center justify-center gap-2"
                 >
-                  <Sparkles className="h-4 w-4" />
+                  <Sparkles className="h-3.5 w-3.5" />
                   <span>Simulacro Compuesto Pareto</span>
                 </Button>
-                <p className="text-[11px] text-center text-text-muted">
-                  Selecciona preguntas ponderadas por probabilidad histórica.
+                <p className="text-[11px] text-center font-mono text-text-tertiary">
+                  Ponderado por probabilidad histórica de cátedra.
                 </p>
               </div>
             </div>
           </Card>
 
           {/* High-Yield Ranked Topics Table */}
-          <Card className="p-5 border-border-subtle space-y-4">
+          <Card className="p-5 border border-border-hairline bg-bg-surface-1 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Flame className="h-5 w-5 text-amber-400" />
-                <h3 className="font-semibold text-text-primary text-base">
+                <Flame className="h-4 w-4 text-text-secondary" />
+                <h3 className="font-serif font-bold text-text-primary text-base">
                   Matriz de Recurrencia y Probabilidad de Evaluación
                 </h3>
               </div>
-              <span className="text-xs text-text-muted">
-                {currentSubjectExams.length} parciales evaluados
+              <span className="text-xs font-mono text-text-tertiary">
+                {currentSubjectExams.length} parciales en legajo
               </span>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {paretoData.allRankedTopics.map((topicStat, index) => {
                 const isCritical = topicStat.yieldCategory === "CRITICAL_HIGH_YIELD";
                 const isHigh = topicStat.yieldCategory === "HIGH_YIELD";
@@ -515,64 +517,52 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
                 return (
                   <div
                     key={topicStat.topic}
-                    className={`p-3.5 rounded-lg border transition-all ${
-                      isCritical
-                        ? "bg-purple-950/20 border-purple-500/40"
-                        : isHigh
-                        ? "bg-emerald-950/20 border-emerald-500/30"
-                        : "bg-bg-surface-2 border-border-subtle"
-                    }`}
+                    className="p-3.5 rounded-lg border border-border-hairline bg-bg-surface-2/60 transition-colors"
                   >
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs font-bold text-text-muted w-5">
+                        <span className="font-mono text-xs text-text-tertiary w-5">
                           #{index + 1}
                         </span>
-                        <h4 className="text-sm font-semibold text-text-primary">
+                        <h4 className="text-xs font-serif font-bold text-text-primary">
                           {topicStat.topic}
                         </h4>
                       </div>
 
                       <div className="flex items-center gap-2">
                         {isCritical && (
-                          <Badge variant="neutral" className="border-purple-400 text-purple-300 bg-purple-500/10 text-xs">
-                            🔥 Fijo en el Parcial (≥70%)
-                          </Badge>
+                          <span className="font-mono text-[10px] px-2 py-0.5 rounded border border-border-hairline bg-bg-surface-1 text-text-primary font-medium">
+                            Fijo en Examen (≥70%)
+                          </span>
                         )}
                         {isHigh && (
-                          <Badge variant="neutral" className="border-emerald-400 text-emerald-300 bg-emerald-500/10 text-xs">
-                            Muy Probable (50-69%)
-                          </Badge>
+                          <span className="font-mono text-[10px] px-2 py-0.5 rounded border border-border-hairline bg-bg-surface-1 text-text-secondary font-medium">
+                            Alta Recurrencia (50-69%)
+                          </span>
                         )}
                         {topicStat.paretoTier === "top_20_percent" && (
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold">
-                            TOP 20% PARETO
+                          <span className="font-mono text-[10px] px-2 py-0.5 rounded border border-border-hairline bg-bg-surface-3 text-text-primary">
+                            Top 20% Pareto
                           </span>
                         )}
                       </div>
                     </div>
 
-                    {/* Progress Bar of recurrence */}
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between text-xs text-text-secondary">
-                        <span>Presente en {topicStat.paperCount} de {currentSubjectExams.length} exámenes</span>
-                        <span className="font-bold">{topicStat.paperPercentage}% de probabilidad</span>
+                    {/* Barra de recurrencia sobria */}
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[11px] font-mono text-text-secondary">
+                        <span>En {topicStat.paperCount} de {currentSubjectExams.length} exámenes</span>
+                        <span className="font-semibold text-text-primary">{topicStat.paperPercentage}% prob.</span>
                       </div>
-                      <div className="h-2 w-full bg-bg-surface-3 rounded-full overflow-hidden">
+                      <div className="h-1.5 w-full bg-bg-surface-3 rounded-full overflow-hidden">
                         <div
-                          className={`h-full rounded-full ${
-                            isCritical
-                              ? "bg-gradient-to-r from-purple-500 to-indigo-500"
-                              : isHigh
-                              ? "bg-emerald-500"
-                              : "bg-border-subtle"
-                          }`}
+                          className="h-full bg-text-primary rounded-full transition-all"
                           style={{ width: `${topicStat.paperPercentage}%` }}
                         />
                       </div>
-                      <div className="flex justify-between text-[11px] text-text-muted">
-                        <span>Puntos totales otorgados históricamente: {topicStat.totalPointsAssigned} pts</span>
-                        <span>Promedio por aparición: {topicStat.averagePointsPerAppearance} pts</span>
+                      <div className="flex justify-between text-[10px] font-mono text-text-tertiary">
+                        <span>Puntaje histórico asignado: {topicStat.totalPointsAssigned} pts</span>
+                        <span>Promedio por mesa: {topicStat.averagePointsPerAppearance} pts</span>
                       </div>
                     </div>
                   </div>
@@ -608,28 +598,28 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
             </Card>
           ) : (
             <div className="space-y-6">
-              {/* Simulator Header & Timer Bar */}
-              <Card className="p-4 border-indigo-500/40 bg-bg-surface-2 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="space-y-1">
+              {/* Simulator Header & Timer Bar — Cabecera de Examen */}
+              <Card className="p-4 border border-border-hairline bg-bg-surface-1 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
-                    <Badge variant="neutral" className="text-xs">
+                    <span className="font-mono text-[11px] px-2 py-0.5 rounded border border-border-hairline bg-bg-surface-2 text-text-secondary">
                       {currentExam.term}
-                    </Badge>
-                    <span className="text-xs text-indigo-300 font-semibold">{currentExam.chairOrProfessor}</span>
+                    </span>
+                    <span className="text-xs font-mono text-text-secondary font-medium">{currentExam.chairOrProfessor}</span>
                   </div>
                   <h2 className="font-serif text-lg font-bold text-text-primary">{currentExam.title}</h2>
                 </div>
 
-                <div className="flex items-center gap-4">
-                  {/* Countdown Timer */}
+                <div className="flex items-center gap-3">
+                  {/* Countdown Timer Sobrio */}
                   <div
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border font-mono font-bold text-sm ${
                       remainingSeconds < 300 && remainingSeconds > 0
-                        ? "bg-red-500/10 border-red-500/40 text-red-400 animate-pulse"
-                        : "bg-bg-surface-3 border-border-subtle text-text-primary"
+                        ? "border-red-800/40 bg-red-950/20 text-red-400"
+                        : "border-border-hairline bg-bg-surface-2 text-text-primary"
                     }`}
                   >
-                    <Clock className="h-4 w-4 text-indigo-400" />
+                    <Clock className="h-4 w-4 text-text-tertiary" />
                     <span>{formatTime(remainingSeconds)}</span>
                   </div>
 
@@ -637,7 +627,7 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
                     <Button
                       variant="primary"
                       onClick={handleFinishExam}
-                      className="text-xs bg-emerald-600 hover:bg-emerald-500 flex items-center gap-1.5"
+                      className="text-xs font-mono flex items-center gap-1.5 px-4 py-2"
                     >
                       <CheckCircle2 className="h-3.5 w-3.5" />
                       <span>Entregar y Calificar</span>
@@ -646,7 +636,7 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
                     <Button
                       variant="outline"
                       onClick={() => startExamSimulator(currentExam)}
-                      className="text-xs flex items-center gap-1.5"
+                      className="text-xs font-mono flex items-center gap-1.5"
                     >
                       <RotateCcw className="h-3.5 w-3.5" />
                       <span>Reintentar</span>
@@ -657,38 +647,32 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
 
               {/* Evaluation Result Report (if finished) */}
               {examFinished && evaluationResult && (
-                <Card
-                  className={`p-5 border space-y-4 animate-in fade-in duration-300 ${
-                    evaluationResult.passed
-                      ? "border-emerald-500/40 bg-emerald-950/20"
-                      : "border-red-500/40 bg-red-950/20"
-                  }`}
-                >
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border-subtle pb-4">
+                <Card className="p-5 border border-border-hairline bg-bg-surface-1 shadow-sm space-y-4">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border-hairline pb-4">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         {evaluationResult.passed ? (
-                          <CheckCircle2 className="h-6 w-6 text-emerald-400" />
+                          <CheckCircle2 className="h-5 w-5 text-emerald-500" />
                         ) : (
-                          <AlertCircle className="h-6 w-6 text-red-400" />
+                          <AlertCircle className="h-5 w-5 text-red-500" />
                         )}
                         <h3 className="font-serif text-xl font-bold text-text-primary">
-                          {evaluationResult.passed ? "¡Parcial Aprobado!" : "Examen no Aprobado"}
+                          {evaluationResult.passed ? "Dictamen: Parcial Aprobado" : "Dictamen: Examen no Aprobado"}
                         </h3>
                       </div>
-                      <p className="text-xs text-text-secondary">
-                        Umbral de aprobación de cátedra: {currentExam.passingScore} / {currentExam.totalMaxPoints} puntos
+                      <p className="text-xs font-mono text-text-secondary">
+                        Umbral de cátedra: {currentExam.passingScore} / {currentExam.totalMaxPoints} puntos
                       </p>
                     </div>
 
                     <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <span className="font-serif text-3xl font-extrabold text-text-primary">
+                        <span className="font-serif text-3xl font-bold text-text-primary">
                           {evaluationResult.totalScore}
                         </span>
-                        <span className="text-text-muted text-sm"> / {evaluationResult.maxScore} pts</span>
-                        <p className="text-xs font-semibold text-text-secondary">
-                          {evaluationResult.percentage}% de efectividad
+                        <span className="text-text-tertiary text-xs font-mono"> / {evaluationResult.maxScore} pts</span>
+                        <p className="text-xs font-mono font-medium text-text-secondary">
+                          {evaluationResult.percentage}% de rendimiento
                         </p>
                       </div>
 
@@ -697,7 +681,7 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
                         variant={sessionSaved ? "outline" : "primary"}
                         disabled={sessionSaved}
                         onClick={handleSaveSession}
-                        className="text-xs flex items-center gap-1.5"
+                        className="text-xs font-mono flex items-center gap-1.5"
                       >
                         <Save className="h-3.5 w-3.5" />
                         <span>{sessionSaved ? "Sesión Guardada" : "Guardar en Historial"}</span>
@@ -706,18 +690,18 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
                   </div>
 
                   {/* Feedback notes */}
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     {evaluationResult.feedback.map((fb, idx) => (
-                      <p key={idx} className="text-xs font-medium text-text-primary flex items-start gap-2">
-                        <span className="text-indigo-400">•</span>
+                      <p key={idx} className="text-xs font-serif text-text-primary flex items-start gap-2">
+                        <span className="text-text-tertiary font-mono">•</span>
                         {fb}
                       </p>
                     ))}
                   </div>
 
                   {/* Topic breakdown list */}
-                  <div className="space-y-2 pt-2">
-                    <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+                  <div className="space-y-2 pt-2 border-t border-border-hairline">
+                    <span className="font-mono text-xs text-text-secondary font-medium block">
                       Desglose Diagnóstico por Tema
                     </span>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">

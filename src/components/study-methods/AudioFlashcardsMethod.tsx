@@ -403,11 +403,11 @@ export const AudioFlashcardsMethod: React.FC<AudioFlashcardsMethodProps> = ({ on
         {/* Step Indicator & Playlist Title */}
         <div className="flex items-center justify-between border-b border-border-subtle/40 pb-4">
           <div className="space-y-1">
-            <span className="text-xs font-mono uppercase tracking-wider text-text-muted">
+            <span className="text-xs font-mono text-text-muted">
               {selectedPlaylist.subject} • {selectedPlaylist.title}
             </span>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-sm font-bold text-cyan-400">
+              <span className="font-mono text-sm font-bold text-accent-primary">
                 Tarjeta {currentIndex + 1} / {selectedPlaylist.cards.length}
               </span>
               <span className="text-xs text-text-muted">• {currentCard.topic}</span>
@@ -440,7 +440,7 @@ export const AudioFlashcardsMethod: React.FC<AudioFlashcardsMethodProps> = ({ on
         <div className="my-8 text-center space-y-6 max-w-2xl mx-auto">
           {/* Question Text */}
           <div className="space-y-2">
-            <span className="text-xs font-semibold uppercase tracking-widest text-text-muted">
+            <span className="text-xs font-medium text-text-muted">
               Consigna / Pregunta
             </span>
             <p
@@ -466,9 +466,9 @@ export const AudioFlashcardsMethod: React.FC<AudioFlashcardsMethodProps> = ({ on
 
           {/* Answer Text (Revealed during answer phase or if manually requested) */}
           {(currentStep === "answer" || currentStep === "pause_consolidation") && (
-            <div className="p-4 rounded-xl bg-emerald-950/20 border border-emerald-500/30 max-w-xl mx-auto space-y-1 animate-in fade-in duration-300">
-              <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">
-                Respuesta Correcta de Cátedra
+            <div className="p-4 rounded-xl bg-bg-surface-2 border border-border-hairline max-w-xl mx-auto space-y-1 animate-in fade-in duration-300">
+              <span className="text-xs font-medium text-signal-ok">
+                Respuesta correcta de cátedra
               </span>
               <p className="text-sm md:text-base text-emerald-200 font-medium leading-relaxed">
                 {currentCard.answer}

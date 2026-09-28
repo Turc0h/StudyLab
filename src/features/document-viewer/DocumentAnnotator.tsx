@@ -85,14 +85,13 @@ export function DocumentAnnotator({ fileId, initialPage, onClose, hideNotesPanel
 
   return (
     <div className="flex h-full flex-col bg-bg-primary text-text-primary">
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border-subtle bg-bg-secondary/95 px-4 py-2.5 backdrop-blur-xs">
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border-hairline bg-bg-surface-1 px-4 py-2.5 shadow-xs">
         <div className="flex min-w-0 items-center gap-3">
           {onClose && (
             <button
               type="button"
               onClick={onClose}
-
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border-subtle bg-bg-elevated text-text-secondary transition-colors duration-150 hover:bg-bg-secondary hover:text-text-primary"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border-hairline bg-bg-surface-2 text-text-secondary transition-colors duration-150 hover:bg-bg-surface-3 hover:text-text-primary cursor-pointer"
               title="Cerrar documento (Esc)"
             >
               <X size={16} strokeWidth={1.75} />
@@ -127,7 +126,7 @@ export function DocumentAnnotator({ fileId, initialPage, onClose, hideNotesPanel
               type="button"
               onClick={handleRunOcr}
               disabled={ocrRunning}
-              className="flex items-center gap-1.5 rounded-md bg-accent-primary px-3 py-1.5 text-xs font-medium text-bg-elevated transition-colors duration-150 hover:bg-accent-hover disabled:opacity-60"
+              className="flex items-center gap-1.5 rounded-md bg-accent-primary px-3 py-1.5 text-xs font-mono font-medium text-text-inverted transition-colors duration-150 hover:bg-accent-hover disabled:opacity-60 cursor-pointer"
             >
               {ocrRunning ? (
                 <Loader2 size={14} className="animate-spin" />
@@ -145,10 +144,10 @@ export function DocumentAnnotator({ fileId, initialPage, onClose, hideNotesPanel
                 setPostItArmed(false);
               }}
               className={clsx(
-                "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-150",
+                "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-mono font-medium transition-colors duration-150 cursor-pointer",
                 highlightMode
-                  ? "bg-accent-primary text-bg-elevated"
-                  : "border border-border-subtle bg-bg-elevated text-text-secondary hover:text-text-primary",
+                  ? "bg-text-primary text-text-inverted"
+                  : "border border-border-hairline bg-bg-surface-2 text-text-secondary hover:text-text-primary hover:bg-bg-surface-3",
               )}
             >
               <Highlighter size={14} strokeWidth={1.75} />
@@ -163,10 +162,10 @@ export function DocumentAnnotator({ fileId, initialPage, onClose, hideNotesPanel
                 setHighlightMode(false);
               }}
               className={clsx(
-                "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-150",
+                "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-mono font-medium transition-colors duration-150 cursor-pointer",
                 postItArmed
-                  ? "bg-accent-primary text-bg-elevated"
-                  : "border border-border-subtle bg-bg-elevated text-text-secondary hover:text-text-primary",
+                  ? "bg-text-primary text-text-inverted"
+                  : "border border-border-hairline bg-bg-surface-2 text-text-secondary hover:text-text-primary hover:bg-bg-surface-3",
               )}
             >
               <StickyNote size={14} strokeWidth={1.75} />
@@ -177,7 +176,7 @@ export function DocumentAnnotator({ fileId, initialPage, onClose, hideNotesPanel
             <button
               type="button"
               onClick={() => setNotesCollapsed((v) => !v)}
-              className="flex items-center gap-1.5 rounded-md border border-border-subtle bg-bg-elevated px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-text-primary transition-colors"
+              className="flex items-center gap-1.5 rounded-md border border-border-hairline bg-bg-surface-2 px-3 py-1.5 text-xs font-mono font-medium text-text-secondary hover:text-text-primary hover:bg-bg-surface-3 transition-colors cursor-pointer"
               title={notesCollapsed ? "Mostrar panel lateral de notas" : "Ocultar panel lateral (Modo Lectura Limpia)"}
             >
               <span>{notesCollapsed ? "Mostrar Notas" : "Ocultar Notas"}</span>

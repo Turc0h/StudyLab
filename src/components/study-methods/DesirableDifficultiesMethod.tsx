@@ -1,71 +1,117 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Card, CardTitle } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
 import { Input, Textarea } from "../ui/Input";
 import { saveStudySession } from "../../lib/db";
+import { db } from "../../db/db";
+import { useLiveQuery } from "dexie-react-hooks";
+import {
+  DEFAULT_BARRIERS,
+  DEFAULT_DESIRABLE_TOPIC,
+  DEFAULT_DESIRABLE_NOTES,
+  getDesirableDifficultiesConfig,
+  saveDesirableDifficultiesConfig,
+  type FrictionBarrier,
+} from "../../features/study-methods/desirableDifficultiesStorage";
 import { 
   Zap, 
   CheckCircle2, 
   Gauge, 
   ShieldAlert, 
   ArrowRight,
-  BrainCircuit
+  BrainCircuit,
+  Check,
+  FolderOpen
 } from "lucide-react";
 
 export interface DesirableDifficultiesMethodProps {
   onSessionFinished?: () => void;
 }
 
-interface FrictionBarrier {
-  id: string;
-  title: string;
-  scientificMechanism: string;
-  practicalAction: string;
-  enabled: boolean;
-}
-
-const DEFAULT_BARRIERS: FrictionBarrier[] = [
-  {
-    id: "delayed-testing",
-    title: "Evaluación Diferida (Separación Temporal)",
-    scientificMechanism: "La evocación inmediata solo prueba la memoria de trabajo a corto plazo; el intervalo de olvido fuerza la consolidación sináptica real.",
-    practicalAction: "No te autoevalúes al terminar de leer. Programa el test para 24 a 48 horas después.",
-    enabled: true,
-  },
-  {
-    id: "blind-interleaving",
-    title: "Entrelazado Ciego de Problemas",
-    scientificMechanism: "Al agrupar ejercicios por tema, el cerebro se ahorra el paso crucial: discernir qué fórmula o algoritmo debe aplicarse.",
-    practicalAction: "Mezcla consignas de 3 unidades distintas sin títulos ni pistas previas.",
-    enabled: true,
-  },
-  {
-    id: "generation-first",
-    title: "Intento Ciego Previo (Efecto Generación)",
-    scientificMechanism: "Intentar resolver un problema antes de ver la solución activa lagunas de conocimiento que aumentan la asimilación posterior.",
-    practicalAction: "Escribe tu mejor hipótesis o cálculo preliminar durante 3 minutos antes de abrir la resolución modelo.",
-    enabled: true,
-  },
-  {
-    id: "context-variation",
-    title: "Variación Deliberada de Contexto",
-    scientificMechanism: "Asociar la información a un único entorno acústico o físico debilita la transferencia a situaciones de examen real.",
-    practicalAction: "Cambia de espacio físico, tipografía o dispositivo entre sesiones del mismo tema.",
-    enabled: false,
-  },
-];
-
 export const DesirableDifficultiesMethod: React.FC<DesirableDifficultiesMethodProps> = ({ onSessionFinished }) => {
-  const [topic, setTopic] = useState<string>("Resolución de Ecuaciones Diferenciales");
+  const [selectedFolderId, setSelectedFolderId] = useState<string>("");
+  const [topic, setTopic] = useState<string>(DEFAULT_DESIRABLE_TOPIC);
   const [barriers, setBarriers] = useState<FrictionBarrier[]>(DEFAULT_BARRIERS);
 
   // Calificación del sesgo cognitivo (Ilusión de Competencia)
   const [perceivedFluency, setPerceivedFluency] = useState<number>(2); // 1 = Fricción máxima, 5 = Muy fluido
   const [testedRetention, setTestedRetention] = useState<number>(4); // 1 = Olvidado, 5 = Retención total
-  const [sessionNotes, setSessionNotes] = useState<string>(
-    "Se aplicó intento ciego en 4 problemas sin mirar las fórmulas. La sensación inicial fue de lentitud y duda, pero al contrastar con las respuestas modelo se logró identificar la causa exacta del error algebraico."
-  );
+  const [sessionNotes, setSessionNotes] = useState<string>(DEFAULT_DESIRABLE_NOTES);
+
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+
+  // Carpetas disponibles
+  const folders = useLiveQuery(() => db.folders.toArray(), []) || [];
+  const subjectFolders = folders.filter((f) => f.type === "subject" || !f.type);
+
+  // 1. Rehidratación reactiva al cambiar de materia o montar
+  useEffect(() => {
+    let isCancelled = false;
+    async function load() {
+      setIsLoaded(false);
+      try {
+        const saved = await getDesirableDifficultiesConfig(selectedFolderId || null);
+        if (isCancelled) return;
+        if (saved) {
+          setTopic(saved.topic || DEFAULT_DESIRABLE_TOPIC);
+          setBarriers(saved.barriers && saved.barriers.length > 0 ? saved.barriers : DEFAULT_BARRIERS);
+          setPerceivedFluency(saved.perceivedFluency ?? 2);
+          setTestedRetention(saved.testedRetention ?? 4);
+          setSessionNotes(saved.sessionNotes ?? DEFAULT_DESIRABLE_NOTES);
+        } else {
+          setTopic(DEFAULT_DESIRABLE_TOPIC);
+          setBarriers(DEFAULT_BARRIERS);
+          setPerceivedFluency(2);
+          setTestedRetention(4);
+          setSessionNotes(DEFAULT_DESIRABLE_NOTES);
+        }
+      } catch (err) {
+        console.error("Error cargando Dificultades Deseables de Dexie:", err);
+      } finally {
+        if (!isCancelled) setIsLoaded(true);
+      }
+    }
+    void load();
+    return () => {
+      isCancelled = true;
+    };
+  }, [selectedFolderId]);
+
+  // 2. Auto-guardado con debounce de 800ms
+  const isFirstMount = useRef(true);
+  useEffect(() => {
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
+    }
+    if (!isLoaded) return;
+
+    setSaveStatus("saving");
+    const timer = setTimeout(async () => {
+      try {
+        await saveDesirableDifficultiesConfig({
+          subjectFolderId: selectedFolderId || null,
+          topic,
+          barriers,
+          perceivedFluency,
+          testedRetention,
+          sessionNotes,
+        });
+        setSaveStatus("saved");
+        const hideTimer = setTimeout(() => {
+          setSaveStatus("idle");
+        }, 2000);
+        return () => clearTimeout(hideTimer);
+      } catch (err) {
+        console.error("Error auto-guardando Dificultades Deseables en Dexie:", err);
+        setSaveStatus("idle");
+      }
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [barriers, topic, perceivedFluency, testedRetention, sessionNotes, selectedFolderId, isLoaded]);
 
   const toggleBarrier = (id: string) => {
     setBarriers(
@@ -76,13 +122,25 @@ export const DesirableDifficultiesMethod: React.FC<DesirableDifficultiesMethodPr
   const activeBarriersCount = barriers.filter((b) => b.enabled).length;
 
   const handleFinishSession = async () => {
+    // Asegurar guardado en Dexie
+    await saveDesirableDifficultiesConfig({
+      subjectFolderId: selectedFolderId || null,
+      topic,
+      barriers,
+      perceivedFluency,
+      testedRetention,
+      sessionNotes,
+    });
+
+    const folderName = subjectFolders.find((f) => f.id === selectedFolderId)?.name;
+
     await saveStudySession({
       id: `desirable_diff_${Date.now()}`,
       methodId: "desirable-difficulties",
-      subject: "Dificultades Deseables (Fricción Cognitiva)",
+      subject: folderName ? `Dificultades Deseables • ${folderName}` : "Dificultades Deseables (Fricción Cognitiva)",
       topic: topic || "Diseño de Barreras de Aprendizaje",
       durationMinutes: 30,
-      notes: `Tema: ${topic}\nBarreras Cognitivas Activadas (${activeBarriersCount}):\n${barriers
+      notes: `Materia: ${folderName || "General"}\nTema: ${topic}\nBarreras Cognitivas Activadas (${activeBarriersCount}):\n${barriers
         .filter((b) => b.enabled)
         .map((b) => `• [${b.title}]: ${b.practicalAction}`)
         .join("\n")}\n\nAuditoría Metacognitiva:\n• Fluidez Subjetiva Sentida: ${perceivedFluency}/5\n• Retención Medida Posterior: ${testedRetention}/5\n• Notas de Sesión:\n${sessionNotes}`,
@@ -106,26 +164,62 @@ export const DesirableDifficultiesMethod: React.FC<DesirableDifficultiesMethodPr
           </p>
         </div>
 
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={handleFinishSession}
-          disabled={!topic.trim()}
-          className="text-xs flex items-center gap-1.5 self-start sm:self-auto"
-        >
-          <CheckCircle2 className="h-3.5 w-3.5" />
-          <span>Guardar Sesión ({activeBarriersCount} Barreras)</span>
-        </Button>
+        <div className="flex items-center gap-3 self-start sm:self-auto">
+          {saveStatus === "saving" && (
+            <span className="text-[11px] text-text-muted flex items-center gap-1.5 font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+              Guardando...
+            </span>
+          )}
+          {saveStatus === "saved" && (
+            <span className="text-[11px] text-emerald-400 flex items-center gap-1 font-mono">
+              <Check className="h-3 w-3" />
+              Guardado
+            </span>
+          )}
+
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleFinishSession}
+            disabled={!topic.trim()}
+            className="text-xs flex items-center gap-1.5"
+          >
+            <CheckCircle2 className="h-3.5 w-3.5" />
+            <span>Guardar Sesión ({activeBarriersCount} Barreras)</span>
+          </Button>
+        </div>
       </div>
 
-      {/* Tema */}
-      <div className="space-y-1.5">
-        <label className="text-xs font-semibold text-text-primary">Materia o Tarea de Estudio</label>
-        <Input
-          value={topic}
-          onChange={(e) => setTopic(e.target.value)}
-          placeholder="Ej: Análisis de Casos de Derecho de Familia"
-        />
+      {/* Selector de Materia y Tema */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <label className="text-xs font-semibold text-text-primary flex items-center gap-1.5">
+            <FolderOpen className="h-3.5 w-3.5 text-accent-primary" />
+            <span>Materia / Carpeta de Cátedra</span>
+          </label>
+          <select
+            value={selectedFolderId}
+            onChange={(e) => setSelectedFolderId(e.target.value)}
+            className="w-full text-xs rounded-lg border border-border-subtle bg-bg-surface px-3 py-2 text-text-primary focus:outline-none focus:ring-1 focus:ring-accent-primary"
+          >
+            <option value="">(Sin carpeta / General)</option>
+            {subjectFolders.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-xs font-semibold text-text-primary">Materia o Tarea de Estudio</label>
+          <Input
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            placeholder="Ej: Análisis de Casos de Derecho de Familia"
+          />
+        </div>
       </div>
 
       {/* Selector de Barreras Cognitivas */}

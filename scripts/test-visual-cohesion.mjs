@@ -33,8 +33,8 @@ async function runTests() {
   {
     console.log("\n[Test 1] Paleta académica de descanso visual");
     const source = fs.readFileSync("src/index.css", "utf8");
-    assert(source.includes("--bg-primary: #FAFAF8"), "Fondo claro con tono suave");
-    assert(source.includes("--accent-primary: #3B5169"), "Azul pizarra académico configurado");
+    assert(source.includes("--bg-primary: #F9F8F5") || source.includes("--bg-primary: #FAFAF8"), "Fondo claro con tono suave");
+    assert(source.includes("--accent-primary: #2C4A6F") || source.includes("--accent-primary: #3B5169"), "Azul pizarra académico configurado");
     assert(source.includes("--border-subtle: #E2E0D8"), "Bordes limpios de descanso visual");
   }
 
@@ -43,7 +43,7 @@ async function runTests() {
     console.log("\n[Test 2] Modo oscuro sobrio mate");
     const source = fs.readFileSync("src/index.css", "utf8");
     assert(source.includes(".dark"), "Selector .dark presente");
-    assert(source.includes("--bg-primary: #18181A"), "Usa grafito mate en lugar de #000000");
+    assert(source.includes("--bg-primary: #17181A") || source.includes("--bg-primary: #18181A"), "Usa grafito mate en lugar de #000000");
   }
 
   // Test 3: Focus-visible en Button.tsx

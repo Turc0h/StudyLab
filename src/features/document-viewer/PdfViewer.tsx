@@ -507,7 +507,7 @@ export function PdfViewer({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border-subtle bg-bg-surface/50 px-3 py-1.5 backdrop-blur-xs">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border-hairline bg-bg-surface-1 px-3 py-1.5 shadow-xs">
         <div className="flex items-center gap-1">
           <button
             type="button"
@@ -529,7 +529,7 @@ export function PdfViewer({
                 if (!isNaN(parsed)) scrollToPage(parsed);
                 else setInputPage(String(activePage));
               }}
-              className="h-6 w-10 rounded border border-border-subtle bg-bg-elevated text-center font-mono text-xs text-text-primary focus:border-accent-primary focus:outline-hidden"
+              className="h-6 w-10 rounded border border-border-hairline bg-bg-surface-2 text-center font-mono text-xs text-text-primary focus:border-border-active focus:outline-hidden"
               title="Presiona Enter para saltar de página"
             />
             <span>/ {numPages || "—"}</span>
@@ -571,7 +571,7 @@ export function PdfViewer({
             <ZoomIn size={16} strokeWidth={1.75} />
           </button>
 
-          <div className="mx-1 h-3.5 w-px bg-border-subtle" />
+          <div className="mx-1 h-3.5 w-px bg-border-hairline" />
 
           <button
             type="button"
@@ -586,7 +586,7 @@ export function PdfViewer({
 
       <div
         ref={scrollContainerRef}
-        className="flex-1 overflow-auto bg-bg-secondary px-4 py-6"
+        className="flex-1 overflow-auto bg-bg-surface-3/60 px-4 py-6"
       >
         <div className="mx-auto flex w-fit flex-col items-center gap-6">
           {pdfDoc &&

@@ -25,7 +25,7 @@ const TOUR_STEPS: StepConfig[] = [
     description:
       "Arrastra tus PDFs universitarios, apuntes en Markdown o textos al uploader drag-and-drop. El motor local extraerá texto, páginas, fórmulas LaTeX y bounding boxes automáticamente.",
     icon: BookOpen,
-    accentColor: "text-cyan-400 border-cyan-500/40 bg-cyan-950/20",
+    accentColor: "text-accent-primary border-accent-primary/40 bg-accent-primary/10",
   },
   {
     targetSelector: '[data-tour="canvas-viewer"]',
@@ -119,12 +119,12 @@ export const AcademicTutorialOverlay: React.FC<AcademicTutorialOverlayProps> = (
   return (
     <div className="fixed inset-0 z-50 pointer-events-auto flex items-center justify-center font-sans">
       {/* Dark overlay backdrop with spotlight cutout if target element exists */}
-      <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xs transition-opacity duration-300" />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-300" />
 
       {/* Target highlight ring */}
       {targetRect && (
         <div
-          className="absolute border-2 border-cyan-400 rounded-2xl pointer-events-none shadow-[0_0_35px_rgba(0,240,255,0.4)] transition-all duration-300 animate-pulse"
+          className="absolute border-2 border-accent-primary rounded-xl pointer-events-none ring-4 ring-accent-primary/20 shadow-lg transition-all duration-300"
           style={{
             top: `${Math.max(0, targetRect.top - 4)}px`,
             left: `${Math.max(0, targetRect.left - 4)}px`,
@@ -135,18 +135,18 @@ export const AcademicTutorialOverlay: React.FC<AcademicTutorialOverlayProps> = (
       )}
 
       {/* Floating Tutorial Card */}
-      <div className="relative z-50 w-full max-w-md mx-4 p-5 rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95">
+      <div className="relative z-50 w-full max-w-md mx-4 p-5 rounded-xl bg-bg-surface-2 border border-border-hairline shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95">
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <div className={`p-2 rounded-xl border ${currentStep.accentColor}`}>
+            <div className={`p-2 rounded-lg border ${currentStep.accentColor}`}>
               <Icon className="w-5 h-5" />
             </div>
             <div>
-              <span className="font-mono text-[10px] text-cyan-400 uppercase tracking-wider block">
+              <span className="font-mono text-[10px] text-accent-primary uppercase tracking-wider block">
                 Guía Interactiva • Paso {stepIndex + 1} de {TOUR_STEPS.length}
               </span>
-              <h3 className="font-display font-bold text-sm text-slate-100">
+              <h3 className="font-display font-semibold text-sm text-text-primary">
                 {currentStep.title}
               </h3>
             </div>
@@ -155,19 +155,19 @@ export const AcademicTutorialOverlay: React.FC<AcademicTutorialOverlayProps> = (
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+            className="p-1 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-bg-surface-1 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Content */}
-        <p className="text-xs text-slate-300 leading-relaxed font-sans">
+        <p className="text-xs text-text-secondary leading-relaxed font-sans">
           {currentStep.description}
         </p>
 
         {/* Step Progress Dots */}
-        <div className="flex items-center justify-between pt-2 border-t border-slate-800">
+        <div className="flex items-center justify-between pt-2 border-t border-border-hairline">
           <div className="flex items-center gap-1.5">
             {TOUR_STEPS.map((_, i) => (
               <button
@@ -176,10 +176,10 @@ export const AcademicTutorialOverlay: React.FC<AcademicTutorialOverlayProps> = (
                 onClick={() => onStepChange(i)}
                 className={`h-1.5 rounded-full transition-all ${
                   i === stepIndex
-                    ? "w-6 bg-cyan-400"
+                    ? "w-6 bg-accent-primary"
                     : i < stepIndex
-                      ? "w-2 bg-emerald-400"
-                      : "w-2 bg-slate-700"
+                      ? "w-2 bg-emerald-500"
+                      : "w-2 bg-border-subtle"
                 }`}
               />
             ))}
@@ -192,7 +192,7 @@ export const AcademicTutorialOverlay: React.FC<AcademicTutorialOverlayProps> = (
                 size="sm"
                 variant="ghost"
                 onClick={() => onStepChange(stepIndex - 1)}
-                className="text-xs font-mono h-7 px-2.5 text-slate-400 hover:text-slate-200"
+                className="text-xs font-mono h-7 px-2.5 text-text-secondary hover:text-text-primary"
               >
                 <ChevronLeft className="w-3.5 h-3.5 mr-0.5" />
                 Atrás
@@ -206,9 +206,9 @@ export const AcademicTutorialOverlay: React.FC<AcademicTutorialOverlayProps> = (
                 if (isLast) onClose();
                 else onStepChange(stepIndex + 1);
               }}
-              className="text-xs font-mono h-7 px-3 flex items-center gap-1 shadow-md shadow-cyan-500/20"
+              className="text-xs font-mono h-7 px-3 flex items-center gap-1"
             >
-              {isLast ? "¡Comenzar a Estudiar!" : "Siguiente"}
+              {isLast ? "Comenzar a Estudiar" : "Siguiente"}
               {!isLast && <ChevronRight className="w-3.5 h-3.5 ml-0.5" />}
             </Button>
           </div>

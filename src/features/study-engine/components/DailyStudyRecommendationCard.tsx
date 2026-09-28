@@ -35,7 +35,18 @@ export const DailyStudyRecommendationCard: React.FC = () => {
       const data = await generateDailyStudyAgenda();
       setAgenda(data);
     } catch (err) {
-      console.error("Error loading daily study agenda:", err);
+      console.warn("[DailyStudyRecommendationCard] Error al generar agenda diaria, usando fallback:", err);
+      setAgenda({
+        targetDate: new Date().toISOString().split("T")[0],
+        headline: "Centro de estudio listo",
+        rationale: "Selecciona una cátedra o método de estudio para comenzar tu sesión.",
+        totalDebtMinutes: 0,
+        urgentReviews: { cardCount: 0, estimatedMinutes: 0, conceptIds: [], topConceptNames: [] },
+        conceptualGaps: [],
+        bottleneckPrerequisites: [],
+        examAlerts: [],
+        generatedAt: Date.now(),
+      });
     } finally {
       setLoading(false);
     }
@@ -74,8 +85,8 @@ export const DailyStudyRecommendationCard: React.FC = () => {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] uppercase tracking-wider text-accent-primary font-bold">
-                CognitiveOS v5.0 · Motor de Recomendación
+              <span className="font-mono text-[10px] text-accent-primary font-semibold">
+                CognitiveOS · Motor de recomendación
               </span>
               <Badge variant="accent" className="font-mono text-[10px]">
                 Adaptive Engine

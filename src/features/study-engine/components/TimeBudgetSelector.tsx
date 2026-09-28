@@ -41,8 +41,8 @@ export const TimeBudgetSelector: React.FC<TimeBudgetSelectorProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Clock className="h-4 w-4 text-accent-primary" />
-          <span className="font-mono text-xs uppercase tracking-wider font-bold text-text-primary">
-            Presupuesto de Estudio · ¿Cuánto tiempo tenés hoy?
+          <span className="font-mono text-xs font-semibold text-text-primary">
+            Presupuesto de estudio · ¿Cuánto tiempo tenés hoy?
           </span>
         </div>
 

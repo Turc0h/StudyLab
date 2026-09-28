@@ -25,8 +25,8 @@ function TreeNode({ folder, childrenByParent, depth, currentFolderId, onSelect }
         className={clsx(
           "group flex w-full items-center justify-between rounded-md py-1 pr-1.5 transition-colors duration-150",
           isActive
-            ? "bg-accent-muted/70 text-accent shadow-[0_0_10px_-4px_var(--color-accent)]"
-            : "text-text-secondary hover:bg-bg-surface-2/80 hover:text-text-primary",
+            ? "bg-bg-surface-3 text-text-primary font-medium"
+            : "text-text-secondary hover:bg-bg-surface-2 hover:text-text-primary",
         )}
       >
         <button

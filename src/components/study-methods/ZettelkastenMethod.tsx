@@ -89,12 +89,12 @@ export const ZettelkastenMethod: React.FC<ZettelkastenMethodProps> = ({ onSessio
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       {/* Header */}
-      <Card elevated className="p-5 flex flex-col gap-3">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border-subtle pb-3">
+      <Card className="p-5 flex flex-col gap-3 rounded-xl border border-border-hairline bg-bg-surface-1 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border-hairline pb-3">
           <div>
             <div className="flex items-center gap-2">
-              <CardTitle className="font-serif text-lg">Zettelkasten Académico</CardTitle>
-              <Badge variant="accent">Notas Atómicas & Red</Badge>
+              <CardTitle className="font-serif text-lg text-text-primary">Zettelkasten Académico</CardTitle>
+              <Badge variant="neutral" className="text-xs">Notas Atómicas & Red</Badge>
             </div>
             <p className="text-xs text-text-secondary mt-0.5">
               Principio de atomicidad: una sola idea nuclear por ficha, enlazada bidireccionalmente con la sintaxis [[Título]].
@@ -102,7 +102,7 @@ export const ZettelkastenMethod: React.FC<ZettelkastenMethodProps> = ({ onSessio
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono bg-bg-primary border border-border-subtle px-2.5 py-1 rounded text-text-primary">
+            <span className="text-xs font-mono bg-bg-surface-2 border border-border-hairline px-2.5 py-1 rounded text-text-primary">
               ID: {zettelId}
             </span>
             <Button variant="outline" size="sm" onClick={handleCopyId} className="text-xs flex items-center gap-1">
@@ -136,7 +136,7 @@ export const ZettelkastenMethod: React.FC<ZettelkastenMethodProps> = ({ onSessio
       {/* Editor Zettelkasten */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
         {/* Panel de Escritura (8 cols) */}
-        <Card elevated className="md:col-span-8 p-5 flex flex-col gap-3">
+        <Card className="md:col-span-8 p-5 flex flex-col gap-3 rounded-xl border border-border-hairline bg-bg-surface-1 shadow-xs">
           <div className="flex items-center justify-between text-xs">
             <span className="font-medium text-text-primary flex items-center gap-1.5">
               <BookOpen className="h-3.5 w-3.5 text-accent-primary" />
@@ -151,10 +151,10 @@ export const ZettelkastenMethod: React.FC<ZettelkastenMethodProps> = ({ onSessio
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Escribí la idea conceptual de forma autónoma...&#10;&#10;Ejemplo:&#10;El potencial de acción responde a la [[Ley del Todo o Nada]]. Si la despolarización inicial alcanza el umbral de -55mV, los canales de Na+ dependientes de voltaje se abren masivamente.&#10;&#10;Véase también: [[Período Refractario Absoluto]]&#10;#neurofisiologia #biofisica"
-            className="w-full text-xs font-mono leading-relaxed resize-none p-3 min-h-[280px] bg-bg-primary"
+            className="w-full text-xs font-mono leading-relaxed resize-none p-3 min-h-[280px] bg-bg-surface-2 border-border-hairline"
           />
 
-          <div className="flex items-center justify-between pt-2 border-t border-border-subtle">
+          <div className="flex items-center justify-between pt-2 border-t border-border-hairline">
             <span className="text-[11px] text-text-muted">
               {content.length} caracteres • {detectedLinks.length} enlaces wiki • {detectedTags.length} tags
             </span>
@@ -184,7 +184,7 @@ export const ZettelkastenMethod: React.FC<ZettelkastenMethodProps> = ({ onSessio
         {/* Panel Lateral: Vínculos Semánticos & Tags (4 cols) */}
         <div className="md:col-span-4 space-y-4">
           {/* Tarjeta de Enlaces Detectados */}
-          <Card className="p-4 border-border-subtle bg-bg-surface-2 space-y-2.5">
+          <Card className="p-4 border border-border-hairline bg-bg-surface-2 space-y-2.5 rounded-xl">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-text-primary">
               <Link2 className="h-3.5 w-3.5 text-accent-primary" />
               <span>Conexiones de Red ([[...]])</span>
@@ -196,7 +196,7 @@ export const ZettelkastenMethod: React.FC<ZettelkastenMethodProps> = ({ onSessio
             ) : (
               <div className="flex flex-wrap gap-1.5">
                 {detectedLinks.map((link) => (
-                  <Badge key={link} variant="accent">
+                  <Badge key={link} variant="neutral" className="text-accent-primary border-border-hairline">
                     [[{link}]]
                   </Badge>
                 ))}
@@ -205,7 +205,7 @@ export const ZettelkastenMethod: React.FC<ZettelkastenMethodProps> = ({ onSessio
           </Card>
 
           {/* Tarjeta de Etiquetas Detectadas */}
-          <Card className="p-4 border-border-subtle bg-bg-surface-2 space-y-2.5">
+          <Card className="p-4 border border-border-hairline bg-bg-surface-2 space-y-2.5 rounded-xl">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-text-primary">
               <Hash className="h-3.5 w-3.5 text-accent-primary" />
               <span>Etiquetas Temáticas</span>
@@ -217,7 +217,7 @@ export const ZettelkastenMethod: React.FC<ZettelkastenMethodProps> = ({ onSessio
             ) : (
               <div className="flex flex-wrap gap-1.5">
                 {detectedTags.map((tag) => (
-                  <Badge key={tag} variant="neutral">
+                  <Badge key={tag} variant="neutral" className="border-border-hairline">
                     {tag}
                   </Badge>
                 ))}
@@ -237,7 +237,7 @@ export const ZettelkastenMethod: React.FC<ZettelkastenMethodProps> = ({ onSessio
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {savedNotes.map((note) => (
-              <Card key={note.id} className="p-4 border-border-subtle space-y-2">
+              <Card key={note.id} className="p-4 border border-border-hairline bg-bg-surface-1 rounded-xl shadow-xs space-y-2">
                 <div className="flex items-start justify-between gap-2">
                   <span className="font-mono text-[11px] text-accent-primary font-bold">
                     {note.id}
@@ -252,12 +252,12 @@ export const ZettelkastenMethod: React.FC<ZettelkastenMethodProps> = ({ onSessio
                 </p>
                 <div className="flex flex-wrap gap-1 pt-1">
                   {note.links.map((l) => (
-                    <Badge key={l} variant="accent" className="text-[10px]">
+                    <Badge key={l} variant="neutral" className="text-[10px] text-accent-primary border-border-hairline">
                       [[{l}]]
                     </Badge>
                   ))}
                   {note.tags.map((t) => (
-                    <Badge key={t} variant="neutral" className="text-[10px]">
+                    <Badge key={t} variant="neutral" className="text-[10px] border-border-hairline">
                       {t}
                     </Badge>
                   ))}

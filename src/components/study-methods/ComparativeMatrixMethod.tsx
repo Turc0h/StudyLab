@@ -124,17 +124,17 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Encabezado */}
-      <Card className="border-border-subtle bg-bg-surface/90 backdrop-blur-md">
+      <Card className="border border-border-hairline bg-bg-surface-1 shadow-sm">
         <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-3">
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-bg-surface-2 text-text-primary border border-border-hairline">
               <Columns3 size={20} />
             </div>
             <div>
-              <CardTitle className="text-lg font-bold text-text-primary flex items-center gap-2">
+              <CardTitle className="text-lg font-bold text-text-primary flex items-center gap-2 font-serif">
                 Matriz Comparativa y Despiece Teórico
-                <Badge variant="accent" className="text-[10px] font-mono py-0">
-                  ACTIVE RECALL A CELDAS CIEGAS
+                <Badge variant="neutral" className="text-xs font-mono py-0">
+                  Active Recall a celdas ciegas
                 </Badge>
               </CardTitle>
               <p className="text-xs text-text-tertiary">
@@ -150,8 +150,8 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
               onClick={() => setViewMode("table")}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium font-mono flex items-center gap-1.5 transition-colors ${
                 viewMode === "table"
-                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
-                  : "text-text-tertiary hover:text-text-primary"
+                  ? "bg-bg-surface-3 text-text-primary border border-border-hairline font-semibold"
+                  : "bg-bg-surface-2 text-text-tertiary hover:text-text-primary border border-border-hairline"
               }`}
             >
               <Eye size={13} /> Cuadro Completo
@@ -161,8 +161,8 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
               onClick={() => handleStartBlindRecall(0.5)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium font-mono flex items-center gap-1.5 transition-colors ${
                 viewMode === "blind-recall"
-                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
-                  : "text-text-tertiary hover:text-text-primary"
+                  ? "bg-bg-surface-3 text-text-primary border border-border-hairline font-semibold"
+                  : "bg-bg-surface-2 text-text-tertiary hover:text-text-primary border border-border-hairline"
               }`}
             >
               <EyeOff size={13} /> Celdas Ciegas (Recall)
@@ -171,9 +171,9 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
         </CardHeader>
 
         {/* Barra de Selección de Matrices */}
-        <div className="p-4 pt-0 flex flex-wrap items-center justify-between gap-3 border-t border-border-subtle/50 mt-2">
+        <div className="p-4 pt-0 flex flex-wrap items-center justify-between gap-3 border-t border-border-hairline mt-2">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-mono uppercase text-text-tertiary">Matrices:</span>
+            <span className="text-xs font-mono text-text-tertiary">Matrices:</span>
             {matrices.map((m) => (
               <button
                 key={m.id}
@@ -186,8 +186,8 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
                 }}
                 className={`px-2.5 py-1 rounded text-xs font-mono transition-all ${
                   selectedMatrixId === m.id
-                    ? "bg-accent-primary/20 text-accent-primary border border-accent-primary/40 font-semibold"
-                    : "bg-bg-surface-2 text-text-tertiary hover:text-text-primary border border-border-subtle"
+                    ? "bg-bg-surface-3 text-text-primary border border-border-hairline font-semibold"
+                    : "bg-bg-surface-2 text-text-tertiary hover:text-text-primary border border-border-hairline"
                 }`}
               >
                 {m.title}
@@ -203,10 +203,10 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
 
       {/* Modal / Formulario de Creación de Matriz Personalizada */}
       {isCreatingCustom && (
-        <Card className="p-4 border-cyan-500/30 bg-cyan-500/5 space-y-3">
+        <Card className="p-4 border border-border-hairline bg-bg-surface-2 space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-bold text-text-primary uppercase font-mono">
-              + Crear Nueva Matriz Comparativa
+            <h4 className="text-xs font-semibold text-text-primary font-serif">
+              Crear nueva matriz comparativa
             </h4>
             <Button size="sm" variant="ghost" onClick={() => setIsCreatingCustom(false)}>
               Cancelar
@@ -215,17 +215,17 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
 
           <div className="grid gap-3 sm:grid-cols-3">
             <div>
-              <label className="text-[10px] font-mono text-text-tertiary block mb-1">Título del Tema:</label>
+              <label className="text-xs font-mono text-text-tertiary block mb-1">Título del tema:</label>
               <input
                 type="text"
                 value={customTitle}
                 onChange={(e) => setCustomTitle(e.target.value)}
                 placeholder="Ej. Modelos de Base de Datos"
-                className="w-full rounded bg-bg-surface px-2.5 py-1.5 text-xs border border-border-subtle text-text-primary"
+                className="w-full rounded bg-bg-surface-1 px-2.5 py-1.5 text-xs border border-border-hairline text-text-primary focus:outline-none focus:border-border-subtle"
               />
             </div>
             <div>
-              <label className="text-[10px] font-mono text-text-tertiary block mb-1">
+              <label className="text-xs font-mono text-text-tertiary block mb-1">
                 Entidades / Columnas (separadas por comas):
               </label>
               <input
@@ -233,11 +233,11 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
                 value={customEntitiesStr}
                 onChange={(e) => setCustomEntitiesStr(e.target.value)}
                 placeholder="Relacional (SQL), NoSQL Documental, Grafo"
-                className="w-full rounded bg-bg-surface px-2.5 py-1.5 text-xs border border-border-subtle text-text-primary"
+                className="w-full rounded bg-bg-surface-1 px-2.5 py-1.5 text-xs border border-border-hairline text-text-primary focus:outline-none focus:border-border-subtle"
               />
             </div>
             <div>
-              <label className="text-[10px] font-mono text-text-tertiary block mb-1">
+              <label className="text-xs font-mono text-text-tertiary block mb-1">
                 Dimensiones / Filas (separadas por comas):
               </label>
               <input
@@ -245,7 +245,7 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
                 value={customDimensionsStr}
                 onChange={(e) => setCustomDimensionsStr(e.target.value)}
                 placeholder="Esquema, Escalabilidad, Garantías ACID, Caso Típico"
-                className="w-full rounded bg-bg-surface px-2.5 py-1.5 text-xs border border-border-subtle text-text-primary"
+                className="w-full rounded bg-bg-surface-1 px-2.5 py-1.5 text-xs border border-border-hairline text-text-primary focus:outline-none focus:border-border-subtle"
               />
             </div>
           </div>
@@ -259,30 +259,30 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
       {/* ----------------- MODO 1: TABLA COMPLETA ----------------- */}
       {viewMode === "table" && (
         <div className="space-y-4">
-          <div className="overflow-x-auto rounded-xl border border-border-subtle bg-bg-surface/80">
+          <div className="overflow-x-auto rounded-xl border border-border-hairline bg-bg-surface-1 shadow-sm">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-border-subtle bg-bg-surface-2/60">
-                  <th className="p-3 font-mono text-[10px] uppercase text-text-tertiary w-40 border-r border-border-subtle">
+                <tr className="border-b border-border-hairline bg-bg-surface-2">
+                  <th className="p-3 font-mono text-xs text-text-tertiary w-40 border-r border-border-hairline font-normal">
                     Dimensión / Eje
                   </th>
                   {activeMatrix.entities.map((ent, idx) => (
-                    <th key={idx} className="p-3 font-bold text-text-primary font-mono border-r border-border-subtle last:border-r-0">
-                      <span className="text-cyan-400 mr-1">#{idx + 1}</span> {ent}
+                    <th key={idx} className="p-3 font-bold text-text-primary font-serif border-r border-border-hairline last:border-r-0">
+                      <span className="text-accent-primary mr-1 font-mono">#{idx + 1}</span> {ent}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border-subtle/50 font-sans">
+              <tbody className="divide-y divide-border-hairline font-sans">
                 {activeMatrix.dimensions.map((dim, dIdx) => (
-                  <tr key={dIdx} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="p-3 font-semibold text-text-secondary bg-bg-surface-2/30 border-r border-border-subtle align-top">
+                  <tr key={dIdx} className="hover:bg-bg-surface-2/30 transition-colors">
+                    <td className="p-3 font-medium text-text-secondary bg-bg-surface-2/40 border-r border-border-hairline align-top">
                       {dim}
                     </td>
                     {activeMatrix.entities.map((_, eIdx) => {
                       const content = activeMatrix.cells[`${eIdx}_${dIdx}`] || "—";
                       return (
-                        <td key={eIdx} className="p-3 text-text-primary border-r border-border-subtle last:border-r-0 align-top leading-relaxed">
+                        <td key={eIdx} className="p-3 text-text-primary border-r border-border-hairline last:border-r-0 align-top leading-relaxed">
                           {content}
                         </td>
                       );
@@ -295,22 +295,22 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
 
           {/* Puntos de Fricción Teórica / Trampas de Examen */}
           {activeMatrix.frictionPoints.length > 0 && (
-            <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-3">
+            <div className="rounded-xl border border-border-hairline bg-bg-surface-2 p-4 space-y-3">
               <div className="flex items-center gap-2">
-                <Flame size={16} className="text-amber-400" />
-                <h4 className="text-xs font-bold text-amber-300 uppercase font-mono tracking-wider">
-                  Puntos de Fricción Teórica & Preguntas Trampa de Final
+                <Flame size={16} className="text-highlighter" />
+                <h4 className="text-xs font-semibold text-text-primary font-serif">
+                  Puntos de fricción teórica y preguntas trampa de examen
                 </h4>
               </div>
 
               <div className="grid gap-2.5 sm:grid-cols-2">
                 {activeMatrix.frictionPoints.map((fp) => (
-                  <div key={fp.id} className="rounded-lg bg-bg-surface/80 p-3 border border-amber-500/20 text-xs">
-                    <p className="font-semibold text-text-primary">{fp.title}</p>
+                  <div key={fp.id} className="rounded-lg bg-bg-surface-1 p-3 border border-border-hairline text-xs">
+                    <p className="font-semibold text-text-primary font-serif">{fp.title}</p>
                     <p className="text-text-secondary mt-1 leading-relaxed">{fp.explanation}</p>
                     <div className="mt-2 flex flex-wrap gap-1">
                       {fp.entitiesInvolved.map((e) => (
-                        <Badge key={e} variant="neutral" className="text-[9px] font-mono">
+                        <Badge key={e} variant="neutral" className="text-[10px] font-mono">
                           {e}
                         </Badge>
                       ))}
@@ -327,14 +327,14 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
       {viewMode === "blind-recall" && (
         <div className="space-y-4">
           {/* Barra de Progreso y Opciones de Celdas Ciegas */}
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-bg-surface p-3 border border-border-subtle">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-bg-surface-1 p-3 border border-border-hairline shadow-sm">
             <div className="flex items-center gap-3">
               <span className="font-mono text-xs font-bold text-text-primary">
                 Dominio: {blindStats.mastered} / {blindStats.totalHidden} celdas ({blindStats.pct}%)
               </span>
-              <div className="w-32 h-1.5 rounded-full bg-bg-surface-2 overflow-hidden">
+              <div className="w-32 h-1.5 rounded-full bg-bg-surface-2 overflow-hidden border border-border-hairline">
                 <div
-                  className="h-full bg-emerald-400 transition-all duration-300"
+                  className="h-full bg-signal-ok transition-all duration-300"
                   style={{ width: `${blindStats.pct}%` }}
                 />
               </div>
@@ -344,8 +344,10 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
               <button
                 type="button"
                 onClick={() => handleStartBlindRecall(0.5)}
-                className={`px-2 py-0.5 rounded text-[11px] font-mono ${
-                  blindRatio === 0.5 ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30" : "text-text-tertiary"
+                className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
+                  blindRatio === 0.5
+                    ? "bg-bg-surface-3 text-text-primary border border-border-hairline font-semibold"
+                    : "bg-bg-surface-2 text-text-tertiary hover:text-text-primary border border-border-hairline"
                 }`}
               >
                 Tapar 50%
@@ -353,11 +355,13 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
               <button
                 type="button"
                 onClick={() => handleStartBlindRecall(1.0)}
-                className={`px-2 py-0.5 rounded text-[11px] font-mono ${
-                  blindRatio === 1.0 ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30" : "text-text-tertiary"
+                className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
+                  blindRatio === 1.0
+                    ? "bg-bg-surface-3 text-text-primary border border-border-hairline font-semibold"
+                    : "bg-bg-surface-2 text-text-tertiary hover:text-text-primary border border-border-hairline"
                 }`}
               >
-                Tapar 100% (Tabique Completo)
+                Tapar 100% (Tabique completo)
               </button>
               <Button size="sm" variant="ghost" onClick={() => handleStartBlindRecall(blindRatio)}>
                 <RotateCcw size={13} /> Reiniciar
@@ -366,24 +370,24 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
           </div>
 
           {/* Grilla de Celdas Ciegas */}
-          <div className="overflow-x-auto rounded-xl border border-border-subtle bg-bg-surface/80">
+          <div className="overflow-x-auto rounded-xl border border-border-hairline bg-bg-surface-1 shadow-sm">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-border-subtle bg-bg-surface-2/60">
-                  <th className="p-3 font-mono text-[10px] uppercase text-text-tertiary w-36 border-r border-border-subtle">
+                <tr className="border-b border-border-hairline bg-bg-surface-2">
+                  <th className="p-3 font-mono text-xs text-text-tertiary w-36 border-r border-border-hairline font-normal">
                     Dimensión
                   </th>
                   {activeMatrix.entities.map((ent, idx) => (
-                    <th key={idx} className="p-3 font-bold text-text-primary font-mono border-r border-border-subtle last:border-r-0">
+                    <th key={idx} className="p-3 font-bold text-text-primary font-serif border-r border-border-hairline last:border-r-0">
                       {ent}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border-subtle/50">
+              <tbody className="divide-y divide-border-hairline font-sans">
                 {activeMatrix.dimensions.map((dim, dIdx) => (
                   <tr key={dIdx}>
-                    <td className="p-3 font-semibold text-text-secondary bg-bg-surface-2/30 border-r border-border-subtle align-top">
+                    <td className="p-3 font-medium text-text-secondary bg-bg-surface-2/40 border-r border-border-hairline align-top">
                       {dim}
                     </td>
                     {activeMatrix.entities.map((ent, eIdx) => {
@@ -397,7 +401,7 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
 
                       if (!isHidden) {
                         return (
-                          <td key={eIdx} className="p-3 text-text-primary border-r border-border-subtle last:border-r-0 align-top opacity-75">
+                          <td key={eIdx} className="p-3 text-text-primary border-r border-border-hairline last:border-r-0 align-top opacity-75">
                             {canonical}
                           </td>
                         );
@@ -406,13 +410,13 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
                       return (
                         <td
                           key={eIdx}
-                          className={`p-3 border-r border-border-subtle last:border-r-0 align-top transition-all ${
+                          className={`p-3 border-r border-border-hairline last:border-r-0 align-top transition-all ${
                             item?.masteryStatus === "mastered"
-                              ? "bg-emerald-500/10"
+                              ? "bg-signal-ok/10"
                               : item?.masteryStatus === "failed"
-                              ? "bg-rose-500/10"
+                              ? "bg-rubric-red/10"
                               : item?.masteryStatus === "doubtful"
-                              ? "bg-amber-500/10"
+                              ? "bg-highlighter/10"
                               : "bg-bg-surface-2/50"
                           }`}
                         >
@@ -420,7 +424,7 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
                             <div className="space-y-2">
                               {isActive ? (
                                 <div className="space-y-1.5 animate-in fade-in duration-150">
-                                  <span className="text-[10px] font-mono text-cyan-400 block font-semibold">
+                                  <span className="text-xs font-mono text-text-primary block font-medium">
                                     Evocá: {ent} en {dim}
                                   </span>
                                   <textarea
@@ -428,13 +432,13 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
                                     value={userInput}
                                     onChange={(e) => setUserInputs({ ...userInputs, [cellKey]: e.target.value })}
                                     placeholder="Escribí lo que recuerdes o formulalo mentalmente..."
-                                    className="w-full rounded bg-bg-surface px-2 py-1 text-xs border border-cyan-500/40 text-text-primary resize-none"
+                                    className="w-full rounded bg-bg-surface-1 px-2 py-1 text-xs border border-border-hairline text-text-primary resize-none focus:outline-none focus:border-border-subtle"
                                   />
                                   <Button
                                     size="sm"
                                     variant="primary"
                                     onClick={() => handleRevealCell(cellKey)}
-                                    className="w-full text-[11px] py-1 justify-center"
+                                    className="w-full text-xs py-1 justify-center"
                                   >
                                     <Eye size={12} /> Revelar Definición Canónica
                                   </Button>
@@ -443,7 +447,7 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
                                 <button
                                   type="button"
                                   onClick={() => setActiveCellKey(cellKey)}
-                                  className="w-full p-2.5 rounded-lg border border-dashed border-cyan-500/40 bg-cyan-500/5 hover:bg-cyan-500/10 text-cyan-400 font-mono text-[11px] flex items-center justify-center gap-1.5 transition-colors"
+                                  className="w-full p-2.5 rounded-lg border border-dashed border-border-hairline bg-bg-surface-2/50 hover:bg-bg-surface-2 text-text-secondary font-mono text-xs flex items-center justify-center gap-1.5 transition-colors"
                                 >
                                   <EyeOff size={13} /> Celda Ciega — Click para Evocar
                                 </button>
@@ -456,10 +460,10 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
                               {userInput.trim() && (() => {
                                 const evalResult = evaluateRecallAnswer(userInput, canonical);
                                 return (
-                                  <div className="rounded bg-bg-surface p-1.5 text-[10px] font-mono border border-border-subtle">
-                                    <span className="text-cyan-400 font-bold">Acierto: {evalResult.score * 10}%</span>
+                                  <div className="rounded bg-bg-surface-2 p-1.5 text-xs font-mono border border-border-hairline">
+                                    <span className="text-accent-primary font-semibold">Acierto: {evalResult.score * 10}%</span>
                                     {evalResult.matchedKeywords.length > 0 && (
-                                      <span className="text-emerald-400 ml-1">✓ {evalResult.matchedKeywords.join(", ")}</span>
+                                      <span className="text-signal-ok ml-1 font-medium">✓ {evalResult.matchedKeywords.join(", ")}</span>
                                     )}
                                   </div>
                                 );
@@ -470,10 +474,10 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
                                 <button
                                   type="button"
                                   onClick={() => handleRateCell(cellKey, "mastered")}
-                                  className={`flex-1 py-1 rounded text-[10px] font-mono border transition-colors ${
+                                  className={`flex-1 py-1 rounded text-xs font-mono border transition-colors ${
                                     item?.masteryStatus === "mastered"
-                                      ? "bg-emerald-500 text-black font-bold border-emerald-400"
-                                      : "bg-emerald-500/15 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/25"
+                                      ? "bg-signal-ok text-white font-semibold border-signal-ok"
+                                      : "bg-signal-ok/15 text-signal-ok border-signal-ok/30 hover:bg-signal-ok/25"
                                   }`}
                                 >
                                   Dominado
@@ -481,10 +485,10 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
                                 <button
                                   type="button"
                                   onClick={() => handleRateCell(cellKey, "doubtful")}
-                                  className={`flex-1 py-1 rounded text-[10px] font-mono border transition-colors ${
+                                  className={`flex-1 py-1 rounded text-xs font-mono border transition-colors ${
                                     item?.masteryStatus === "doubtful"
-                                      ? "bg-amber-500 text-black font-bold border-amber-400"
-                                      : "bg-amber-500/15 text-amber-300 border-amber-500/30 hover:bg-amber-500/25"
+                                      ? "bg-highlighter text-black font-semibold border-highlighter"
+                                      : "bg-highlighter/15 text-highlighter border-highlighter/30 hover:bg-highlighter/25"
                                   }`}
                                 >
                                   Dudoso
@@ -492,10 +496,10 @@ export const ComparativeMatrixMethod: React.FC<ComparativeMatrixMethodProps> = (
                                 <button
                                   type="button"
                                   onClick={() => handleRateCell(cellKey, "failed")}
-                                  className={`flex-1 py-1 rounded text-[10px] font-mono border transition-colors ${
+                                  className={`flex-1 py-1 rounded text-xs font-mono border transition-colors ${
                                     item?.masteryStatus === "failed"
-                                      ? "bg-rose-500 text-white font-bold border-rose-400"
-                                      : "bg-rose-500/15 text-rose-300 border-rose-500/30 hover:bg-rose-500/25"
+                                      ? "bg-rubric-red text-white font-semibold border-rubric-red"
+                                      : "bg-rubric-red/15 text-rubric-red border-rubric-red/30 hover:bg-rubric-red/25"
                                   }`}
                                 >
                                   Fallo

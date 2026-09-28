@@ -1,4 +1,4 @@
-import React, { useState, Suspense, lazy } from "react";
+import React, { useState, useMemo, Suspense, lazy } from "react";
 import { useSearchParams } from "react-router-dom";
 import type { StudyMethodId } from "../types";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -6,10 +6,27 @@ import { db, type StudyMethod } from "../db/db";
 import { STUDY_METHODS_30_SEEDS } from "../data/studyMethodsSeed";
 import { MethodPreviewModal } from "../components/study-methods/MethodPreviewModal";
 import { CognitiveTriageModal } from "../components/study-methods/CognitiveTriageModal";
-import { Card, CardHeader, CardTitle } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { Badge } from "../components/ui/Badge";
-import { ArrowLeft, ArrowRight, Eye, Play, Sparkles, Search, Layers, Cpu, CheckCircle2, Flame, Mic, FileText, Columns3, Briefcase, CalendarDays, GraduationCap, Bot, Headphones, Scale, Binary } from "lucide-react";
+import {
+  ArrowLeft,
+  Eye,
+  Play,
+  Search,
+  Cpu,
+  Flame,
+  GraduationCap,
+  Scale,
+  Binary,
+  Compass,
+  Mic,
+  FileText,
+  Columns3,
+  Briefcase,
+  CalendarDays,
+  Headphones,
+  Bot,
+} from "lucide-react";
 import { PanelGuide } from "../components/guide/PanelGuide";
 import { useNavigate } from "react-router-dom";
 
@@ -145,6 +162,9 @@ const LocalAiMethod = lazy(() =>
 const AudioFlashcardsMethod = lazy(() =>
   import("../components/study-methods/AudioFlashcardsMethod").then((m) => ({ default: m.AudioFlashcardsMethod })),
 );
+const SplitScreenStudyRunner = lazy(() =>
+  import("../components/study-methods/SplitScreenStudyRunner").then((m) => ({ default: m.SplitScreenStudyRunner })),
+);
 
 const CATEGORIES = [
   { id: "all", label: "Todas las Categorías" },
@@ -181,6 +201,13 @@ export const MethodsPage: React.FC = () => {
   const allMethods: StudyMethod[] = (methodsFromDb && methodsFromDb.length > 0)
     ? methodsFromDb
     : STUDY_METHODS_30_SEEDS;
+
+  const fsrsCards = useLiveQuery(() => db.cardsFsrs.toArray(), []);
+  const dueFsrsCount = useMemo(() => {
+    if (!fsrsCards) return 0;
+    const now = Date.now();
+    return fsrsCards.filter((c) => c.dueDate <= now).length;
+  }, [fsrsCards]);
 
   const handleStartMethod = (id: string) => {
     setActiveRunningMethod(id as StudyMethodId);
@@ -313,6 +340,8 @@ export const MethodsPage: React.FC = () => {
           return <FinalBoardMethod onSessionFinished={handleBackToCatalog} />;
         case "math-blackboard":
           return <MathBlackboardMethod onSessionFinished={handleBackToCatalog} />;
+        case "split-screen":
+          return <SplitScreenStudyRunner onFinish={handleBackToCatalog} />;
         default:
           return (
             <div className="p-8 text-center space-y-4">
@@ -369,352 +398,425 @@ export const MethodsPage: React.FC = () => {
 
   // Otherwise, render the Catalog of 30 Methods with Filters and Search
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-8 pb-16 font-sans">
       {/* Editorial Header */}
-      <div className="flex items-start justify-between border-b border-border-subtle pb-4">
+      <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-border-subtle pb-5 gap-4">
         <div>
-          <div className="flex items-center gap-2.5">
-            <h1 className="font-serif text-2xl font-semibold tracking-tight text-text-primary">
-              Catálogo de Métodos de Estudio
-            </h1>
-            <Badge variant="neutral">{allMethods.length} Métodos Científicos</Badge>
-          </div>
-          <p className="mt-1 font-sans text-sm text-text-secondary">
-            Explora 30 técnicas de estudio basadas en evidencia psicopedagógica, organizadas por objetivo cognitivo y conectadas al motor de sesiones de StudyLab.
+          <h1 className="font-serif text-2xl md:text-3xl font-semibold tracking-tight text-text-primary">
+            Métodos de Estudio y Práctica Cognitiva
+          </h1>
+          <p className="mt-1 text-sm text-text-secondary max-w-2xl leading-relaxed">
+            30 protocolos basados en evidencia psicopedagógica, estructurados por demanda cognitiva y conectados al motor de retención FSRS de StudyLab.
           </p>
-          <div className="mt-3 flex items-center gap-2">
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setIsTriageOpen(true)}
-              className="text-xs flex items-center gap-1.5 shadow-xs"
-            >
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>Asistente de Triaje Cognitivo</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleStartMethod("cram")}
-              className="text-xs flex items-center gap-1.5 border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 hover:text-amber-200"
-            >
-              <Flame className="h-3.5 w-3.5 text-amber-400" />
-              <span>Modo Repaso de Emergencia (Blitz)</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleStartMethod("oral-defense")}
-              className="text-xs flex items-center gap-1.5 border-indigo-500/40 bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500/20 hover:text-indigo-200"
-            >
-              <Mic className="h-3.5 w-3.5 text-indigo-400" />
-              <span>Simulador de Coloquio Oral</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleStartMethod("essay-exam")}
-              className="text-xs flex items-center gap-1.5 border-cyan-500/40 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 hover:text-cyan-200"
-            >
-              <FileText className="h-3.5 w-3.5 text-cyan-400" />
-              <span>Examen a Desarrollo & Ensayo</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleStartMethod("comparative-matrix")}
-              className="text-xs flex items-center gap-1.5 border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 hover:text-emerald-200"
-            >
-              <Columns3 className="h-3.5 w-3.5 text-emerald-400" />
-              <span>Matriz Comparativa de Cátedra</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleStartMethod("case-study")}
-              className="text-xs flex items-center gap-1.5 border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 hover:text-amber-200"
-            >
-              <Briefcase className="h-3.5 w-3.5 text-amber-400" />
-              <span>Casos Prácticos & Viñetas</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleStartMethod("semester-gantt")}
-              className="text-xs flex items-center gap-1.5 border-indigo-500/40 bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500/20 hover:text-indigo-200"
-            >
-              <CalendarDays className="h-3.5 w-3.5 text-indigo-400" />
-              <span>Cronograma & Gantt</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleStartMethod("past-exams")}
-              className="text-xs flex items-center gap-1.5 border-purple-500/40 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20 hover:text-purple-200"
-            >
-              <GraduationCap className="h-3.5 w-3.5 text-purple-400" />
-              <span>Banco de Parciales & Pareto</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleStartMethod("local-ai")}
-              className="text-xs flex items-center gap-1.5 border-cyan-500/40 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 hover:text-cyan-200"
-            >
-              <Bot className="h-3.5 w-3.5 text-cyan-400" />
-              <span>Tutor IA Local & Ollama</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleStartMethod("audio-flashcards")}
-              className="text-xs flex items-center gap-1.5 border-teal-500/40 bg-teal-500/10 text-teal-300 hover:bg-teal-500/20 hover:text-teal-200"
-            >
-              <Headphones className="h-3.5 w-3.5 text-teal-400" />
-              <span>Audio Flashcards & Podcast</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleStartMethod("final-board")}
-              className="text-xs flex items-center gap-1.5 border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 hover:text-amber-200"
-            >
-              <Scale className="h-3.5 w-3.5 text-amber-400" />
-              <span>Tribunal de Examen Final & Tesis</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleStartMethod("math-blackboard")}
-              className="text-xs flex items-center gap-1.5 border-cyan-500/40 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 hover:text-cyan-200"
-            >
-              <Binary className="h-3.5 w-3.5 text-cyan-400" />
-              <span>Pizarra Matemática & KaTeX</span>
-            </Button>
-          </div>
-        </div>
-        <PanelGuide
-          id="methods-catalog-guide"
-          title="Catálogo de Métodos Cognitivos"
-          whatItDoes="Catálogo integral de 30 métodos de estudio con respaldo neurocognitivo formal, fichas descriptivas y vinculación con FSRS y el grafo."
-          howToUse={[
-            "Usá el buscador o filtrá por categoría (Memorización, Comprensión, Tiempo, etc.).",
-            "Filtrá entre 'Listos para Usar' (con runner activo) y 'Fichas Teóricas' informativas.",
-            "Tocá 'Ver Ficha' para consultar los pasos accionables y respaldo científico.",
-            "Usá los botones de acción rápida para saltar a FSRS, el Grafo o iniciar sesión.",
-          ]}
-          tip="Para asimilar demostraciones o fórmulas complejas, combiná Feynman o Autoexplicación con Repetición Espaciada."
-        />
-      </div>
-
-      {/* Search Bar & Status Filter */}
-      <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-muted" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Buscar método por nombre o materias afines..."
-            className="w-full rounded border border-border-subtle bg-bg-secondary/60 pl-9 pr-3 py-1.5 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-colors"
-          />
         </div>
 
-        {/* Status Pills */}
-        <div className="flex items-center gap-1.5 self-end sm:self-auto text-xs">
-          {[
-            { id: "all", label: `Todos (${allMethods.length})` },
-            { id: "ready", label: `Listos (${allMethods.filter(m => m.implemented).length})` },
-            { id: "preview", label: `Próximamente (${allMethods.filter(m => !m.implemented).length})` },
-          ].map((statusTab) => (
-            <button
-              key={statusTab.id}
-              type="button"
-              onClick={() => setSelectedStatus(statusTab.id as any)}
-              className={`rounded px-2.5 py-1 text-xs font-sans transition-colors ${
-                selectedStatus === statusTab.id
-                  ? "bg-bg-elevated text-accent-primary font-semibold border border-accent-primary/40 shadow-xs"
-                  : "text-text-muted hover:text-text-primary hover:bg-bg-secondary"
-              }`}
-            >
-              {statusTab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Category Filter Pills */}
-      <div className="flex flex-wrap items-center gap-2">
-        {CATEGORIES.map((tab) => {
-          const count = tab.id === "all"
-            ? allMethods.length
-            : allMethods.filter((m) => m.category === tab.id).length;
-
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setSelectedCategory(tab.id)}
-              className={`rounded px-3 py-1.5 text-xs font-sans font-medium transition-colors ${
-                selectedCategory === tab.id
-                  ? "bg-accent-primary text-bg-elevated border border-accent-primary shadow-xs"
-                  : "bg-bg-secondary text-text-secondary border border-border-subtle hover:bg-bg-elevated hover:text-text-primary"
-              }`}
-            >
-              {tab.label} ({count})
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Grid of Methods */}
-      {filteredMethods.length === 0 ? (
-        <div className="rounded border border-dashed border-border-subtle p-12 text-center">
-          <p className="text-sm text-text-muted">No se encontraron métodos de estudio con los filtros seleccionados.</p>
+        <div className="flex items-center gap-2 self-start md:self-auto">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              setSelectedCategory("all");
-              setSelectedStatus("all");
-              setSearchQuery("");
-            }}
-            className="mt-3 text-xs"
+            onClick={() => setIsTriageOpen(true)}
+            className="text-xs flex items-center gap-2 border-border-subtle hover:bg-bg-elevated"
           >
-            Restablecer Filtros
+            <Compass className="h-3.5 w-3.5 text-accent-primary" />
+            <span>Asistente de Triaje Cognitivo</span>
+          </Button>
+          <PanelGuide
+            id="methods-catalog-guide"
+            title="Catálogo de Métodos Cognitivos"
+            whatItDoes="Catálogo integral de 30 métodos de estudio con respaldo neurocognitivo formal, fichas descriptivas y vinculación con FSRS y el grafo."
+            howToUse={[
+              "El bloque superior destaca el método prioritario sugerido para hoy según tu carga biológica de repaso.",
+              "En 'Herramientas de Cátedra' encontrás simuladores específicos de parcial, pizarra y coloquio.",
+              "En el catálogo inferior podés buscar cualquier técnica y consultar sus pasos o iniciar sesión.",
+            ]}
+            tip="Para asimilar demostraciones o fórmulas complejas, combiná Feynman o Autoexplicación con Repetición Espaciada."
+          />
+        </div>
+      </div>
+
+      {/* 1. FOCUS HERO: Spotlight Prioritario de Hoy */}
+      <section aria-labelledby="focus-hero-title">
+        <div className="rounded-lg border border-accent-primary/30 bg-bg-elevated p-6 shadow-xs relative overflow-hidden">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="space-y-2 max-w-2xl">
+              <div className="flex items-center gap-2 text-xs font-mono text-accent-primary">
+                <span className="w-2 h-2 rounded-full bg-accent-primary" />
+                <span>FOCO PRIORITARIO DE HOY</span>
+              </div>
+              <h2 id="focus-hero-title" className="font-serif text-xl md:text-2xl font-semibold text-text-primary">
+                {dueFsrsCount > 0 ? "Repetición Espaciada (FSRS v5)" : "Asimilación Conceptual: Técnica Feynman"}
+              </h2>
+              <p className="text-xs md:text-sm text-text-secondary leading-relaxed">
+                {dueFsrsCount > 0
+                  ? `Tenés ${dueFsrsCount} ${dueFsrsCount === 1 ? "tarjeta pendiente" : "tarjetas pendientes"} de repaso hoy según tu curva de retención R(t). Resolverlas a tiempo previene el decaimiento de memoria antes de los exámenes.`
+                  : "No tenés repasos FSRS vencidos en este momento. Es el intervalo ideal para asimilar conceptos densos con explicación en lenguaje llano o abordar una unidad nueva."}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 shrink-0">
+              {dueFsrsCount > 0 ? (
+                <>
+                  <Button
+                    variant="primary"
+                    onClick={() => handleStartMethod("spaced-repetition")}
+                    className="flex items-center gap-2 px-4 py-2 text-xs font-medium cursor-pointer"
+                  >
+                    <Play className="h-3.5 w-3.5 fill-current" />
+                    <span>Iniciar Repaso Diario ({dueFsrsCount})</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate("/session?deck=default")}
+                    className="text-xs cursor-pointer border-border-subtle"
+                  >
+                    Ver Barajas
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="primary"
+                  onClick={() => handleStartMethod("feynman")}
+                  className="flex items-center gap-2 px-4 py-2 text-xs font-medium cursor-pointer"
+                >
+                  <Play className="h-3.5 w-3.5 fill-current" />
+                  <span>Iniciar Técnica Feynman</span>
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 2. HERRAMIENTAS DE CÁTEDRA & EVALUACIÓN */}
+      <section className="space-y-3" aria-labelledby="tools-section-title">
+        <div className="flex items-baseline justify-between border-b border-border-subtle pb-2">
+          <h2 id="tools-section-title" className="font-serif text-lg font-semibold text-text-primary">
+            Formatos de Cátedra &amp; Examen
+          </h2>
+          <span className="text-xs text-text-muted">Simuladores troncales de evaluación universitaria</span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {/* Pizarra Matemática */}
+          <div
+            onClick={() => handleStartMethod("math-blackboard")}
+            className="group p-4 rounded-lg border border-border-subtle bg-bg-elevated hover:border-accent-primary/60 transition-colors cursor-pointer flex flex-col justify-between"
+          >
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-serif font-medium text-text-primary">Pizarra Matemática</span>
+                <Binary className="h-4 w-4 text-accent-primary" />
+              </div>
+              <p className="text-xs text-text-secondary leading-snug">
+                Demostraciones paso a paso, fórmulas KaTeX y validación deductiva.
+              </p>
+            </div>
+            <div className="mt-4 pt-2 border-t border-border-subtle flex items-center justify-between text-xs text-accent-primary font-medium">
+              <span>Abrir Pizarra</span>
+              <Play className="h-3 w-3 fill-current" />
+            </div>
+          </div>
+
+          {/* Tribunal de Examen Final */}
+          <div
+            onClick={() => handleStartMethod("final-board")}
+            className="group p-4 rounded-lg border border-border-subtle bg-bg-elevated hover:border-accent-primary/60 transition-colors cursor-pointer flex flex-col justify-between"
+          >
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-serif font-medium text-text-primary">Tribunal de Examen Final</span>
+                <Scale className="h-4 w-4 text-accent-primary" />
+              </div>
+              <p className="text-xs text-text-secondary leading-snug">
+                Simulación con 3 docentes, defensa oral y generación de acta oficial.
+              </p>
+            </div>
+            <div className="mt-4 pt-2 border-t border-border-subtle flex items-center justify-between text-xs text-accent-primary font-medium">
+              <span>Simular Tribunal</span>
+              <Play className="h-3 w-3 fill-current" />
+            </div>
+          </div>
+
+          {/* Banco de Parciales */}
+          <div
+            onClick={() => handleStartMethod("past-exams")}
+            className="group p-4 rounded-lg border border-border-subtle bg-bg-elevated hover:border-accent-primary/60 transition-colors cursor-pointer flex flex-col justify-between"
+          >
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-serif font-medium text-text-primary">Banco de Parciales & Pareto</span>
+                <GraduationCap className="h-4 w-4 text-accent-primary" />
+              </div>
+              <p className="text-xs text-text-secondary leading-snug">
+                Análisis Pareto 80/20 de temas frecuentes y simulacro con cronómetro.
+              </p>
+            </div>
+            <div className="mt-4 pt-2 border-t border-border-subtle flex items-center justify-between text-xs text-accent-primary font-medium">
+              <span>Explorar Exámenes</span>
+              <Play className="h-3 w-3 fill-current" />
+            </div>
+          </div>
+
+          {/* Modo Blitz / Cram de Emergencia */}
+          <div
+            onClick={() => handleStartMethod("cram")}
+            className="group p-4 rounded-lg border border-border-subtle bg-bg-elevated hover:border-accent-primary/60 transition-colors cursor-pointer flex flex-col justify-between"
+          >
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-serif font-medium text-text-primary">Modo Repaso de Emergencia (Blitz)</span>
+                <Flame className="h-4 w-4 text-amber-500" />
+              </div>
+              <p className="text-xs text-text-secondary leading-snug">
+                Triage intensivo contrarreloj para la víspera del examen parcial.
+              </p>
+            </div>
+            <div className="mt-4 pt-2 border-t border-border-subtle flex items-center justify-between text-xs text-accent-primary font-medium">
+              <span>Iniciar Blitz</span>
+              <Play className="h-3 w-3 fill-current" />
+            </div>
+          </div>
+        </div>
+
+        {/* Simuladores Especializados de Cátedra */}
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleStartMethod("oral-defense")}
+            className="text-xs flex items-center gap-1.5 border-border-subtle hover:bg-bg-elevated text-text-secondary hover:text-text-primary"
+          >
+            <Mic className="h-3.5 w-3.5 text-accent-primary" />
+            <span>Simulador de Coloquio Oral</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleStartMethod("essay-exam")}
+            className="text-xs flex items-center gap-1.5 border-border-subtle hover:bg-bg-elevated text-text-secondary hover:text-text-primary"
+          >
+            <FileText className="h-3.5 w-3.5 text-accent-primary" />
+            <span>Examen a Desarrollo & Ensayo</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleStartMethod("comparative-matrix")}
+            className="text-xs flex items-center gap-1.5 border-border-subtle hover:bg-bg-elevated text-text-secondary hover:text-text-primary"
+          >
+            <Columns3 className="h-3.5 w-3.5 text-accent-primary" />
+            <span>Matriz Comparativa de Cátedra</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleStartMethod("case-study")}
+            className="text-xs flex items-center gap-1.5 border-border-subtle hover:bg-bg-elevated text-text-secondary hover:text-text-primary"
+          >
+            <Briefcase className="h-3.5 w-3.5 text-accent-primary" />
+            <span>Casos Prácticos & Viñetas</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleStartMethod("semester-gantt")}
+            className="text-xs flex items-center gap-1.5 border-border-subtle hover:bg-bg-elevated text-text-secondary hover:text-text-primary"
+          >
+            <CalendarDays className="h-3.5 w-3.5 text-accent-primary" />
+            <span>Cronograma & Gantt</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleStartMethod("audio-flashcards")}
+            className="text-xs flex items-center gap-1.5 border-border-subtle hover:bg-bg-elevated text-text-secondary hover:text-text-primary"
+          >
+            <Headphones className="h-3.5 w-3.5 text-accent-primary" />
+            <span>Audio Flashcards</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleStartMethod("local-ai")}
+            className="text-xs flex items-center gap-1.5 border-border-subtle hover:bg-bg-elevated text-text-secondary hover:text-text-primary"
+          >
+            <Bot className="h-3.5 w-3.5 text-accent-primary" />
+            <span>Tutor IA Local & Ollama</span>
           </Button>
         </div>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
-          {filteredMethods.map((m) => (
-            <Card
-              key={m.id}
-              className="flex flex-col justify-between hover:border-accent-primary/40 transition-colors cursor-pointer group"
-              onClick={() => setPreviewMethod(m)}
+      </section>
+
+      {/* 3. REPERTORIO METODOLÓGICO COMPLETO */}
+      <section className="space-y-4" aria-labelledby="catalog-section-title">
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between border-b border-border-subtle pb-3">
+          <div>
+            <h2 id="catalog-section-title" className="font-serif text-lg font-semibold text-text-primary">
+              Repertorio Metodológico
+            </h2>
+            <span className="text-xs text-text-muted">
+              {filteredMethods.length} de {allMethods.length} técnicas catalogadas
+            </span>
+          </div>
+
+          <div className="relative w-full sm:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-muted" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Buscar por nombre, objetivo o materia..."
+              className="w-full rounded border border-border-subtle bg-bg-secondary/60 pl-9 pr-3 py-1.5 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-colors"
+            />
+          </div>
+        </div>
+
+        {/* Filtros de Categoría y Estado */}
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-1.5">
+            {CATEGORIES.map((tab) => {
+              const count = tab.id === "all"
+                ? allMethods.length
+                : allMethods.filter((m) => m.category === tab.id).length;
+
+              const isSelected = selectedCategory === tab.id;
+
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setSelectedCategory(tab.id)}
+                  className={`rounded px-2.5 py-1 text-xs font-sans transition-colors cursor-pointer border ${
+                    isSelected
+                      ? "bg-accent-primary text-white border-accent-primary font-medium"
+                      : "bg-bg-elevated text-text-secondary border-border-subtle hover:text-text-primary hover:border-border-subtle/80"
+                  }`}
+                >
+                  {tab.label} <span className="opacity-75">({count})</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-text-muted text-[11px]">Disponibilidad:</span>
+            {[
+              { id: "all", label: `Todos (${allMethods.length})` },
+              { id: "ready", label: `Interactivos (${allMethods.filter(m => m.implemented).length})` },
+              { id: "preview", label: `Próximamente (${allMethods.filter(m => !m.implemented).length})` },
+            ].map((statusTab) => (
+              <button
+                key={statusTab.id}
+                type="button"
+                onClick={() => setSelectedStatus(statusTab.id as any)}
+                className={`px-2 py-0.5 rounded text-xs transition-colors cursor-pointer ${
+                  selectedStatus === statusTab.id
+                    ? "font-semibold text-accent-primary border-b border-accent-primary"
+                    : "text-text-muted hover:text-text-primary"
+                }`}
+              >
+                {statusTab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Lista Indexada Tipo Catálogo */}
+        {filteredMethods.length === 0 ? (
+          <div className="rounded border border-dashed border-border-subtle p-10 text-center">
+            <p className="text-sm text-text-muted">No se encontraron métodos con los filtros actuales.</p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSelectedCategory("all");
+                setSelectedStatus("all");
+                setSearchQuery("");
+              }}
+              className="mt-3 text-xs"
             >
-              <div>
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <Badge variant="accent">{CATEGORY_NAMES[m.category] || m.category}</Badge>
-                    <div className="flex items-center gap-1.5">
-                      {m.implemented ? (
-                        <Badge variant="success">Listo para Usar</Badge>
-                      ) : (
-                        <Badge variant="neutral">Próximamente</Badge>
-                      )}
-                    </div>
-                  </div>
-                  <CardTitle className="font-serif text-lg font-semibold text-text-primary mt-2 flex items-baseline justify-between gap-2">
-                    <span>{m.name}</span>
+              Restablecer Filtros
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {filteredMethods.map((m) => (
+              <div
+                key={m.id}
+                onClick={() => setPreviewMethod(m)}
+                className="group p-4 rounded-lg border border-border-subtle bg-bg-elevated hover:border-accent-primary/50 transition-colors cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4"
+              >
+                <div className="space-y-1 flex-1 min-w-0">
+                  <div className="flex items-center gap-2.5">
+                    <span className="font-serif text-base font-semibold text-text-primary group-hover:text-accent-primary transition-colors">
+                      {m.name}
+                    </span>
                     {m.nameEn && (
-                      <span className="font-sans text-xs font-normal text-text-muted truncate max-w-[200px]">
+                      <span className="text-xs text-text-muted truncate max-w-[200px]">
                         {m.nameEn}
                       </span>
                     )}
-                  </CardTitle>
-                </CardHeader>
-                <div className="px-6 py-1 space-y-2.5">
-                  <p className="font-sans text-xs text-text-secondary leading-relaxed line-clamp-3">
+                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-bg-secondary text-text-secondary border border-border-subtle">
+                      {CATEGORY_NAMES[m.category] || m.category}
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-text-secondary line-clamp-2 leading-relaxed">
                     {m.description}
                   </p>
 
-                  {/* Scientific Basis Snippet */}
                   {m.scientificBasis && (
-                    <div className="rounded bg-bg-secondary/70 border border-border-subtle/70 p-2 text-[11px] text-text-muted flex items-start gap-1.5">
-                      <Sparkles className="h-3 w-3 text-accent-primary shrink-0 mt-0.5" />
-                      <span className="line-clamp-1">{m.scientificBasis}</span>
-                    </div>
-                  )}
-
-                  {/* Best For Tags */}
-                  {m.bestFor && m.bestFor.length > 0 && (
-                    <div className="flex flex-wrap gap-1 pt-1">
-                      {m.bestFor.slice(0, 3).map((item, idx) => (
-                        <span
-                          key={idx}
-                          className="inline-flex items-center gap-1 rounded bg-bg-secondary px-2 py-0.5 text-[10px] text-text-muted border border-border-subtle/50"
-                        >
-                          <CheckCircle2 className="h-2.5 w-2.5 text-accent-secondary shrink-0" />
-                          <span className="truncate max-w-[130px]">{item}</span>
-                        </span>
-                      ))}
-                      {m.bestFor.length > 3 && (
-                        <span className="text-[10px] text-text-muted self-center">
-                          +{m.bestFor.length - 3} más
-                        </span>
-                      )}
-                    </div>
+                    <p className="text-[11px] text-text-muted line-clamp-1 italic">
+                      Base empírica: {m.scientificBasis}
+                    </p>
                   )}
                 </div>
-              </div>
 
-              <div className="border-t border-border-subtle px-6 py-3 flex flex-wrap items-center justify-between gap-2 bg-bg-secondary/20 mt-3">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-xs text-text-secondary group-hover:text-text-primary flex items-center gap-1.5"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setPreviewMethod(m);
-                  }}
-                >
-                  <Eye className="h-3.5 w-3.5" />
-                  <span>Ver Ficha Completa</span>
-                </Button>
-
-                <div className="flex items-center gap-2">
-                  {/* Contextual Quick Links for non-implemented or special methods */}
-                  {m.integratesWith?.includes("fsrs") && !m.implemented && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs flex items-center gap-1"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleContextualNav("fsrs", m.id);
-                      }}
-                    >
-                      <Cpu className="h-3 w-3 text-accent-primary" />
-                      <span>Usar con FSRS</span>
-                    </Button>
-                  )}
-
-                  {m.integratesWith?.includes("knowledge-graph") && !m.implemented && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs flex items-center gap-1"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleContextualNav("knowledge-graph", m.id);
-                      }}
-                    >
-                      <Layers className="h-3 w-3 text-accent-primary" />
-                      <span>Ver en Grafo</span>
-                    </Button>
-                  )}
+                <div className="flex items-center gap-2 shrink-0 self-end md:self-auto" onClick={(e) => e.stopPropagation()}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs text-text-secondary hover:text-text-primary"
+                    onClick={() => setPreviewMethod(m)}
+                  >
+                    <Eye className="h-3.5 w-3.5 mr-1" />
+                    <span>Ver Ficha</span>
+                  </Button>
 
                   {m.implemented ? (
                     <Button
                       variant="primary"
                       size="sm"
-                      className="text-xs flex items-center gap-1.5"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleStartMethod(m.id);
-                      }}
+                      className="text-xs flex items-center gap-1.5 cursor-pointer"
+                      onClick={() => handleStartMethod(m.id)}
                     >
                       <Play className="h-3 w-3 fill-current" />
-                      <span>Iniciar Sesión</span>
-                      <ArrowRight className="h-3 w-3" />
+                      <span>Iniciar Protocolo</span>
                     </Button>
-                  ) : null}
+                  ) : (
+                    m.integratesWith?.includes("fsrs") ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs cursor-pointer"
+                        onClick={() => handleContextualNav("fsrs", m.id)}
+                      >
+                        <Cpu className="h-3 w-3 mr-1 text-accent-primary" />
+                        <span>Abrir en FSRS</span>
+                      </Button>
+                    ) : null
+                  )}
                 </div>
               </div>
-            </Card>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </section>
 
       {/* Preview Modal */}
       <MethodPreviewModal
@@ -732,3 +834,4 @@ export const MethodsPage: React.FC = () => {
     </div>
   );
 };
+export default MethodsPage;

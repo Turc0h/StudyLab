@@ -41,7 +41,7 @@ export function parseTextIntakeRules(text: string): TextIntakeDraft {
     suggestedDate = tomorrow.toISOString().split("T")[0];
   } else {
     // Buscar patrón tipo DD/MM o DD-MM
-    const dateMatch = text.match(/\b(\d{1,2})[\/\-](\d{1,2})\b/);
+    const dateMatch = text.match(/\b(\d{1,2})[/-](\d{1,2})\b/);
     if (dateMatch) {
       const day = dateMatch[1].padStart(2, "0");
       const month = dateMatch[2].padStart(2, "0");

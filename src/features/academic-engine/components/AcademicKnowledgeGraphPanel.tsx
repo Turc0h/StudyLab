@@ -202,27 +202,27 @@ export const AcademicKnowledgeGraphPanel: React.FC<AcademicKnowledgeGraphPanelPr
 
   return (
     <div className="flex flex-col h-full gap-3 font-sans">
-      {/* Header with RPG Concept Purpose */}
-      <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-col gap-2">
+      {/* Header with Prerequisite Concept Purpose */}
+      <div className="p-3 rounded-xl bg-bg-surface-2 border border-border-hairline flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <span className="font-display font-bold text-xs uppercase tracking-wider text-cyan-300 flex items-center gap-1.5">
-            <Share2 className="w-3.5 h-3.5 text-cyan-400" />
+          <span className="font-display font-semibold text-xs text-text-primary flex items-center gap-1.5">
+            <Share2 className="w-3.5 h-3.5 text-accent-primary" />
             Mapa de Prerrequisitos Académicos
           </span>
-          <span className="text-[10px] font-mono text-slate-400">Ruta Crítica RPG</span>
+          <span className="text-[10px] font-mono text-text-tertiary">Ruta Crítica</span>
         </div>
-        <p className="text-[11px] text-slate-400 leading-relaxed">
-          Tu árbol de desbloqueo cognitivo: cada concepto avanzado exige consolidar previamente sus bases.
+        <p className="text-[11px] text-text-secondary leading-relaxed">
+          Árbol de articulación cognitiva: los conceptos avanzados requieren consolidar previamente sus bases.
         </p>
 
-        {/* RPG Legend */}
-        <div className="grid grid-cols-3 gap-1.5 pt-2 border-t border-slate-800 text-[10px] font-mono">
+        {/* Legend */}
+        <div className="grid grid-cols-3 gap-1.5 pt-2 border-t border-border-hairline text-[10px] font-mono">
           <div className="flex items-center gap-1 text-emerald-400">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
             <span>Dominado (≥80%)</span>
           </div>
-          <div className="flex items-center gap-1 text-cyan-400">
-            <span className="w-2 h-2 rounded-full bg-cyan-400" />
+          <div className="flex items-center gap-1 text-accent-primary">
+            <span className="w-2 h-2 rounded-full bg-accent-primary" />
             <span>Progreso (50-79%)</span>
           </div>
           <div className="flex items-center gap-1 text-rose-400">
@@ -239,10 +239,10 @@ export const AcademicKnowledgeGraphPanel: React.FC<AcademicKnowledgeGraphPanelPr
             key={dom}
             type="button"
             onClick={() => setFilterDomain(dom)}
-            className={`px-2.5 py-1 rounded-lg border transition-colors shrink-0 ${
+            className={`px-2.5 py-1 rounded-lg border transition-colors shrink-0 cursor-pointer ${
               filterDomain === dom
-                ? "bg-cyan-950/60 border-cyan-500/50 text-cyan-300 font-bold"
-                : "border-slate-800 text-slate-400 hover:bg-slate-900"
+                ? "bg-accent-primary/15 border-accent-primary/40 text-accent-primary font-medium"
+                : "border-border-hairline text-text-secondary hover:bg-bg-surface-3 hover:text-text-primary"
             }`}
           >
             {dom === "all" ? "Todos los Dominios" : dom.toUpperCase()}
@@ -259,20 +259,20 @@ export const AcademicKnowledgeGraphPanel: React.FC<AcademicKnowledgeGraphPanelPr
           const isCritical = r < 0.5;
           const isLocked = concept.isLockedByPrereq;
 
-          let cardBorder = "border-slate-800 bg-slate-900/50 hover:border-slate-700";
+          let cardBorder = "border-border-hairline bg-bg-surface-2 hover:bg-bg-surface-3";
           let badgeVariant: "success" | "accent" | "danger" | "warning" = "accent";
           let statusText = "En Progreso";
 
           if (isLocked) {
-            cardBorder = "border-amber-500/30 bg-amber-950/15 hover:border-amber-500/50";
+            cardBorder = "border-amber-500/30 bg-amber-500/10 hover:border-amber-500/50";
             badgeVariant = "warning";
             statusText = "Base Débil";
           } else if (isMastered) {
-            cardBorder = "border-emerald-500/30 bg-emerald-950/10 hover:border-emerald-500/50";
+            cardBorder = "border-emerald-500/30 bg-emerald-500/10 hover:border-emerald-500/50";
             badgeVariant = "success";
             statusText = "Dominado";
           } else if (isCritical) {
-            cardBorder = "border-rose-500/40 bg-rose-950/20 hover:border-rose-500/60";
+            cardBorder = "border-rose-500/40 bg-rose-500/10 hover:border-rose-500/60";
             badgeVariant = "danger";
             statusText = "Crítico";
           }
@@ -286,13 +286,13 @@ export const AcademicKnowledgeGraphPanel: React.FC<AcademicKnowledgeGraphPanelPr
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-1.5 min-w-0">
                   {isLocked ? (
-                    <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                    <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
                   ) : isMastered ? (
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                   ) : (
-                    <Unlock className="w-4 h-4 text-cyan-400 shrink-0" />
+                    <Unlock className="w-4 h-4 text-accent-primary shrink-0" />
                   )}
-                  <span className="font-display font-semibold text-xs text-slate-200 truncate">
+                  <span className="font-display font-medium text-xs text-text-primary truncate">
                     {concept.name}
                   </span>
                 </div>
@@ -302,32 +302,32 @@ export const AcademicKnowledgeGraphPanel: React.FC<AcademicKnowledgeGraphPanelPr
                 </Badge>
               </div>
 
-              <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+              <p className="text-[11px] text-text-secondary line-clamp-2 leading-relaxed">
                 {concept.description}
               </p>
 
               {/* Progress Bar and Retrievability */}
-              <div className="flex items-center gap-2 pt-1 border-t border-slate-800/60">
-                <div className="flex-1 bg-slate-950 rounded-full h-1.5 overflow-hidden border border-slate-800">
+              <div className="flex items-center gap-2 pt-1 border-t border-border-hairline">
+                <div className="flex-1 bg-bg-surface-1 rounded-full h-1.5 overflow-hidden border border-border-hairline">
                   <div
                     className={`h-full transition-all duration-300 ${
                       isMastered
-                        ? "bg-emerald-400"
+                        ? "bg-emerald-500"
                         : isInProgress
-                          ? "bg-cyan-400"
+                          ? "bg-accent-primary"
                           : "bg-rose-500"
                     }`}
                     style={{ width: `${Math.round(r * 100)}%` }}
                   />
                 </div>
-                <span className="font-mono text-[10px] text-slate-400 shrink-0">
+                <span className="font-mono text-[10px] text-text-tertiary shrink-0">
                   R = {(r * 100).toFixed(0)}%
                 </span>
               </div>
 
               {/* Unmet Prerequisites Warning */}
               {concept.isLockedByPrereq && concept.unmetPrereqs.length > 0 && (
-                <div className="text-[10px] font-mono text-rose-300 flex items-center gap-1 bg-rose-950/40 p-1.5 rounded border border-rose-800/40">
+                <div className="text-[10px] font-mono text-rose-300 flex items-center gap-1 bg-rose-500/10 p-1.5 rounded border border-rose-500/30">
                   <AlertTriangle className="w-3 h-3 text-rose-400 shrink-0" />
                   <span>Requiere consolidar: {concept.unmetPrereqs.join(", ")}</span>
                 </div>
@@ -342,34 +342,34 @@ export const AcademicKnowledgeGraphPanel: React.FC<AcademicKnowledgeGraphPanelPr
         <Modal
           open={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          title={`⚔️ Ruta Crítica: ${selectedConcept.name}`}
+          title={`Ruta Crítica: ${selectedConcept.name}`}
         >
           <div className="flex flex-col gap-3 font-sans text-xs">
-            <p className="text-slate-300 leading-relaxed font-mono text-[11px] bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+            <p className="text-text-secondary leading-relaxed font-mono text-[11px] bg-bg-surface-2 p-2.5 rounded-lg border border-border-hairline">
               {selectedConcept.description}
             </p>
 
             <div className="grid grid-cols-2 gap-2 font-mono text-[11px]">
-              <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
-                <span className="text-slate-400 text-[10px] block">Retención Actual R(t):</span>
-                <span className="text-cyan-400 text-sm font-bold">
+              <div className="p-2.5 rounded-lg bg-bg-surface-2 border border-border-hairline">
+                <span className="text-text-tertiary text-[10px] block">Retención Actual R(t):</span>
+                <span className="text-accent-primary text-sm font-bold">
                   {(selectedConcept.currentRetrievability * 100).toFixed(0)}%
                 </span>
               </div>
-              <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
-                <span className="text-slate-400 text-[10px] block">Estado de Dominio:</span>
-                <span className="text-slate-200 text-sm font-bold capitalize">
+              <div className="p-2.5 rounded-lg bg-bg-surface-2 border border-border-hairline">
+                <span className="text-text-tertiary text-[10px] block">Estado de Dominio:</span>
+                <span className="text-text-primary text-sm font-bold capitalize">
                   {selectedConcept.status}
                 </span>
               </div>
             </div>
 
             {selectedConcept.isLockedByPrereq && (
-              <div className="p-3 rounded-lg bg-amber-950/30 border border-amber-500/40 text-amber-200 text-[11px] flex flex-col gap-2">
+              <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] flex flex-col gap-2">
                 <div className="flex items-start gap-2">
                   <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                   <div>
-                    <strong className="block font-bold text-amber-300">Prerrequisito con Retención Baja</strong>
+                    <strong className="block font-bold text-amber-400">Prerrequisito con Retención Baja</strong>
                     Este concepto se fundamenta en: <span className="underline font-semibold">{selectedConcept.unmetPrereqs.join(", ")}</span> (R &lt; 50%).
                     CognitiveOS no te bloquea de forma rígida, pero la evidencia pedagógica demuestra que estudiar temas derivados sin asentar las bases incrementa los errores en un 60%.
                   </div>
@@ -377,7 +377,7 @@ export const AcademicKnowledgeGraphPanel: React.FC<AcademicKnowledgeGraphPanelPr
               </div>
             )}
 
-            <div className="pt-2 flex flex-wrap items-center justify-end gap-2 border-t border-slate-800">
+            <div className="pt-2 flex flex-wrap items-center justify-end gap-2 border-t border-border-hairline">
               <Button
                 variant="secondary"
                 size="sm"
@@ -410,7 +410,7 @@ export const AcademicKnowledgeGraphPanel: React.FC<AcademicKnowledgeGraphPanelPr
                 variant="primary"
                 size="sm"
                 onClick={handleStartExpress}
-                className="text-xs font-mono flex items-center gap-1.5 shadow-lg shadow-cyan-500/20"
+                className="text-xs font-mono flex items-center gap-1.5"
               >
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>

@@ -18,7 +18,9 @@ import {
   Volume2,
   Flame,
   Calendar,
+  Activity,
 } from "lucide-react";
+import { Dashboard as TelemetryDashboard } from "./Dashboard";
 import { StudyTipsWidget } from "../components/study-tips/StudyTipsWidget";
 import { CourseProgressCard } from "../components/progress/CourseProgressCard";
 import { DailyStudyRecommendationCard } from "../features/study-engine/components/DailyStudyRecommendationCard";
@@ -130,17 +132,38 @@ function DashboardSkeleton() {
 export const DashboardPage: React.FC = () => {
   const [sessions, setSessions] = useState<StudySession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<"hub" | "telemetry">("hub");
 
   useEffect(() => {
     let cancelled = false;
-    getStudySessions().then((data) => {
+    // Timeout de seguridad: nunca dejar la pantalla bloqueada en gris por más de 500ms
+    const safetyTimer = setTimeout(() => {
       if (!cancelled) {
-        setSessions(data);
         setIsLoading(false);
       }
-    });
+    }, 500);
+
+    getStudySessions()
+      .then((data) => {
+        if (!cancelled) {
+          setSessions(data || []);
+          setIsLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.warn("[DashboardPage] Fallback por error al cargar sesiones:", err);
+        if (!cancelled) {
+          setSessions([]);
+          setIsLoading(false);
+        }
+      })
+      .finally(() => {
+        clearTimeout(safetyTimer);
+      });
+
     return () => {
       cancelled = true;
+      clearTimeout(safetyTimer);
     };
   }, []);
 
@@ -213,14 +236,46 @@ export const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Onboarding para estudiantes nuevos sin datos */}
-      <OnboardingWelcomeCard />
+      {/* Selector de Pestañas Universitario */}
+      <div className="flex items-center gap-1.5 p-1 rounded-lg border border-border-hairline bg-bg-surface-2 self-start">
+        <button
+          type="button"
+          onClick={() => setActiveTab("hub")}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-sans transition-colors cursor-pointer ${
+            activeTab === "hub"
+              ? "bg-bg-surface-1 text-text-primary shadow-xs font-medium"
+              : "text-text-muted hover:text-text-primary"
+          }`}
+        >
+          <BookOpen className="h-3.5 w-3.5" />
+          <span>Hub de Estudio</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("telemetry")}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-sans transition-colors cursor-pointer ${
+            activeTab === "telemetry"
+              ? "bg-bg-surface-1 text-text-primary shadow-xs font-medium"
+              : "text-text-muted hover:text-text-primary"
+          }`}
+        >
+          <Activity className="h-3.5 w-3.5" />
+          <span>Telemetría y Control Cognitivo</span>
+        </button>
+      </div>
 
-      {/* Fila Superior: Métricas Clave Limpias (Sin gráficos pesados) */}
-      <div className="flex items-center justify-between px-1">
-        <span className="font-mono text-xs text-text-tertiary uppercase tracking-wider">
-          Métricas de Aprendizaje
-        </span>
+      {activeTab === "telemetry" ? (
+        <TelemetryDashboard />
+      ) : (
+        <>
+          {/* Onboarding para estudiantes nuevos sin datos */}
+          <OnboardingWelcomeCard />
+
+          {/* Fila Superior: Métricas Clave Limpias (Sin gráficos pesados) */}
+          <div className="flex items-center justify-between px-1">
+            <span className="font-mono text-xs text-text-tertiary">
+              Métricas de aprendizaje
+            </span>
         <PanelGuide
           id="study-metrics"
           title="Métricas de Esfuerzo y Retención"
@@ -482,6 +537,8 @@ export const DashboardPage: React.FC = () => {
           </Card>
         </div>
       </div>
+        </>
+      )}
     </motion.div>
   )}
 </AnimatePresence>

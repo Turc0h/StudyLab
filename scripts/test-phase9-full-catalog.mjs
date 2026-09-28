@@ -48,6 +48,19 @@ assert(desFile.includes("testedRetention"), "Mide la retención real comprobada 
 assert(desFile.includes("Efecto Bjork confirmado"), "Verifica la correlación paradójica alta fricción = alta retención");
 assert(desFile.includes('methodId: "desirable-difficulties"'), "Guarda sesión con methodId: 'desirable-difficulties'");
 
+// Importación y validación funcional real de persistencia
+import {
+  DEFAULT_BARRIERS,
+  DEFAULT_DESIRABLE_TOPIC,
+  buildDesirableDifficultiesId,
+} from "../src/features/study-methods/desirableDifficultiesStorage.ts";
+
+assert(DEFAULT_BARRIERS.length === 4, "DEFAULT_BARRIERS exporta 4 palancas reales");
+assert(typeof DEFAULT_DESIRABLE_TOPIC === "string" && DEFAULT_DESIRABLE_TOPIC.length > 5, "Eje temático por defecto definido");
+assert(buildDesirableDifficultiesId("med_1") === "desirable_diff_config_med_1", "Aislamiento por carpeta validado");
+assert(desFile.includes("saveDesirableDifficultiesConfig"), "Conecta con saveDesirableDifficultiesConfig");
+assert(desFile.includes("getDesirableDifficultiesConfig"), "Conecta con getDesirableDifficultiesConfig");
+
 // -----------------------------------------------------------------------------
 // Test 3: Runner de Principio de Segmentación (SegmentationPrincipleMethod.tsx)
 // -----------------------------------------------------------------------------

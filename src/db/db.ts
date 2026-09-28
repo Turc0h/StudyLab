@@ -315,6 +315,55 @@ export interface ContextTimeBlockRecord {
   createdAt: number;
 }
 
+export interface SavedBlackboardRecord {
+  id: string;
+  title: string;
+  subjectFolderId?: string | null;
+  compressedPayload: string;
+  strokeCount: number;
+  pointCount: number;
+  surfaceTheme: "chalkboard" | "notebook";
+  previewDataUrl?: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface ChunkGroup {
+  id: string;
+  name: string;
+  mnemonicTag: string;
+  items: string[];
+}
+
+export interface ChunkingSetRecord {
+  id: string;
+  subjectFolderId?: string | null;
+  topic: string;
+  chunks: ChunkGroup[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface FrictionBarrier {
+  id: string;
+  title: string;
+  scientificMechanism: string;
+  practicalAction: string;
+  enabled: boolean;
+}
+
+export interface DesirableDifficultiesConfigRecord {
+  id: string;
+  subjectFolderId?: string | null;
+  topic: string;
+  barriers: FrictionBarrier[];
+  perceivedFluency: number;
+  testedRetention: number;
+  sessionNotes: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
 const db = new Dexie("studylab") as Dexie & {
   folders: EntityTable<FolderRecord, "id">;
   files: EntityTable<FileRecord, "id">;
@@ -341,6 +390,9 @@ const db = new Dexie("studylab") as Dexie & {
   studyMethods: EntityTable<StudyMethod, "id">;
   contextProjects: EntityTable<ContextProjectRecord, "id">;
   contextTimeBlocks: EntityTable<ContextTimeBlockRecord, "id">;
+  blackboards: EntityTable<SavedBlackboardRecord, "id">;
+  chunkingSets: EntityTable<ChunkingSetRecord, "id">;
+  desirableDifficultiesConfigs: EntityTable<DesirableDifficultiesConfigRecord, "id">;
 };
 
 export type StudentErrorCategory =
@@ -439,6 +491,17 @@ db.version(6).stores({
   studyMethods: "id, category, implemented",
   contextProjects: "id, name, status, createdAt",
   contextTimeBlocks: "id, projectId, isConfirmed, dayOfWeek",
+});
+
+// v7 — Pizarra Virtual Acelerada en Rust: Almacenamiento binario delta y miniaturas
+db.version(7).stores({
+  blackboards: "id, title, subjectFolderId, createdAt, updatedAt",
+});
+
+// v8 — Persistencia relacional de métodos cognitivos vinculados a materias (Chunking y Dificultades Deseables)
+db.version(8).stores({
+  chunkingSets: "id, subjectFolderId, topic, updatedAt",
+  desirableDifficultiesConfigs: "id, subjectFolderId, topic, updatedAt",
 });
 
 // Sembrado automático idempotente al inicializar la base de datos

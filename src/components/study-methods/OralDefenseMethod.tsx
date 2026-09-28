@@ -16,22 +16,63 @@ import {
   Mic,
   MicOff,
   Clock,
-  CheckCircle2,
   AlertCircle,
   RotateCcw,
   Sparkles,
-  ArrowRight,
   UserCheck,
-  Award,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+import { RubricScorer, type RubricDimension } from "../shells";
 
 export interface OralDefenseMethodProps {
   onSessionFinished?: () => void;
 }
 
 type Phase = "setup" | "exposition" | "questions" | "rubric";
+
+const ORAL_RUBRIC_DIMENSIONS: RubricDimension[] = [
+  {
+    id: "conceptualMastery",
+    name: "1. Dominio Conceptual & Deducción Teórica",
+    description: "Explicación de leyes de base sin memoria mecánica.",
+    min: 1,
+    max: 5,
+    levelLabels: { 1: "Insuficiente", 3: "Aceptable", 5: "Magistral" },
+  },
+  {
+    id: "terminologyRigor",
+    name: "2. Rigor Terminológico y Ausencia de Muletillas",
+    description: "Precisión de vocabulario disciplinar y elocuencia técnica.",
+    min: 1,
+    max: 5,
+    levelLabels: { 1: "Vago/Coloquial", 3: "Técnico", 5: "Preciso/Erudito" },
+  },
+  {
+    id: "timeManagement",
+    name: "3. Manejo del Tiempo y Estructura Discursiva",
+    description: "Ajuste al límite temporal con inicio, desarrollo y cierre.",
+    min: 1,
+    max: 5,
+    levelLabels: { 1: "Desbordado", 3: "Ajustado", 5: "Estructura Impecable" },
+  },
+  {
+    id: "objectionHandling",
+    name: "4. Solvencia ante Objeciones y Repreguntas",
+    description: "Respuesta consistente ante casos de borde y contraejemplos.",
+    min: 1,
+    max: 5,
+    levelLabels: { 1: "Titubeo severo", 3: "Defensa básica", 5: "Desmanteló objeción" },
+  },
+  {
+    id: "calmPoise",
+    name: "5. Serenidad, Convicción y Presencia Escénica",
+    description: "Firmeza en la exposición y solvencia ante la mesa evaluadora.",
+    min: 1,
+    max: 5,
+    levelLabels: { 1: "Ansiedad visible", 3: "Aplomo", 5: "Convicción absoluta" },
+  },
+];
 
 export const OralDefenseMethod: React.FC<OralDefenseMethodProps> = ({ onSessionFinished }) => {
   const [phase, setPhase] = useState<Phase>("setup");
@@ -74,7 +115,10 @@ export const OralDefenseMethod: React.FC<OralDefenseMethodProps> = ({ onSessionF
 
   // Iniciar la exposición oral
   const handleStartExposition = () => {
-    const finalTopic = topic.trim() || (selectedFolderId ? folders.find((f) => f.id === selectedFolderId)?.name : "Tema de Cátedra") || "Exposición de Cátedra";
+    const finalTopic =
+      topic.trim() ||
+      (selectedFolderId ? folders.find((f) => f.id === selectedFolderId)?.name : "Tema de Cátedra") ||
+      "Exposición de Cátedra";
     const relevantConceptNames = concepts.slice(0, 5).map((c) => c.name);
 
     const generated = generateJuryQuestions(finalTopic, relevantConceptNames, questionCount);
@@ -130,7 +174,6 @@ export const OralDefenseMethod: React.FC<OralDefenseMethodProps> = ({ onSessionF
       setCurrentQuestionIdx(nextIdx);
       setQuestionTimer(questions[nextIdx]?.recommendedTimeSec || 90);
     } else {
-      // Pasar a la rúbrica
       const result = calculateOralRubricScore(rubricScores);
       setEvalResult(result);
       setPhase("rubric");
@@ -212,23 +255,23 @@ export const OralDefenseMethod: React.FC<OralDefenseMethodProps> = ({ onSessionF
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 p-4">
-      {/* 1. SETUP DE EXPOSICIÓN */}
+      {/* 1. SETUP DE EXPOSICIÓN — ACTA DE MESA EXAMINADORA */}
       {phase === "setup" && (
-        <Card className="border-indigo-500/30 bg-slate-900/90 shadow-2xl backdrop-blur-md">
-          <CardHeader className="border-b border-slate-800 pb-4">
+        <Card className="border border-border-hairline bg-bg-surface-1 shadow-sm">
+          <CardHeader className="border-b border-border-hairline pb-4 bg-bg-surface-2/40 px-6 py-4 rounded-t-xl">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-400 ring-1 ring-indigo-500/40">
-                <Mic className="h-6 w-6" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border-hairline bg-bg-surface-2 text-text-primary">
+                <Mic className="h-5 w-5" />
               </div>
               <div>
-                <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
+                <CardTitle className="text-lg font-serif font-bold text-text-primary flex items-center gap-2.5">
                   Simulador de Coloquios y Exámenes Orales
-                  <Badge variant="neutral" className="text-xs uppercase tracking-wider">
-                    Defensa de Cátedra
-                  </Badge>
+                  <span className="font-mono text-[11px] px-2 py-0.5 rounded border border-border-hairline bg-bg-surface-2 text-text-secondary font-normal">
+                    Acta de Coloquio
+                  </span>
                 </CardTitle>
-                <p className="text-xs text-slate-400 mt-1">
-                  Entrena la elocuencia, estructura temporal y capacidad de respuesta ante objeciones docentes bajo condiciones reales de mesa examinadora.
+                <p className="text-xs text-text-secondary mt-0.5 font-sans">
+                  Protocolo de disertación académica, control de cadencia discursiva y resolución de objeciones docentes ante mesa examinadora.
                 </p>
               </div>
             </div>
@@ -237,93 +280,93 @@ export const OralDefenseMethod: React.FC<OralDefenseMethodProps> = ({ onSessionF
           <div className="p-6 space-y-6">
             {/* Materia y Tema */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-200">Materia o Cátedra:</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono font-medium text-text-secondary">Cátedra o Asignatura:</label>
                 <select
                   value={selectedFolderId}
                   onChange={(e) => setSelectedFolderId(e.target.value)}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-800/90 px-3.5 py-2 text-sm text-slate-100 focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-lg border border-border-hairline bg-bg-surface-2 px-3 py-2 text-xs text-text-primary focus:border-border-active focus:outline-hidden"
                 >
-                  <option value="">Seleccionar materia (opcional)</option>
+                  <option value="">Seleccionar cátedra (opcional)</option>
                   {folders.map((f) => (
                     <option key={f.id} value={f.id}>
-                      📁 {f.name}
+                      {f.name}
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-200">Tema o Tesis a Exponer:</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono font-medium text-text-secondary">Tesis Central o Tema a Defender:</label>
                 <input
                   type="text"
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
                   placeholder="Ej: Principio de Bernoulli y sustentación aerodinámica..."
-                  className="w-full rounded-lg border border-slate-700 bg-slate-800/90 px-3.5 py-2 text-sm text-slate-100 focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-lg border border-border-hairline bg-bg-surface-2 px-3 py-2 text-xs text-text-primary focus:border-border-active focus:outline-hidden"
                 />
               </div>
             </div>
 
             {/* Duración de la Exposición */}
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-200">Tiempo de Exposición Formal:</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-mono font-medium text-text-secondary">Pauta Temporal de Exposición:</label>
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { min: 3, label: "3 min (Flash)", desc: "Síntesis extrema de coloquio" },
+                  { min: 3, label: "3 min (Síntesis)", desc: "Coloquio rápido de regularidad" },
                   { min: 5, label: "5 min (Estándar)", desc: "Examen final universitario" },
-                  { min: 10, label: "10 min (Defensa)", desc: "Tesina o proyecto integrador" },
+                  { min: 10, label: "10 min (Defensa)", desc: "Proyecto integrador o tesina" },
                 ].map((item) => (
                   <button
                     key={item.min}
                     type="button"
                     onClick={() => setExpoMinutes(item.min)}
-                    className={`flex flex-col items-center justify-center rounded-lg border p-3 transition-all ${
+                    className={`flex flex-col items-center justify-center rounded-lg border p-3 transition-colors cursor-pointer text-left ${
                       expoMinutes === item.min
-                        ? "border-indigo-500 bg-indigo-500/10 text-indigo-300 ring-1 ring-indigo-500/50"
-                        : "border-slate-800 bg-slate-800/40 text-slate-400 hover:border-slate-700 hover:text-slate-200"
+                        ? "border-border-active bg-bg-surface-3 text-text-primary font-medium"
+                        : "border-border-hairline bg-bg-surface-2 text-text-secondary hover:text-text-primary hover:bg-bg-surface-3"
                     }`}
                   >
-                    <span className="text-sm font-bold">{item.label}</span>
-                    <span className="text-[10px] text-slate-400 mt-0.5">{item.desc}</span>
+                    <span className="text-xs font-bold font-mono">{item.label}</span>
+                    <span className="text-[10px] text-text-tertiary mt-0.5">{item.desc}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Ficha de Ponencia / Tarjeta de Memoria */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-semibold text-slate-200">
-                  Ficha de Ponencia (Notas permitidas en mesa):
+                <label className="text-xs font-mono font-medium text-text-secondary">
+                  Ficha de Ponencia (Tarjeta de memoria en atril):
                 </label>
-                <span className="text-[11px] text-slate-400">Máx 5 viñetas guía (palabras clave)</span>
+                <span className="text-[10px] font-mono text-text-tertiary">Guía de conceptos clave (máx. 5 ítems)</span>
               </div>
               <textarea
                 rows={3}
                 value={cheatSheetNotes}
                 onChange={(e) => setCheatSheetNotes(e.target.value)}
-                placeholder="• Definición y ecuación gobernante&#10;• Hipótesis de fluido incompresible&#10;• Analogía del tubo Venturi&#10;• Límites en flujo supersónico"
-                className="w-full rounded-lg border border-slate-700 bg-slate-800/90 p-3 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none font-mono"
+                placeholder="• Definición formal y ecuación de estado&#10;• Hipótesis de validez física&#10;• Contraejemplo de borde&#10;• Aplicación en ingeniería"
+                className="w-full rounded-lg border border-border-hairline bg-bg-surface-2 p-3 text-xs text-text-primary placeholder:text-text-tertiary focus:border-border-active focus:outline-hidden font-mono"
               />
             </div>
 
             {/* Cantidad de Preguntas del Tribunal */}
-            <div className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-800/40 p-4">
+            <div className="flex items-center justify-between rounded-lg border border-border-hairline bg-bg-surface-2/60 p-3.5">
               <div>
-                <div className="text-sm font-semibold text-slate-200">Preguntas del Tribunal Docente:</div>
-                <div className="text-xs text-slate-400">Rondas de contra-preguntas de profesores tras la exposición</div>
+                <div className="text-xs font-semibold text-text-primary">Miembros de la Mesa Examinadora:</div>
+                <div className="text-[11px] text-text-secondary">Intervenciones docentes planificadas tras la disertación</div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 {[2, 3, 4].map((n) => (
                   <button
                     key={n}
                     type="button"
                     onClick={() => setQuestionCount(n)}
-                    className={`h-8 w-10 rounded font-bold text-xs ${
+                    className={`h-7 w-8 rounded text-xs font-mono font-semibold transition-colors cursor-pointer ${
                       questionCount === n
-                        ? "bg-indigo-600 text-white"
-                        : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                        ? "bg-text-primary text-text-inverted"
+                        : "bg-bg-surface-1 border border-border-hairline text-text-secondary hover:text-text-primary"
                     }`}
                   >
                     {n}
@@ -333,16 +376,17 @@ export const OralDefenseMethod: React.FC<OralDefenseMethodProps> = ({ onSessionF
             </div>
 
             {/* Botón de Inicio */}
-            <div className="flex items-center justify-between pt-2">
-              <Button variant="ghost" onClick={onSessionFinished} className="text-slate-400">
+            <div className="flex items-center justify-between pt-2 border-t border-border-hairline">
+              <Button variant="ghost" onClick={onSessionFinished} className="text-xs text-text-secondary hover:text-text-primary">
                 Volver al catálogo
               </Button>
               <Button
                 onClick={handleStartExposition}
-                className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-2.5 shadow-lg shadow-indigo-950/40 flex items-center gap-2"
+                variant="primary"
+                className="text-xs font-mono px-5 py-2 flex items-center gap-2"
               >
-                <Mic className="h-4 w-4" />
-                Comenzar Exposición Oral
+                <Mic className="h-3.5 w-3.5" />
+                Iniciar Disertación de Cátedra
               </Button>
             </div>
           </div>
@@ -352,79 +396,79 @@ export const OralDefenseMethod: React.FC<OralDefenseMethodProps> = ({ onSessionF
       {/* 2. EXPOSICIÓN ORAL EN VIVO */}
       {phase === "exposition" && (
         <div className="space-y-4">
-          <Card className="border-indigo-500/40 bg-slate-900/95 shadow-2xl">
-            <CardHeader className="border-b border-slate-800 pb-4">
+          <Card className="border border-border-hairline bg-bg-surface-1 shadow-sm">
+            <CardHeader className="border-b border-border-hairline pb-4 bg-bg-surface-2/40 px-6 py-4 rounded-t-xl">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Badge variant="accent" className="bg-indigo-600 text-white font-mono">
-                    FASE 1: EXPOSICIÓN DEL TEMA
+                <div className="flex items-center gap-2.5">
+                  <Badge variant="neutral" className="font-mono text-xs">
+                    FASE 1: EXPOSICIÓN
                   </Badge>
-                  <span className="text-xs text-slate-400 font-semibold">{topic || "Exposición"}</span>
+                  <span className="text-xs text-text-secondary font-medium font-serif">{topic || "Exposición de Cátedra"}</span>
                 </div>
 
-                {/* Temporizador Regresivo */}
+                {/* Temporizador Regresivo Sobrio */}
                 <div
-                  className={`flex items-center gap-2 font-mono text-xl font-black px-4 py-1.5 rounded-lg border ${
+                  className={`flex items-center gap-2 font-mono text-base font-bold px-3 py-1 rounded-lg border ${
                     timeRemaining <= 60
-                      ? "border-amber-500/60 bg-amber-950/40 text-amber-400 animate-pulse"
-                      : "border-slate-700 bg-slate-800 text-indigo-400"
+                      ? "border-red-800/40 bg-red-950/20 text-red-400"
+                      : "border-border-hairline bg-bg-surface-2 text-text-primary"
                   }`}
                 >
-                  <Clock className="h-5 w-5" />
+                  <Clock className="h-4 w-4 text-text-tertiary" />
                   <span>{formatTime(timeRemaining)}</span>
                 </div>
               </div>
             </CardHeader>
 
             <div className="p-8 space-y-6 text-center">
-              <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-indigo-500/10 text-indigo-400 ring-4 ring-indigo-500/30">
-                <Mic className="h-10 w-10 animate-pulse" />
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-border-hairline bg-bg-surface-2 text-text-primary">
+                <Mic className="h-7 w-7 text-text-secondary" />
               </div>
 
               <div>
-                <h3 className="text-xl font-bold text-white">Diserta con voz clara y proyección firme</h3>
-                <p className="text-xs text-slate-400 max-w-md mx-auto mt-2 leading-relaxed">
-                  Imagina al tribunal docente frente a ti. Estructura tu relato: introduce la tesis central, demuestra las deducciones de base y anticipa las limitaciones prácticas.
+                <h3 className="text-lg font-serif font-bold text-text-primary">Disertación en Curso</h3>
+                <p className="text-xs text-text-secondary max-w-md mx-auto mt-1.5 leading-relaxed font-sans">
+                  Dirígete a la mesa con claridad y precisión terminológica. Introduce la hipótesis de partida, desglosa el aparato analítico y cierra con las implicancias del caso.
                 </p>
               </div>
 
               {/* Dictado y telemetría de habla */}
-              <div className="flex items-center justify-center gap-4 pt-2">
+              <div className="flex items-center justify-center gap-3 pt-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={toggleSpeechRecognition}
-                  className={`text-xs flex items-center gap-1.5 ${
+                  className={`text-xs flex items-center gap-1.5 font-mono ${
                     isListening
-                      ? "border-red-500 text-red-400 bg-red-950/20"
-                      : "border-slate-700 text-slate-300"
+                      ? "border-red-800 text-red-400 bg-red-950/20"
+                      : "border-border-hairline text-text-secondary hover:text-text-primary"
                   }`}
                 >
                   {isListening ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
-                  <span>{isListening ? "Detener Transcripción" : "Medir Ritmo de Habla (Voz)"}</span>
+                  <span>{isListening ? "Detener Transcripción" : "Medir Cadencia de Habla (Voz)"}</span>
                 </Button>
 
                 {spokenWordCount > 0 && (
-                  <Badge variant="neutral" className="text-xs font-mono">
-                    {spokenWordCount} palabras emitidas (~{Math.round((spokenWordCount / Math.max(1, (expoMinutes * 60 - timeRemaining) / 60)))} ppm)
-                  </Badge>
+                  <span className="text-xs font-mono px-2.5 py-1 rounded border border-border-hairline bg-bg-surface-2 text-text-secondary">
+                    {spokenWordCount} palabras (~{Math.round((spokenWordCount / Math.max(1, (expoMinutes * 60 - timeRemaining) / 60)))} ppm)
+                  </span>
                 )}
               </div>
 
               {/* Ficha de Ponencia Desplegable */}
               {cheatSheetNotes && (
-                <div className="pt-4 max-w-lg mx-auto text-left">
+                <div className="pt-3 max-w-lg mx-auto text-left">
                   <button
                     type="button"
                     onClick={() => setIsCheatSheetVisible(!isCheatSheetVisible)}
-                    className="flex items-center justify-between w-full p-2.5 rounded-lg border border-slate-800 bg-slate-800/40 text-xs text-slate-300 hover:text-white"
+                    className="flex items-center justify-between w-full p-2.5 rounded-lg border border-border-hairline bg-bg-surface-2 text-xs text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
                   >
-                    <span>Ficha de Ponencia (Tu tarjeta de apoyo)</span>
-                    {isCheatSheetVisible ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    <span className="font-mono text-[11px]">Ficha de Ponencia (Notas de atril)</span>
+                    {isCheatSheetVisible ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
                   </button>
 
                   {isCheatSheetVisible && (
-                    <div className="rounded-b-lg border-x border-b border-slate-800 bg-slate-950/60 p-4 text-xs font-mono text-indigo-300 whitespace-pre-line">
+                    <div className="rounded-b-lg border-x border-b border-border-hairline bg-bg-surface-1 p-3.5 text-xs font-mono text-text-primary whitespace-pre-line leading-relaxed">
                       {cheatSheetNotes}
                     </div>
                   )}
@@ -432,224 +476,136 @@ export const OralDefenseMethod: React.FC<OralDefenseMethodProps> = ({ onSessionF
               )}
             </div>
 
-            <div className="border-t border-slate-800 p-4 bg-slate-950/60 flex items-center justify-between rounded-b-xl">
+            <div className="border-t border-border-hairline p-4 bg-bg-surface-2/40 flex items-center justify-between rounded-b-xl">
               <Button
                 variant="ghost"
                 onClick={() => setIsTimerRunning(!isTimerRunning)}
-                className="text-xs text-slate-400"
+                className="text-xs font-mono text-text-secondary hover:text-text-primary"
               >
                 {isTimerRunning ? "Pausar Cronómetro" : "Reanudar"}
               </Button>
               <Button
                 onClick={handleProceedToQuestions}
-                className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 px-5 flex items-center gap-2"
+                variant="primary"
+                className="text-xs font-mono py-2 px-4 flex items-center gap-1.5"
               >
-                <span>Concluir Exposición y Recibir Preguntas</span>
-                <ArrowRight className="h-4 w-4" />
+                <span>Concluir Exposición y Abrir Debate</span>
               </Button>
             </div>
           </Card>
         </div>
       )}
 
-      {/* 3. PREGUNTAS DEL TRIBUNAL */}
+      {/* 3. PREGUNTAS DEL TRIBUNAL — DEBATE CON LA MESA */}
       {phase === "questions" && questions[currentQuestionIdx] && (
-        <Card className="border-amber-500/30 bg-slate-900/95 shadow-2xl">
-          <CardHeader className="border-b border-slate-800 pb-4">
+        <Card className="border border-border-hairline bg-bg-surface-1 shadow-sm">
+          <CardHeader className="border-b border-border-hairline pb-4 bg-bg-surface-2/40 px-6 py-4 rounded-t-xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Badge variant="warning" className="font-mono text-xs">
+                <Badge variant="neutral" className="font-mono text-xs">
                   FASE 2: MESA EXAMINADORA
                 </Badge>
-                <span className="text-xs text-slate-400">
-                  Pregunta <span className="font-bold text-white">{currentQuestionIdx + 1}</span> de {questions.length}
+                <span className="text-xs font-mono text-text-secondary">
+                  Intervención {currentQuestionIdx + 1} de {questions.length}
                 </span>
               </div>
 
-              <div className="flex items-center gap-2 font-mono text-sm font-bold text-amber-400 bg-amber-950/30 border border-amber-500/30 px-3 py-1 rounded-lg">
-                <Clock className="h-4 w-4" />
+              <div className="flex items-center gap-1.5 font-mono text-xs font-medium text-text-secondary border border-border-hairline bg-bg-surface-2 px-2.5 py-1 rounded">
+                <Clock className="h-3.5 w-3.5 text-text-tertiary" />
                 <span>{questionTimer}s sugeridos</span>
               </div>
             </div>
           </CardHeader>
 
           <div className="p-8 space-y-6">
-            {/* Personaje del Tribunal */}
-            <div className="flex items-center gap-3 rounded-lg border border-slate-800 bg-slate-800/40 p-3.5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/20 text-amber-400">
-                <UserCheck className="h-5 w-5" />
+            {/* Jurado Docente */}
+            <div className="flex items-center gap-3 rounded-lg border border-border-hairline bg-bg-surface-2/50 p-3.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-border-hairline bg-bg-surface-1 text-text-primary">
+                <UserCheck className="h-4 w-4" />
               </div>
               <div>
-                <div className="text-sm font-bold text-slate-200">
+                <div className="text-xs font-bold font-serif text-text-primary">
                   {questions[currentQuestionIdx].roleTitle}
                 </div>
-                <div className="text-xs text-slate-400">
-                  Intención docente: {questions[currentQuestionIdx].intentLabel}
+                <div className="text-[11px] font-sans text-text-secondary">
+                  Enfoque: {questions[currentQuestionIdx].intentLabel}
                 </div>
               </div>
             </div>
 
-            {/* Pregunta */}
-            <div className="rounded-xl border border-amber-500/40 bg-amber-950/20 p-6 space-y-3">
-              <div className="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                <AlertCircle className="h-4 w-4" />
-                Intervención de la Mesa:
+            {/* Intervención del Docente */}
+            <div className="rounded-lg border border-border-hairline bg-bg-surface-2 p-5 space-y-2">
+              <div className="text-[11px] font-mono font-medium text-text-secondary flex items-center gap-1.5">
+                <AlertCircle className="h-3.5 w-3.5 text-text-tertiary" />
+                Intervención de la Cátedra:
               </div>
-              <div className="text-lg font-medium text-slate-100 leading-relaxed">
+              <div className="text-base font-serif text-text-primary leading-relaxed">
                 "{questions[currentQuestionIdx].question}"
               </div>
             </div>
 
-            <div className="text-xs text-slate-400 text-center leading-relaxed max-w-md mx-auto">
-              Responde en voz alta sin apresurarte. Si te plantean una hipótesis errónea o trampa, señala con cortesía y rigor por qué no aplica al caso.
+            {/* Pauta Pedagógica Formal */}
+            <div className="text-[11px] font-sans text-text-tertiary text-center leading-relaxed max-w-md mx-auto border-t border-border-hairline pt-3">
+              Responde con serenidad y rigor formal. Si la cátedra introduce una hipótesis contradictoria, desmantélala fundamentando en los principios axiomáticos de la disciplina.
             </div>
           </div>
 
-          <div className="border-t border-slate-800 p-4 bg-slate-950/60 flex items-center justify-between rounded-b-xl">
-            <span className="text-xs text-slate-500 font-mono">
-              Objeción {currentQuestionIdx + 1} / {questions.length}
+          <div className="border-t border-border-hairline p-4 bg-bg-surface-2/40 flex items-center justify-between rounded-b-xl">
+            <span className="text-xs font-mono text-text-tertiary">
+              Intervención {currentQuestionIdx + 1} de {questions.length}
             </span>
             <Button
               onClick={handleNextQuestion}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 px-5 flex items-center gap-2"
+              variant="primary"
+              className="text-xs font-mono py-2 px-4 flex items-center gap-1.5"
             >
               <span>
                 {currentQuestionIdx + 1 < questions.length
-                  ? "Siguiente Pregunta del Tribunal"
-                  : "Pasar a Rúbrica y Veredicto"}
+                  ? "Siguiente Miembro del Tribunal"
+                  : "Cerrar Coloquio y Dictamen"}
               </span>
-              <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
         </Card>
       )}
-
-      {/* 4. RÚBRICA Y VEREDICTO FINAL */}
+      {/* 4. RÚBRICA Y VEREDICTO FINAL — ACTA DE CALIFICACIÓN */}
       {phase === "rubric" && evalResult && (
-        <Card className="border-indigo-500/40 bg-slate-900/90 shadow-2xl backdrop-blur-md">
-          <CardHeader className="border-b border-slate-800 pb-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-400 ring-1 ring-indigo-500/40">
-                  <Award className="h-6 w-6" />
-                </div>
-                <div>
-                  <CardTitle className="text-xl font-bold text-white">
-                    Rúbrica de Evaluación Oral Universitaria
-                  </CardTitle>
-                  <p className="text-xs text-slate-400 mt-1">
-                    Califica con honestidad cada dimensión para computar tu veredicto de cátedra sobre 10 puntos.
-                  </p>
-                </div>
-              </div>
-
-              {/* Nota Final */}
-              <div className="text-right">
-                <div className="text-3xl font-black text-white font-mono">{evalResult.finalGrade.toFixed(1)}</div>
-                <Badge
-                  variant={
-                    evalResult.status === "reprobado"
-                      ? "danger"
-                      : evalResult.status === "aprobado"
-                      ? "warning"
-                      : "success"
-                  }
-                  className="text-xs"
-                >
-                  {evalResult.statusLabel}
-                </Badge>
-              </div>
+        <RubricScorer
+          title="Acta de Evaluación del Coloquio"
+          subtitle="Cómputo formal de rúbrica en las cinco dimensiones canónicas de la disertación oral."
+          badgeText="Simulación de Mesa Examinadora"
+          scaleType="ten_point"
+          dimensions={ORAL_RUBRIC_DIMENSIONS}
+          scores={rubricScores as unknown as Record<string, number>}
+          onChangeScores={(newScores) => {
+            for (const [k, v] of Object.entries(newScores)) {
+              if (v !== rubricScores[k as keyof OralRubricScores]) {
+                handleScoreChange(k as keyof OralRubricScores, v);
+              }
+            }
+          }}
+          onSave={handleFinishAndSave}
+          saveLabel="Homologar en Expediente"
+          actionsSlot={() => (
+            <Button
+              variant="outline"
+              onClick={() => setPhase("setup")}
+              className="text-xs font-mono border-border-hairline text-text-secondary hover:text-text-primary flex items-center gap-1.5"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              Nuevo Coloquio
+            </Button>
+          )}
+        >
+          {/* Dictamen Pedagógico */}
+          <div className="rounded-lg border border-border-hairline bg-bg-surface-2 p-4 text-xs text-text-secondary leading-relaxed space-y-1">
+            <div className="font-semibold font-mono text-[11px] text-text-primary flex items-center gap-1.5">
+              <Sparkles className="h-3.5 w-3.5 text-text-tertiary" />
+              Dictamen Razonado de la Mesa:
             </div>
-          </CardHeader>
-
-          <div className="p-6 space-y-6">
-            {/* Criterios de la Rúbrica */}
-            <div className="space-y-4">
-              {[
-                {
-                  key: "conceptualMastery" as const,
-                  label: "1. Dominio Conceptual & Deducción Teórica",
-                  desc: "Explicaste las leyes de base sin apoyarte en la memoria mecánica.",
-                },
-                {
-                  key: "terminologyRigor" as const,
-                  label: "2. Rigor Terminológico y Ausencia de Muletillas",
-                  desc: "Vocabulario académico preciso, sin titubeos excesivos ('ehhh', 'este').",
-                },
-                {
-                  key: "timeManagement" as const,
-                  label: "3. Manejo del Tiempo y Estructura Discursiva",
-                  desc: "Completaste el tema en el tiempo previsto con introducción, nudo y cierre.",
-                },
-                {
-                  key: "objectionHandling" as const,
-                  label: "4. Solvencia ante Objeciones y Repreguntas",
-                  desc: "Respondiste a las condiciones de borde y contraejemplos con solidez.",
-                },
-                {
-                  key: "calmPoise" as const,
-                  label: "5. Serenidad, Convicción y Presencia Escénica",
-                  desc: "Postura erguida, tono de voz asertivo y control de la ansiedad escénica.",
-                },
-              ].map((criterio) => (
-                <div
-                  key={criterio.key}
-                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 rounded-lg border border-slate-800 bg-slate-800/30 p-3.5"
-                >
-                  <div>
-                    <div className="text-sm font-semibold text-slate-200">{criterio.label}</div>
-                    <div className="text-xs text-slate-400">{criterio.desc}</div>
-                  </div>
-
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    {[1, 2, 3, 4, 5].map((val) => (
-                      <button
-                        key={val}
-                        type="button"
-                        onClick={() => handleScoreChange(criterio.key, val)}
-                        className={`h-7 w-8 rounded text-xs font-bold transition-colors ${
-                          rubricScores[criterio.key] === val
-                            ? "bg-indigo-600 text-white"
-                            : "bg-slate-700 text-slate-400 hover:bg-slate-600 hover:text-white"
-                        }`}
-                      >
-                        {val}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Devolución Pedagógica */}
-            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-xs text-slate-300 leading-relaxed space-y-1">
-              <div className="font-bold text-indigo-400 flex items-center gap-1.5">
-                <Sparkles className="h-4 w-4" />
-                Dictamen del Tribunal:
-              </div>
-              <p>{evalResult.feedbackSummary}</p>
-            </div>
-
-            {/* Acciones Finales */}
-            <div className="flex items-center justify-between pt-2">
-              <Button
-                variant="outline"
-                onClick={() => setPhase("setup")}
-                className="border-slate-700 text-slate-300 hover:text-white flex items-center gap-2"
-              >
-                <RotateCcw className="h-4 w-4" />
-                Nuevo Coloquio
-              </Button>
-              <Button
-                onClick={handleFinishAndSave}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-2.5 flex items-center gap-2"
-              >
-                <CheckCircle2 className="h-4 w-4" />
-                Guardar Sesión y Salir
-              </Button>
-            </div>
+            <p className="font-serif italic text-text-primary">{evalResult.feedbackSummary}</p>
           </div>
-        </Card>
+        </RubricScorer>
       )}
     </div>
   );

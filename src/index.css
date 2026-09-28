@@ -1,37 +1,50 @@
 @import "tailwindcss";
 
 :root {
-  /* Identidad académica de biblioteca / archivo (Tokens canónicos) */
-  --bg-base: #15171B;
-  --bg-panel: #1A1D22;
-  --bg-panel-raised: #20242A;
-  --border-hairline: rgba(255, 255, 255, 0.07);
-  --text-primary: #E9E6E0;
-  --text-secondary: #96938C;
-  --accent-ink: #5B7FA6;
-  --accent-ink-muted: #3E5470;
-  --signal-ok: #6B8F71;
+  /* Identidad académica de biblioteca / cuaderno de cátedra */
+  --color-paper: #F9F8F5;
+  --color-page: #FFFFFF;
+  --color-ink: #1C1E21;
+  --color-ink-muted: #60646C;
+  --color-rule: #E2E0D8;
+  --color-highlighter: #D99426;
+  --color-seal: #2C4A6F;
+  --color-rubric-red: #9E3B3B;
+  --color-system-notice: #4A4D54;
+  --color-system-notice-bg: #EFECE6;
+  --color-system-notice-border: #D6D2C8;
+
+  /* Aliases canónicos compatibles */
+  --bg-base: #F9F8F5;
+  --bg-panel: #FFFFFF;
+  --bg-panel-raised: #F4F3EF;
+  --border-hairline: #E2E0D8;
+  --text-primary: #1C1E21;
+  --text-secondary: #60646C;
+  --accent-ink: #2C4A6F;
+  --accent-ink-muted: #1E3450;
+  --signal-ok: #3B6347;
 
   /* Aliases de descanso visual y compatibilidad */
-  --bg-primary: #FAFAF8;
-  --bg-secondary: #F4F3EF;
+  --bg-primary: #F9F8F5;
+  --bg-secondary: #F2F1EC;
   --bg-elevated: #FFFFFF;
-  --bg-base-alt: #F4F3EF;
+  --bg-base-alt: #F2F1EC;
 
-  --text-muted: #84848A;
-  --text-tertiary: #84848A;
+  --text-muted: #757880;
+  --text-tertiary: #757880;
 
-  --accent-primary: #3B5169;
+  --accent-primary: #2C4A6F;
   --accent-secondary: #4A5D45;
-  --accent-hover: #2B3D50;
+  --accent-hover: #1E3450;
 
   --border-subtle: #E2E0D8;
 
-  --success: #4E7350;
-  --warning: #9E7448;
-  --error: #9E4E4E;
+  --success: #3B6347;
+  --warning: #D99426;
+  --error: #9E3B3B;
 
-  /* Tokens de animación estandarizados (FASE 5) */
+  /* Tokens de animación estandarizados */
   --duration-micro: 100ms;
   --duration-standard: 200ms;
   --duration-complex: 300ms;
@@ -44,34 +57,58 @@
 
 /* Modo oscuro sobrio — grafito mate y biblioteca */
 .dark, [data-theme="dark"] {
-  --bg-base: #15171B;
-  --bg-panel: #1A1D22;
-  --bg-panel-raised: #20242A;
-  --border-hairline: rgba(255, 255, 255, 0.07);
-  --text-primary: #E9E6E0;
-  --text-secondary: #96938C;
-  --accent-ink: #5B7FA6;
-  --accent-ink-muted: #3E5470;
-  --signal-ok: #6B8F71;
+  --color-paper: #17181A;
+  --color-page: #1F2124;
+  --color-ink: #EDECE8;
+  --color-ink-muted: #94979E;
+  --color-rule: #2D3035;
+  --color-highlighter: #E0A33A;
+  --color-seal: #7398C2;
+  --color-rubric-red: #C95D5D;
+  --color-system-notice: #A8ABB3;
+  --color-system-notice-bg: #222428;
+  --color-system-notice-border: #35383F;
 
-  --bg-primary: #18181A;
-  --bg-secondary: #202023;
-  --bg-elevated: #28282C;
-  --bg-base-alt: #202023;
+  --bg-base: #17181A;
+  --bg-panel: #1F2124;
+  --bg-panel-raised: #282A2E;
+  --border-hairline: #2D3035;
+  --text-primary: #EDECE8;
+  --text-secondary: #94979E;
+  --accent-ink: #7398C2;
+  --accent-ink-muted: #537599;
+  --signal-ok: #72A37E;
 
-  --text-muted: #72706B;
-  --text-tertiary: #72706B;
+  --bg-primary: #17181A;
+  --bg-secondary: #1F2124;
+  --bg-elevated: #282A2E;
+  --bg-base-alt: #1F2124;
 
-  --border-subtle: #2F2F33;
-  --accent-primary: #657D96;
+  --text-muted: #858890;
+  --text-tertiary: #858890;
+
+  --border-subtle: #2D3035;
+  --accent-primary: #7398C2;
   --accent-secondary: #6B8065;
-  --accent-hover: #7E97B1;
-  --success: #658F67;
-  --warning: #B38E66;
-  --error: #B36666;
+  --accent-hover: #8EB4DE;
+  --success: #72A37E;
+  --warning: #E0A33A;
+  --error: #C95D5D;
 }
 
 @theme {
+  --color-paper: var(--color-paper);
+  --color-page: var(--color-page);
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-rule: var(--color-rule);
+  --color-highlighter: var(--color-highlighter);
+  --color-seal: var(--color-seal);
+  --color-rubric-red: var(--color-rubric-red);
+  --color-system-notice: var(--color-system-notice);
+  --color-system-notice-bg: var(--color-system-notice-bg);
+  --color-system-notice-border: var(--color-system-notice-border);
+
   --color-bg-base: var(--bg-base);
   --color-bg-panel: var(--bg-panel);
   --color-bg-panel-raised: var(--bg-panel-raised);
@@ -100,6 +137,7 @@
 
   --font-serif: "Source Serif 4", "Lora", Georgia, serif;
   --font-sans: "Inter", "IBM Plex Sans", -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 }
 
 html, body {

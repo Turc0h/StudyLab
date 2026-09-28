@@ -8,6 +8,7 @@ import { GuideStatusBar } from "../guide/GuideStatusBar";
 import { OrganizationDrawer } from "../organization/OrganizationDrawer";
 import { NotificationCenter } from "../notifications/NotificationCenter";
 import { toggleFloatingIslandWindow, openFloatingIslandWindow } from "../../platform/islandWindow";
+import { isDesktop } from "../../platform/platform";
 import { useThemeStore } from "../../stores/useThemeStore";
 import { useFocusModeStore } from "../../stores/useFocusModeStore";
 import { useOrganizationStore } from "../../stores/useOrganizationStore";
@@ -89,9 +90,17 @@ export const Shell: React.FC = () => {
     }
   }, [animationsEnabled, reducedMotion]);
 
-  // Inicializar ventana flotante de escritorio independiente al inicio
+  // Inicializar ventana flotante de escritorio independiente tras First Paint de forma no bloqueante
   useEffect(() => {
-    void openFloatingIslandWindow();
+    // En Web no abrir ventanas emergentes no solicitadas (evita bloqueo de navegador y carga doble)
+    if (!isDesktop()) return;
+
+    // En Desktop diferir tras First Paint para eliminar competencia de procesos y arranque pesado
+    const timer = setTimeout(() => {
+      void openFloatingIslandWindow();
+    }, 1200);
+
+    return () => clearTimeout(timer);
   }, []);
 
   // Manejo de atajos globales: Esc, Ctrl+K (Command Palette), Ctrl+B (Sidebar), Ctrl+O (Org), Ctrl+N (Notif), Ctrl+I (Island)
@@ -154,17 +163,14 @@ export const Shell: React.FC = () => {
     if (path.startsWith("/academic")) {
       return { title: "Academic Hub", subtitle: "Ingesta PDF, visor interactivo con citas y tutor socrático" };
     }
-    if (path.startsWith("/workspace")) {
-      return { title: "Workspace OS", subtitle: "Terminal LaTeX, ondas binaurales y monitoreo de fatiga" };
+    if (path.startsWith("/workspace") || path.startsWith("/methods")) {
+      return { title: "Métodos de Estudio", subtitle: "Catálogo de técnicas con respaldo empírico y protocolos guiados" };
     }
     if (path.startsWith("/graph")) {
       return { title: "Grafo Causal", subtitle: "Topología DAG de conceptos y barreras de retención FSRS" };
     }
     if (path.startsWith("/files")) {
       return { title: "Archivos Universitarios", subtitle: "Jerarquía de cátedras, documentos y notas marginales" };
-    }
-    if (path.startsWith("/methods")) {
-      return { title: "Métodos de Estudio", subtitle: "Catálogo de técnicas con respaldo empírico y protocolos guiados" };
     }
     if (path.startsWith("/session")) {
       return { title: "Sesión de Estudio", subtitle: "Entorno Deep Work temporizado y registro cognitivo" };

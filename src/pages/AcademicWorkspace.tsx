@@ -12,7 +12,6 @@ import { AcademicCognitiveWidgets } from "../features/academic-engine/components
 import { AcademicTutorialOverlay } from "../features/academic-engine/components/AcademicTutorialOverlay";
 import { AudioOverviewModal } from "../features/academic-engine/components/AudioOverviewModal";
 import {
-  BrainCircuit,
   BookOpen,
   HelpCircle,
   Compass,
@@ -280,11 +279,14 @@ export const AcademicWorkspace: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="h-[calc(100vh-4rem)] flex items-center justify-center bg-slate-950 text-slate-300">
-        <div className="flex flex-col items-center gap-3">
-          <BrainCircuit className="w-8 h-8 text-cyan-400 animate-spin" />
-          <span className="font-mono text-xs tracking-wider text-slate-400">
-            INICIALIZANDO MOTOR COGNITIVO ACADÉMICO...
+      <div className="h-[calc(100vh-4rem)] flex items-center justify-center bg-bg-base text-text-primary">
+        <div className="flex flex-col items-center gap-3 text-center p-8">
+          <BookOpen className="w-7 h-7 text-accent-primary animate-pulse" />
+          <h2 className="font-serif text-base font-semibold text-text-primary">
+            Cargando espacio de cátedra...
+          </h2>
+          <span className="text-xs text-text-secondary font-sans max-w-xs">
+            Verificando fuentes locales y estado de sincronización.
           </span>
         </div>
       </div>
@@ -321,47 +323,47 @@ export const AcademicWorkspace: React.FC = () => {
           void handleProcessFile(files[0]);
         }
       }}
-      className="h-[calc(100vh-4rem)] flex flex-col bg-[--bg-base] text-[--text-primary] overflow-hidden font-sans relative"
+      className="h-[calc(100vh-4rem)] flex flex-col bg-bg-base text-text-primary overflow-hidden font-sans relative"
     >
       {/* Visual Window Drag & Drop Overlay */}
       {(isWindowDragging || isProcessingFile) && (
-        <div className="absolute inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex flex-col items-center justify-center p-8 border-2 border-dashed border-cyan-400 animate-in fade-in duration-150">
+        <div className="absolute inset-0 z-50 bg-bg-primary/95 backdrop-blur-xs flex flex-col items-center justify-center p-8 border-2 border-dashed border-accent-primary/60 animate-in fade-in duration-100">
           {isProcessingFile ? (
-            <div className="flex flex-col items-center gap-3 text-cyan-300">
-              <Loader2 className="w-10 h-10 animate-spin text-cyan-400" />
-              <span className="font-mono text-sm font-semibold tracking-wider">
-                {processingStatus || "PROCESANDO DOCUMENTO..."}
-              </span>
-              <span className="text-xs text-slate-400 font-sans">
-                Extrayendo teoremas, fórmulas y generando embeddings locales...
+            <div className="flex flex-col items-center gap-3 text-center">
+              <Loader2 className="w-8 h-8 animate-spin text-accent-primary" />
+              <h2 className="font-serif text-lg font-semibold text-text-primary">
+                {processingStatus || "Procesando documento..."}
+              </h2>
+              <span className="text-xs text-text-secondary font-sans max-w-sm">
+                Extrayendo teoremas, fórmulas y generando embeddings 100% en local...
               </span>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-3 text-center pointer-events-none">
-              <UploadCloud className="w-14 h-14 text-cyan-400 animate-bounce" />
-              <h2 className="font-display font-bold text-lg text-white">
-                Soltá tu archivo PDF o apunte aquí
+              <UploadCloud className="w-10 h-10 text-accent-primary" />
+              <h2 className="font-serif text-xl font-semibold text-text-primary">
+                Soltá el documento aquí
               </h2>
-              <p className="text-xs text-slate-300 max-w-md font-sans">
-                StudyLab procesará automáticamente el texto, fórmulas LaTeX y teoremas de forma 100% local en tu dispositivo.
+              <p className="text-xs text-text-secondary max-w-sm font-sans leading-relaxed">
+                StudyLab procesará el texto, las fórmulas y la estructura para vincularlo a tu biblioteca de cátedra.
               </p>
             </div>
           )}
         </div>
       )}
       {/* Top Academic Context Header */}
-      <header className="h-11 border-b border-[--border-hairline] bg-[--bg-panel] px-4 flex items-center justify-between z-20">
+      <header className="h-11 border-b border-border-hairline bg-bg-panel px-4 flex items-center justify-between z-20">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="flex items-center gap-2 text-[--accent-ink] shrink-0">
+          <div className="flex items-center gap-2 text-accent-primary shrink-0">
             <BookOpen className="w-4 h-4" />
-            <h1 className="text-xs font-serif font-semibold tracking-normal text-[--text-primary]">
-              Personal Academic Knowledge Engine
+            <h1 className="text-xs font-serif font-semibold tracking-normal text-text-primary">
+              Lienzo de Cátedra
             </h1>
           </div>
-          <span className="text-[--border-hairline] hidden sm:inline">|</span>
-          <span className="text-xs font-mono text-[--text-secondary] truncate hidden sm:inline">
+          <span className="text-border-subtle hidden sm:inline">|</span>
+          <span className="text-xs font-sans text-text-secondary truncate hidden sm:inline">
             {activeSource
-              ? `${activeSource.title} • ${activeSource.career ?? "Universidad"}`
+              ? `${activeSource.title} (${activeSource.career ?? "Universidad"})`
               : "Seleccione una fuente"}
           </span>
         </div>
@@ -450,10 +452,10 @@ export const AcademicWorkspace: React.FC = () => {
             )}
           </div>
 
-          {/* Status Bar Indicator tipo Editor de Código */}
-          <div className="flex items-center gap-1.5 text-[11px] font-mono text-[--text-secondary] pl-2 border-l border-[--border-hairline]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[--signal-ok]" />
-            <span className="hidden md:inline">Biblioteca sincronizada · Local-First</span>
+          {/* Indicador de estado local */}
+          <div className="flex items-center gap-2 text-xs text-text-secondary pl-2 border-l border-border-hairline">
+            <span className="w-1.5 h-1.5 rounded-full bg-signal-ok" />
+            <span className="hidden md:inline font-sans text-[11px]">Sincronizado en local</span>
           </div>
         </div>
       </header>

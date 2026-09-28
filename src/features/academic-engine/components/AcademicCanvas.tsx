@@ -473,8 +473,8 @@ export function AcademicCanvas({
     >
       {/* Toast Notification */}
       {feedbackToast && (
-        <div className="absolute top-12 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-xl bg-slate-900 border border-cyan-500/50 text-cyan-300 font-mono text-xs shadow-2xl flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
-          <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+        <div className="absolute top-12 left-1/2 -translate-x-1/2 z-50 px-3.5 py-1.5 rounded-lg bg-bg-surface-2 border border-border-hairline text-text-primary font-mono text-xs shadow-lg flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+          <CheckCircle2 className="w-3.5 h-3.5 text-accent-primary shrink-0" />
           <span>{feedbackToast}</span>
         </div>
       )}
@@ -482,50 +482,79 @@ export function AcademicCanvas({
       {/* Floating Contextual Selection Popover */}
       {selectionMenu && (
         <div
-          className="fixed z-50 flex items-center gap-1 bg-slate-900/95 border border-cyan-500/40 rounded-xl p-1.5 shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95"
+          className="fixed z-50 flex items-center gap-1 bg-bg-surface-2/95 border border-border-hairline rounded-lg p-1 shadow-xl backdrop-blur-md animate-in fade-in zoom-in-95 text-[11px] font-mono"
           style={{ top: `${selectionMenu.y}px`, left: `${selectionMenu.x}px` }}
         >
           <button
             type="button"
-            onClick={handleCreateFlashcardFromSelection}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan-950/60 hover:bg-cyan-500/20 text-cyan-300 text-[11px] font-mono border border-cyan-500/30 transition-colors"
+            onClick={() => {
+              setChatInput(`Estimado profesor: ¿podría auditar y explicar rigurosamente este pasaje: "${selectionMenu.text}"?`);
+              setSelectionMenu(null);
+              window.getSelection()?.removeAllRanges();
+            }}
+            className="flex items-center gap-1 px-2 py-1 rounded bg-accent-primary text-text-inverted hover:bg-accent-hover transition-colors cursor-pointer font-medium"
+            title="Auditar este pasaje con el Catedrático Socrático"
           >
-            <Sparkles className="w-3 h-3 text-cyan-400" />
-            Flashcard FSRS
+            <BrainCircuit className="w-3 h-3" />
+            <span>Auditar</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setChatInput(`Plantéeme una pregunta socrática o caso límite sobre esta proposición: "${selectionMenu.text}"`);
+              setSelectionMenu(null);
+              window.getSelection()?.removeAllRanges();
+            }}
+            className="flex items-center gap-1 px-2 py-1 rounded bg-bg-surface-1 hover:bg-bg-surface-3 text-text-secondary hover:text-text-primary border border-border-hairline transition-colors cursor-pointer"
+            title="Generar caso límite o pregunta socrática"
+          >
+            <Zap className="w-3 h-3 text-amber-500" />
+            <span>Caso Límite</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => void handleCreateFlashcardFromSelection()}
+            className="flex items-center gap-1 px-2 py-1 rounded bg-bg-surface-1 hover:bg-bg-surface-3 text-text-secondary hover:text-text-primary border border-border-hairline transition-colors cursor-pointer"
+            title="Crear Flashcard FSRS"
+          >
+            <Sparkles className="w-3 h-3 text-accent-primary" />
+            <span>+ FSRS</span>
           </button>
           <button
             type="button"
             onClick={handleCreateClozeFromSelection}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-950/60 hover:bg-amber-500/20 text-amber-300 text-[11px] font-mono border border-amber-500/30 transition-colors"
-            title="Ocultar esta selección y crear tarjeta cloze {{c1::...}} directamente"
+            className="flex items-center gap-1 px-2 py-1 rounded bg-bg-surface-1 hover:bg-bg-surface-3 text-text-secondary hover:text-text-primary border border-border-hairline transition-colors cursor-pointer"
+            title="Ocultar esta selección y crear tarjeta cloze {{c1::...}}"
           >
-            <EyeOff className="w-3 h-3 text-amber-400" />
-            Ocultar esto (Cloze)
+            <EyeOff className="w-3 h-3 text-amber-500" />
+            <span>Cloze</span>
           </button>
           <button
             type="button"
             onClick={handleCreateImageOcclusionFromSelection}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-950/60 hover:bg-indigo-500/20 text-indigo-300 text-[11px] font-mono border border-indigo-500/30 transition-colors"
+            className="flex items-center gap-1 px-2 py-1 rounded bg-bg-surface-1 hover:bg-bg-surface-3 text-text-secondary hover:text-text-primary border border-border-hairline transition-colors cursor-pointer"
             title="Generar tarjeta de oclusión con coordenadas del visor PDF"
           >
             <Layers className="w-3 h-3 text-indigo-400" />
-            Oclusión
+            <span>Oclusión</span>
           </button>
           <button
             type="button"
             onClick={handleEvaluateFeynmanFromSelection}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-950/60 hover:bg-purple-500/20 text-purple-300 text-[11px] font-mono border border-purple-500/30 transition-colors"
+            className="flex items-center gap-1 px-2 py-1 rounded bg-bg-surface-1 hover:bg-bg-surface-3 text-text-secondary hover:text-text-primary border border-border-hairline transition-colors cursor-pointer"
+            title="Evaluar comprensión con la técnica Feynman"
           >
             <BrainCircuit className="w-3 h-3 text-purple-400" />
-            Evaluar Feynman
+            <span>Feynman</span>
           </button>
           <button
             type="button"
-            onClick={handleConnectToGraphFromSelection}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-950/60 hover:bg-emerald-500/20 text-emerald-300 text-[11px] font-mono border border-emerald-500/30 transition-colors"
+            onClick={() => void handleConnectToGraphFromSelection()}
+            className="flex items-center gap-1 px-2 py-1 rounded bg-bg-surface-1 hover:bg-bg-surface-3 text-text-secondary hover:text-text-primary border border-border-hairline transition-colors cursor-pointer"
+            title="Conectar concepto al Grafo Causal"
           >
-            <Share2 className="w-3 h-3 text-emerald-400" />
-            Grafo Causal
+            <Share2 className="w-3 h-3 text-accent-secondary" />
+            <span>+ Grafo</span>
           </button>
         </div>
       )}
@@ -656,10 +685,10 @@ export function AcademicCanvas({
                     if (page !== activeViewerPage || !highlightBbox) return null;
                     return (
                       <div
-                        className={`absolute rounded pointer-events-none transition-all duration-300 ${
+                        className={`absolute rounded-xs pointer-events-none transition-all duration-300 ${
                           isBboxPulsing
-                            ? "border-2 border-cyan-400 shadow-[0_0_24px_rgba(0,240,255,0.85)] bg-cyan-400/15 animate-pulse"
-                            : "border border-cyan-400/60 bg-cyan-400/10"
+                            ? "border-2 border-amber-600 bg-amber-400/25 ring-2 ring-amber-500/30"
+                            : "border border-amber-600/70 bg-amber-400/15"
                         }`}
                         style={{
                           left: `${highlightBbox.x * pageSize.width}px`,
@@ -668,8 +697,8 @@ export function AcademicCanvas({
                           height: `${highlightBbox.height * pageSize.height}px`,
                         }}
                       >
-                        <div className="absolute -top-5 left-0 px-1.5 py-0.5 rounded bg-cyan-400 text-black font-mono font-bold text-[9px] uppercase shadow-md">
-                          Cita Auditada ↗
+                        <div className="absolute -top-5 left-0 px-1.5 py-0.5 rounded bg-amber-700 text-amber-50 font-mono text-[9px] font-semibold tracking-normal shadow-xs">
+                          Cita Auditada
                         </div>
                       </div>
                     );
@@ -711,10 +740,10 @@ export function AcademicCanvas({
                               setSelectedExamOption(null);
                               setShowExamResult(false);
                             }}
-                            className="text-[10px] py-1 px-2 font-mono flex items-center gap-1 rounded bg-amber-950/40 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 transition-colors"
+                            className="text-[10px] py-1 px-2 font-mono flex items-center gap-1 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 transition-colors cursor-pointer"
                           >
-                            <Zap className="h-3 w-3 text-amber-400" />
-                            ⚡ Ejecutar Simulacro
+                            <Zap className="h-3 w-3 text-amber-500" />
+                            Simulacro
                           </button>
 
                           {onGenerateCardsForChunk && (
@@ -750,13 +779,13 @@ export function AcademicCanvas({
                     </div>
                   )}
 
-                  {/* Neon Cyan Pulsating Bounding Box Overlay */}
+                  {/* Amber Highlighter Bounding Box Overlay */}
                   {highlightBbox && (
                     <div
-                      className={`absolute rounded pointer-events-none transition-all duration-300 ${
+                      className={`absolute rounded-xs pointer-events-none transition-all duration-300 ${
                         isBboxPulsing
-                          ? "border-2 border-cyan-400 shadow-[0_0_24px_rgba(0,240,255,0.85)] bg-cyan-400/15 animate-pulse"
-                          : "border border-cyan-400/60 bg-cyan-400/10"
+                          ? "border-2 border-amber-600 bg-amber-400/25 ring-2 ring-amber-500/30"
+                          : "border border-amber-600/70 bg-amber-400/15"
                       }`}
                       style={{
                         left: `${highlightBbox.x * 100}%`,
@@ -765,8 +794,8 @@ export function AcademicCanvas({
                         height: `${highlightBbox.height * 100}%`,
                       }}
                     >
-                      <div className="absolute -top-5 left-0 px-1.5 py-0.5 rounded bg-cyan-400 text-black font-mono font-bold text-[9px] uppercase shadow-md">
-                        Cita Auditada ↗
+                      <div className="absolute -top-5 left-0 px-1.5 py-0.5 rounded bg-amber-700 text-amber-50 font-mono text-[9px] font-semibold tracking-normal shadow-xs">
+                        Cita Auditada
                       </div>
                     </div>
                   )}
@@ -797,7 +826,7 @@ export function AcademicCanvas({
               className="hidden lg:flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono border border-border-subtle bg-bg-surface-2 text-text-secondary"
               title="Motor del Catedrático Socrático activo (100% honesto)"
             >
-              <Cpu className="h-3 w-3 text-cyan-400 shrink-0" />
+              <Cpu className="h-3 w-3 text-accent-primary shrink-0" />
               <span>{activeEngineName}</span>
             </div>
             <span className="hidden xl:inline text-[10px] text-text-tertiary">
@@ -1023,29 +1052,29 @@ export function AcademicCanvas({
         </div>
 
         {/* Socratic Mode & Scaffolding Toolbar */}
-        <div className="px-3 py-1.5 border-t border-border-subtle/60 bg-bg-surface-2/60 flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono">
+        <div className="px-3 py-1.5 border-t border-border-hairline bg-bg-surface-2/60 flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono">
           {/* Mode Switcher */}
           <div className="flex items-center gap-1">
             <span className="text-text-tertiary mr-1 hidden sm:inline">Modo:</span>
             <button
               type="button"
               onClick={() => setProfessorMode("consulta")}
-              className={`flex items-center gap-1 px-2 py-0.5 rounded transition-all cursor-pointer ${
+              className={`flex items-center gap-1 px-2 py-0.5 rounded transition-colors cursor-pointer ${
                 professorMode === "consulta"
-                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold"
+                  ? "bg-accent-primary/15 text-accent-primary border border-accent-primary/30 font-medium"
                   : "text-text-tertiary hover:text-text-primary hover:bg-bg-surface-1"
               }`}
               title="Modo Consulta: El catedrático explica y deduce conceptos citando las fuentes"
             >
-              <BookOpen className="w-3 h-3 text-cyan-400" />
+              <BookOpen className="w-3 h-3 text-accent-primary" />
               <span>Consulta</span>
             </button>
             <button
               type="button"
               onClick={() => setProfessorMode("auditoria")}
-              className={`flex items-center gap-1 px-2 py-0.5 rounded transition-all cursor-pointer ${
+              className={`flex items-center gap-1 px-2 py-0.5 rounded transition-colors cursor-pointer ${
                 professorMode === "auditoria"
-                  ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold"
+                  ? "bg-amber-500/15 text-amber-300 border border-amber-500/30 font-medium"
                   : "text-text-tertiary hover:text-text-primary hover:bg-bg-surface-1"
               }`}
               title="Modo Auditoría: Audita tu razonamiento, detecta inconsistencias y no resuelve mecánicamente"
@@ -1056,9 +1085,9 @@ export function AcademicCanvas({
             <button
               type="button"
               onClick={() => setProfessorMode("examen")}
-              className={`flex items-center gap-1 px-2 py-0.5 rounded transition-all cursor-pointer ${
+              className={`flex items-center gap-1 px-2 py-0.5 rounded transition-colors cursor-pointer ${
                 professorMode === "examen"
-                  ? "bg-rose-500/20 text-rose-300 border border-rose-500/40 font-semibold"
+                  ? "bg-rose-500/15 text-rose-300 border border-rose-500/30 font-medium"
                   : "text-text-tertiary hover:text-text-primary hover:bg-bg-surface-1"
               }`}
               title="Modo Examen: Bloqueado hasta presentar tu intento formal de resolución"
@@ -1142,15 +1171,15 @@ export function AcademicCanvas({
         <Modal
           open={Boolean(activeExamChunk)}
           onClose={() => setActiveExamChunk(null)}
-          title={`⚡ Simulacro Exprés — Pág. ${activeExamChunk.pageNumber}`}
+          title={`Simulacro de Cátedra — Pág. ${activeExamChunk.pageNumber}`}
         >
           <div className="flex flex-col gap-3 font-sans text-xs">
-            <div className="p-3 rounded-lg bg-slate-900 border border-slate-800 font-mono text-[11px] text-slate-300">
-              <strong className="text-cyan-400 block mb-1">Premisa evaluada:</strong>
+            <div className="p-3 rounded-lg bg-bg-surface-2 border border-border-hairline font-mono text-[11px] text-text-secondary">
+              <strong className="text-accent-primary block mb-1">Premisa evaluada:</strong>
               {activeExamChunk.rawContent.split("\n")[1] || activeExamChunk.rawContent.slice(0, 140)}
             </div>
 
-            <p className="font-semibold text-slate-200">
+            <p className="font-medium text-text-primary">
               ¿Cuál de las siguientes conclusiones se deduce rigurosamente del teorema o definición anterior?
             </p>
 
@@ -1169,12 +1198,12 @@ export function AcademicCanvas({
                   correct: false,
                 },
               ].map((opt, i) => {
-                let btnStyle = "border-slate-800 bg-slate-900/60 hover:bg-slate-900 text-slate-300";
+                let btnStyle = "border-border-hairline bg-bg-surface-1 hover:bg-bg-surface-2 text-text-secondary hover:text-text-primary";
                 if (showExamResult) {
-                  if (opt.correct) btnStyle = "border-emerald-500 bg-emerald-950/40 text-emerald-200";
-                  else if (selectedExamOption === i) btnStyle = "border-rose-500 bg-rose-950/40 text-rose-200";
+                  if (opt.correct) btnStyle = "border-emerald-600/60 bg-emerald-500/10 text-emerald-400";
+                  else if (selectedExamOption === i) btnStyle = "border-rose-600/60 bg-rose-500/10 text-rose-400";
                 } else if (selectedExamOption === i) {
-                  btnStyle = "border-cyan-400 bg-cyan-950/40 text-cyan-200";
+                  btnStyle = "border-accent-primary bg-accent-primary/10 text-text-primary";
                 }
 
                 return (
@@ -1185,9 +1214,9 @@ export function AcademicCanvas({
                       setSelectedExamOption(i);
                       setShowExamResult(true);
                     }}
-                    className={`text-left p-3 rounded-xl border text-xs transition-all ${btnStyle}`}
+                    className={`text-left p-3 rounded-lg border text-xs transition-colors cursor-pointer ${btnStyle}`}
                   >
-                    <span className="font-mono text-slate-400 mr-1.5">[{i + 1}]</span>
+                    <span className="font-mono text-text-tertiary mr-1.5">[{i + 1}]</span>
                     {opt.text}
                   </button>
                 );
@@ -1195,7 +1224,7 @@ export function AcademicCanvas({
             </div>
 
             {showExamResult && (
-              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] text-slate-300 mt-1">
+              <div className="p-3 rounded-lg bg-bg-surface-2 border border-border-hairline text-[11px] text-text-secondary mt-1">
                 {selectedExamOption === 0 ? (
                   <span className="text-emerald-400 font-bold block mb-1">
                     ✓ ¡Correcto! Justificación certificada por la demostración del texto.
@@ -1205,63 +1234,11 @@ export function AcademicCanvas({
                     ✗ Incorrecto. Revisa las condiciones de contorno e hipótesis necesarias.
                   </span>
                 )}
-                <span>Fuente: {activeSource?.title} (Pág. {activeExamChunk.pageNumber})</span>
+                <span className="font-mono text-[10px] text-text-tertiary">Fuente: {activeSource?.title} (Pág. {activeExamChunk.pageNumber})</span>
               </div>
             )}
           </div>
         </Modal>
-      )}
-
-      {/* Floating Contextual Selection Popover Menu */}
-      {selectionMenu && (
-        <div
-          style={{ left: `${selectionMenu.x}px`, top: `${selectionMenu.y}px` }}
-          className="fixed z-50 flex items-center gap-1.5 p-1.5 rounded-xl border border-accent-primary/40 bg-bg-surface-2/95 shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95"
-        >
-          <button
-            type="button"
-            onClick={() => {
-              setChatInput(`Estimado profesor: ¿podría auditar y explicar rigurosamente este pasaje: "${selectionMenu.text}"?`);
-              setSelectionMenu(null);
-              window.getSelection()?.removeAllRanges();
-            }}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-accent-primary text-text-inverted text-[11px] font-mono hover:bg-accent-hover transition-all cursor-pointer shadow-xs"
-          >
-            <BrainCircuit className="h-3 w-3" />
-            <span>Auditar con Catedrático</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setChatInput(`Plantéeme una pregunta socrática o caso límite sobre esta proposición: "${selectionMenu.text}"`);
-              setSelectionMenu(null);
-              window.getSelection()?.removeAllRanges();
-            }}
-            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-mono hover:bg-amber-500/25 transition-all cursor-pointer"
-          >
-            <Zap className="h-3 w-3 text-amber-400" />
-            <span>Caso Límite</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => void handleCreateFlashcardFromSelection()}
-            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-bg-surface-1 text-text-secondary hover:text-text-primary text-[11px] font-mono border border-border-subtle transition-all cursor-pointer"
-          >
-            <Sparkles className="h-3 w-3 text-accent-primary" />
-            <span>+ FSRS</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => void handleConnectToGraphFromSelection()}
-            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-bg-surface-1 text-text-secondary hover:text-text-primary text-[11px] font-mono border border-border-subtle transition-all cursor-pointer"
-          >
-            <Share2 className="h-3 w-3 text-accent-secondary" />
-            <span>+ Grafo</span>
-          </button>
-        </div>
       )}
 
       {/* Editor de Oclusión de Imágenes SVG (Sección 9-BIS) */}

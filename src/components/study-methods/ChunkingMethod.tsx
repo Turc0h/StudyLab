@@ -1,9 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Card, CardTitle } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
 import { Input } from "../ui/Input";
 import { saveStudySession } from "../../lib/db";
+import { db } from "../../db/db";
+import { useLiveQuery } from "dexie-react-hooks";
+import {
+  DEFAULT_CHUNKS,
+  DEFAULT_CHUNKING_TOPIC,
+  getChunkingSet,
+  saveChunkingSet,
+  type ChunkGroup,
+} from "../../features/study-methods/chunkingStorage";
 import { 
   Boxes, 
   Plus, 
@@ -13,51 +22,22 @@ import {
   EyeOff, 
   Layers, 
   Sparkles,
-  Play
+  Play,
+  Check,
+  FolderOpen
 } from "lucide-react";
 
 export interface ChunkingMethodProps {
   onSessionFinished?: () => void;
 }
 
-interface ChunkGroup {
-  id: string;
-  name: string;
-  mnemonicTag: string;
-  items: string[];
-}
-
-const DEFAULT_CHUNKS: ChunkGroup[] = [
-  {
-    id: "chunk_1",
-    name: "Pares Craneales Sensitivos",
-    mnemonicTag: "1 - 2 - 8 (Sentidos especiales)",
-    items: ["Nervio Olfatorio (I)", "Nervio Óptico (II)", "Nervio Vestibulococlear (VIII)"],
-  },
-  {
-    id: "chunk_2",
-    name: "Motores Oculares",
-    mnemonicTag: "3 - 4 - 6 (Movimiento del ojo)",
-    items: ["Nervio Oculomotor (III)", "Nervio Troclear (IV)", "Nervio Abducens (VI)"],
-  },
-  {
-    id: "chunk_3",
-    name: "Motores Puros Restantes",
-    mnemonicTag: "11 - 12 (Cuello y Lengua)",
-    items: ["Nervio Accesorio / Espinal (XI)", "Nervio Hipogloso (XII)"],
-  },
-  {
-    id: "chunk_4",
-    name: "Pares Craneales Mixtos",
-    mnemonicTag: "5 - 7 - 9 - 10 (Cara y Vísceras)",
-    items: ["Nervio Trigémino (V)", "Nervio Facial (VII)", "Nervio Glosofaríngeo (IX)", "Nervio Vago (X)"],
-  },
-];
-
 export const ChunkingMethod: React.FC<ChunkingMethodProps> = ({ onSessionFinished }) => {
-  const [topic, setTopic] = useState<string>("Los 12 Pares Craneales");
+  const [selectedFolderId, setSelectedFolderId] = useState<string>("");
+  const [topic, setTopic] = useState<string>(DEFAULT_CHUNKING_TOPIC);
   const [chunks, setChunks] = useState<ChunkGroup[]>(DEFAULT_CHUNKS);
   const [mode, setMode] = useState<"organize" | "recall">("organize");
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
 
   // Estado para nuevo chunk
   const [newChunkName, setNewChunkName] = useState("");
@@ -69,6 +49,68 @@ export const ChunkingMethod: React.FC<ChunkingMethodProps> = ({ onSessionFinishe
   // Drill de recuerdo
   const [revealedChunks, setRevealedChunks] = useState<Record<string, boolean>>({});
   const [testedCount, setTestedCount] = useState<number>(0);
+
+  // Carpetas disponibles
+  const folders = useLiveQuery(() => db.folders.toArray(), []) || [];
+  const subjectFolders = folders.filter((f) => f.type === "subject" || !f.type);
+
+  // 1. Rehidratación reactiva al cambiar de materia o montar
+  useEffect(() => {
+    let isCancelled = false;
+    async function load() {
+      setIsLoaded(false);
+      try {
+        const saved = await getChunkingSet(selectedFolderId || null);
+        if (isCancelled) return;
+        if (saved) {
+          setTopic(saved.topic || DEFAULT_CHUNKING_TOPIC);
+          setChunks(saved.chunks && saved.chunks.length > 0 ? saved.chunks : DEFAULT_CHUNKS);
+        } else {
+          setTopic(DEFAULT_CHUNKING_TOPIC);
+          setChunks(DEFAULT_CHUNKS);
+        }
+      } catch (err) {
+        console.error("Error cargando chunks de Dexie:", err);
+      } finally {
+        if (!isCancelled) setIsLoaded(true);
+      }
+    }
+    void load();
+    return () => {
+      isCancelled = true;
+    };
+  }, [selectedFolderId]);
+
+  // 2. Auto-guardado con debounce de 800ms
+  const isFirstMount = useRef(true);
+  useEffect(() => {
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
+    }
+    if (!isLoaded) return;
+
+    setSaveStatus("saving");
+    const timer = setTimeout(async () => {
+      try {
+        await saveChunkingSet({
+          subjectFolderId: selectedFolderId || null,
+          topic,
+          chunks,
+        });
+        setSaveStatus("saved");
+        const hideTimer = setTimeout(() => {
+          setSaveStatus("idle");
+        }, 2000);
+        return () => clearTimeout(hideTimer);
+      } catch (err) {
+        console.error("Error auto-guardando Chunking en Dexie:", err);
+        setSaveStatus("idle");
+      }
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [chunks, topic, selectedFolderId, isLoaded]);
 
   const handleAddChunk = () => {
     if (!newChunkName.trim()) return;
@@ -118,13 +160,22 @@ export const ChunkingMethod: React.FC<ChunkingMethodProps> = ({ onSessionFinishe
   const totalItems = chunks.reduce((acc, c) => acc + c.items.length, 0);
 
   const handleFinishSession = async () => {
+    // Asegurar guardado inmediato en Dexie
+    await saveChunkingSet({
+      subjectFolderId: selectedFolderId || null,
+      topic,
+      chunks,
+    });
+
+    const folderName = subjectFolders.find((f) => f.id === selectedFolderId)?.name;
+
     await saveStudySession({
       id: `chunking_${Date.now()}`,
       methodId: "chunking",
-      subject: "Agrupación Cognitiva (Chunking)",
+      subject: folderName ? `Chunking • ${folderName}` : "Agrupación Cognitiva (Chunking)",
       topic: topic || "Compresión en Paquetes Mnémicos",
       durationMinutes: Math.max(15, totalItems * 3),
-      notes: `Tema: ${topic}\nPaquetes Cognitivos (${chunks.length}):\n${chunks
+      notes: `Materia: ${folderName || "General"}\nTema: ${topic}\nPaquetes Cognitivos (${chunks.length}):\n${chunks
         .map(
           (c) =>
             `[${c.name}] (${c.mnemonicTag}):\n  ${c.items.map((it) => `• ${it}`).join("\n  ")}`
@@ -150,7 +201,20 @@ export const ChunkingMethod: React.FC<ChunkingMethodProps> = ({ onSessionFinishe
           </p>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto">
+        <div className="flex items-center gap-3 self-start sm:self-auto">
+          {saveStatus === "saving" && (
+            <span className="text-[11px] text-text-muted flex items-center gap-1.5 font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+              Guardando...
+            </span>
+          )}
+          {saveStatus === "saved" && (
+            <span className="text-[11px] text-emerald-400 flex items-center gap-1 font-mono">
+              <Check className="h-3 w-3" />
+              Guardado
+            </span>
+          )}
+
           <Button
             variant={mode === "recall" ? "secondary" : "ghost"}
             size="sm"
@@ -183,14 +247,35 @@ export const ChunkingMethod: React.FC<ChunkingMethodProps> = ({ onSessionFinishe
         </div>
       </div>
 
-      {/* Tema */}
-      <div className="space-y-1.5">
-        <label className="text-xs font-semibold text-text-primary">Eje Temático a Comprimir</label>
-        <Input
-          value={topic}
-          onChange={(e) => setTopic(e.target.value)}
-          placeholder="Ej: Fórmulas de Física Mecánica"
-        />
+      {/* Selector de Materia y Eje Temático */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <label className="text-xs font-semibold text-text-primary flex items-center gap-1.5">
+            <FolderOpen className="h-3.5 w-3.5 text-accent-primary" />
+            <span>Materia / Carpeta de Cátedra</span>
+          </label>
+          <select
+            value={selectedFolderId}
+            onChange={(e) => setSelectedFolderId(e.target.value)}
+            className="w-full text-xs rounded-lg border border-border-subtle bg-bg-surface px-3 py-2 text-text-primary focus:outline-none focus:ring-1 focus:ring-accent-primary"
+          >
+            <option value="">(Sin carpeta / General)</option>
+            {subjectFolders.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-xs font-semibold text-text-primary">Eje Temático a Comprimir</label>
+          <Input
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            placeholder="Ej: Fórmulas de Física Mecánica"
+          />
+        </div>
       </div>
 
       {/* Resumen Métrico de Capacidad */}

@@ -180,6 +180,13 @@ pub fn run() {
       commands::fsrs_commands::detect_fsrs_card_leech,
       commands::fsrs_commands::calculate_fsrs_model_rmse,
       commands::fsrs_commands::plan_fsrs_load_balance,
+      commands::stroke_commands::beautify_stroke,
+      commands::stroke_commands::simplify_stroke,
+      commands::stroke_commands::compress_strokes_binary,
+      commands::stroke_commands::decompress_strokes_binary,
+      commands::search_commands::search_academic_chunks,
+      commands::search_commands::tokenize_text_fast,
+      commands::dossier_commands::compile_academic_dossier,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

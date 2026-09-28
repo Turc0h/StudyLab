@@ -3,8 +3,9 @@ import { Card, CardHeader, CardTitle } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { getFlashcards, saveFlashcard, saveStudySession } from "../../lib/db";
 import type { FlashcardItem } from "../../types";
-import { RotateCw, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Input, Textarea } from "../ui/Input";
+import { FlipCard } from "../shells";
 
 export interface SpacedRepetitionMethodProps {
   onSessionFinished?: () => void;
@@ -118,37 +119,29 @@ export const SpacedRepetitionMethod: React.FC<SpacedRepetitionMethodProps> = ({ 
             <span>Intervalo actual: {currentCard.intervalDays} día(s)</span>
           </div>
 
-          <div
-            onClick={() => setIsFlipped((f) => !f)}
-            className="min-h-[180px] p-6 rounded border border-border-subtle bg-bg-elevated cursor-pointer flex flex-col justify-between hover:border-accent-primary transition-colors select-none"
-          >
-            <span className="font-sans text-[11px] uppercase tracking-wider text-text-muted">
-              {isFlipped ? "Reverso" : "Anverso (Clic para voltear)"}
-            </span>
-            <p className="font-serif text-base text-text-primary my-4 leading-relaxed">
-              {isFlipped ? currentCard.back : currentCard.front}
-            </p>
-            <div className="flex justify-end">
-              <RotateCw className="h-4 w-4 text-text-muted" />
-            </div>
-          </div>
-
-          {isFlipped && (
-            <div className="grid grid-cols-4 gap-2 pt-2 border-t border-border-subtle">
-              <Button variant="outline" size="sm" onClick={() => handleRate(0.5)} className="text-xs">
-                Repetir (0.5x)
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => handleRate(1.0)} className="text-xs">
-                Difícil (1x)
-              </Button>
-              <Button variant="primary" size="sm" onClick={() => handleRate(1.5)} className="text-xs">
-                Bien (1.5x)
-              </Button>
-              <Button variant="secondary" size="sm" onClick={() => handleRate(2.5)} className="text-xs">
-                Fácil (2.5x)
-              </Button>
-            </div>
-          )}
+          <FlipCard
+            isFlipped={isFlipped}
+            onFlip={setIsFlipped}
+            frontBadge="Anverso"
+            backBadge="Reverso"
+            front={
+              <p className="font-serif text-base text-text-primary my-4 leading-relaxed">
+                {currentCard.front}
+              </p>
+            }
+            back={
+              <p className="font-serif text-base text-text-primary my-4 leading-relaxed">
+                {currentCard.back}
+              </p>
+            }
+            ratings={[
+              { value: 0.5, label: "Repetir (0.5x)", keyHint: "1", variant: "danger" },
+              { value: 1.0, label: "Difícil (1x)", keyHint: "2", variant: "warning" },
+              { value: 1.5, label: "Bien (1.5x)", keyHint: "3", variant: "primary" },
+              { value: 2.5, label: "Fácil (2.5x)", keyHint: "4", variant: "success" },
+            ]}
+            onRate={(val) => handleRate(Number(val))}
+          />
         </div>
       ) : (
         <div className="py-8 text-center text-xs text-text-muted">

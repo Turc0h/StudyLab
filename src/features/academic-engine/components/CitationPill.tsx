@@ -75,7 +75,7 @@ export function CitationPill({
       <button
         type="button"
         onClick={handleClick}
-        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-accent-primary/15 hover:bg-accent-primary/25 text-accent-primary border border-accent-primary/30 font-mono text-[11px] font-semibold transition-all hover:shadow-[0_0_8px_rgba(0,240,255,0.4)] cursor-pointer"
+        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-accent-primary/10 hover:bg-accent-primary/20 text-accent-primary border border-accent-primary/20 font-mono text-[11px] font-medium transition-colors cursor-pointer"
         title="Auditar cita en la fuente original"
       >
         <Icon className="h-2.5 w-2.5" />
@@ -85,7 +85,7 @@ export function CitationPill({
 
       {/* Hover Citation Audit Popover */}
       {showPopover && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-72 p-3 rounded-xl border border-accent-primary/40 bg-bg-surface-2/95 shadow-2xl backdrop-blur-md text-left font-sans text-xs animate-in fade-in zoom-in-95 duration-150 pointer-events-none">
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-72 p-3 rounded-lg border border-border-hairline bg-bg-elevated shadow-md text-left font-sans text-xs animate-in fade-in duration-100 pointer-events-none">
           <div className="flex items-center justify-between text-[10px] font-mono text-text-tertiary border-b border-border-subtle pb-1.5 mb-1.5">
             <span className="truncate max-w-[170px] text-text-secondary">{sourceTitle}</span>
             <span className="text-accent-primary font-bold">
@@ -98,19 +98,19 @@ export function CitationPill({
           </div>
 
           {snippet && (
-            <p className="text-text-primary text-[11px] leading-relaxed italic bg-bg-surface-1/80 p-2 rounded border border-border-subtle/50 mb-1.5">
+            <p className="text-text-primary text-[11px] leading-relaxed italic bg-bg-panel p-2 rounded border border-border-subtle/50 mb-1.5">
               "{snippet}"
             </p>
           )}
 
           {formulaLatex && (
-            <div className="text-[10px] font-mono text-accent-primary bg-bg-surface-1 p-1.5 rounded border border-accent-primary/20">
+            <div className="text-[10px] font-mono text-accent-primary bg-bg-panel p-1.5 rounded border border-accent-primary/20">
               $${formulaLatex}$$
             </div>
           )}
 
           <span className="text-[9px] font-mono text-text-tertiary block text-right mt-1">
-            {webUrlFragment ? "Clic para abrir enlace web ↗" : "Clic para saltar con resplandor neón ↗"}
+            {webUrlFragment ? "Clic para abrir enlace web ↗" : "Clic para ver pasaje citado ↗"}
           </span>
         </div>
       )}

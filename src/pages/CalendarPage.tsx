@@ -349,7 +349,7 @@ export const CalendarPage: React.FC = () => {
   return (
     <div className="flex flex-col gap-6 p-6 max-w-7xl mx-auto min-h-[calc(100vh-4rem)]">
       {/* Barra Superior con Controles */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border-subtle pb-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border-hairline pb-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-primary/10 text-accent-primary">
@@ -368,14 +368,14 @@ export const CalendarPage: React.FC = () => {
 
         <div className="flex items-center flex-wrap gap-2">
           {/* Switcher de Vista */}
-          <div className="flex items-center rounded-lg border border-border-subtle bg-bg-elevated/80 p-0.5 shadow-2xs">
+          <div className="flex items-center rounded-lg border border-border-hairline bg-bg-surface-2 p-0.5 shadow-2xs">
             <button
               type="button"
               onClick={() => setViewMode("month")}
               className={clsx(
                 "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-sans transition-all cursor-pointer",
                 viewMode === "month"
-                  ? "bg-accent-primary text-white font-medium shadow-2xs"
+                  ? "bg-accent-primary text-bg-surface-1 font-medium shadow-2xs"
                   : "text-text-secondary hover:text-text-primary"
               )}
             >
@@ -388,7 +388,7 @@ export const CalendarPage: React.FC = () => {
               className={clsx(
                 "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-sans transition-all cursor-pointer",
                 viewMode === "agenda"
-                  ? "bg-accent-primary text-white font-medium shadow-2xs"
+                  ? "bg-accent-primary text-bg-surface-1 font-medium shadow-2xs"
                   : "text-text-secondary hover:text-text-primary"
               )}
             >
@@ -401,7 +401,7 @@ export const CalendarPage: React.FC = () => {
           <button
             type="button"
             onClick={() => openModalWithDate(new Date())}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-accent-primary text-white text-xs font-sans font-medium hover:bg-accent-primary/90 transition-colors shadow-2xs cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-accent-primary text-bg-surface-1 text-xs font-sans font-medium hover:bg-accent-primary/90 transition-colors shadow-2xs cursor-pointer"
           >
             <Plus size={15} strokeWidth={2.2} />
             <span>Nuevo Vencimiento</span>
@@ -410,13 +410,13 @@ export const CalendarPage: React.FC = () => {
       </div>
 
       {/* Barra de Filtros y Navegación de Mes */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-bg-elevated/40 border border-border-subtle/80 rounded-xl p-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-bg-surface-1 border border-border-hairline rounded-xl p-3 shadow-xs">
         {/* Navegación Mes */}
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={handlePrevMonth}
-            className="flex h-8 w-8 items-center justify-center rounded-md border border-border-subtle bg-bg-surface text-text-secondary hover:text-text-primary hover:border-accent-primary transition-colors cursor-pointer shadow-2xs"
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-border-hairline bg-bg-surface-2 text-text-secondary hover:text-text-primary hover:border-accent-primary transition-colors cursor-pointer shadow-2xs"
             title="Mes anterior"
           >
             <ChevronLeft size={16} />
@@ -427,7 +427,7 @@ export const CalendarPage: React.FC = () => {
           <button
             type="button"
             onClick={handleNextMonth}
-            className="flex h-8 w-8 items-center justify-center rounded-md border border-border-subtle bg-bg-surface text-text-secondary hover:text-text-primary hover:border-accent-primary transition-colors cursor-pointer shadow-2xs"
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-border-hairline bg-bg-surface-2 text-text-secondary hover:text-text-primary hover:border-accent-primary transition-colors cursor-pointer shadow-2xs"
             title="Mes siguiente"
           >
             <ChevronRight size={16} />
@@ -435,7 +435,7 @@ export const CalendarPage: React.FC = () => {
           <button
             type="button"
             onClick={handleGoToday}
-            className="px-2.5 py-1 rounded-md border border-border-subtle bg-bg-surface text-xs font-sans font-medium text-text-secondary hover:text-text-primary hover:border-accent-primary transition-colors cursor-pointer ml-1"
+            className="px-2.5 py-1 rounded-md border border-border-hairline bg-bg-surface-2 text-xs font-sans font-medium text-text-secondary hover:text-text-primary hover:border-accent-primary transition-colors cursor-pointer ml-1"
           >
             Hoy
           </button>
@@ -446,20 +446,20 @@ export const CalendarPage: React.FC = () => {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value as any)}
-            className="h-8 px-2.5 rounded-md border border-border-subtle bg-bg-surface text-xs font-sans text-text-primary focus:outline-hidden focus:border-accent-primary cursor-pointer"
+            className="h-8 px-2.5 rounded-md border border-border-hairline bg-bg-surface-2 text-xs font-sans text-text-primary focus:outline-hidden focus:border-accent-primary cursor-pointer"
           >
             <option value="all">Todas las categorías</option>
-            <option value="exam">🔴 Exámenes / Parciales</option>
-            <option value="delivery">🟡 Entregas / TPs</option>
-            <option value="review">🔵 Repasos programados</option>
-            <option value="google">🟢 Google Calendar</option>
+            <option value="exam">Exámenes / Parciales</option>
+            <option value="delivery">Entregas / TPs</option>
+            <option value="review">Repasos programados</option>
+            <option value="google">Google Calendar</option>
           </select>
 
           {folders.length > 0 && (
             <select
               value={selectedSubjectId}
               onChange={(e) => setSelectedSubjectId(e.target.value)}
-              className="h-8 px-2.5 rounded-md border border-border-subtle bg-bg-surface text-xs font-sans text-text-primary focus:outline-hidden focus:border-accent-primary cursor-pointer max-w-[180px] truncate"
+              className="h-8 px-2.5 rounded-md border border-border-hairline bg-bg-surface-2 text-xs font-sans text-text-primary focus:outline-hidden focus:border-accent-primary cursor-pointer max-w-[180px] truncate"
             >
               <option value="all">Todas las materias</option>
               {folders.map((f) => (
@@ -475,9 +475,9 @@ export const CalendarPage: React.FC = () => {
       {/* VISTA 1: GRILLA MENSUAL */}
       {viewMode === "month" && (
         <div className="flex flex-col lg:flex-row gap-6">
-          <div className="flex-1 bg-bg-surface border border-border-subtle rounded-xl overflow-hidden shadow-2xs">
+          <div className="flex-1 bg-bg-surface-1 border border-border-hairline rounded-xl overflow-hidden shadow-xs">
             {/* Cabecera de Días de la Semana */}
-            <div className="grid grid-cols-7 border-b border-border-subtle bg-bg-elevated/40 text-center text-xs font-semibold uppercase tracking-wider text-text-muted py-2.5">
+            <div className="grid grid-cols-7 border-b border-border-hairline bg-bg-surface-2 text-center text-xs font-medium text-text-muted py-2.5">
               {DAY_NAMES.map((name) => (
                 <div key={name}>{name}</div>
               ))}
@@ -527,19 +527,19 @@ export const CalendarPage: React.FC = () => {
                           title={`${item.title} ${item.subjectName ? `(${item.subjectName})` : ""}`}
                           className={clsx(
                             "truncate text-[10px] px-1.5 py-0.5 rounded font-sans font-medium border leading-tight flex items-center gap-1",
-                            item.category === "exam" && "bg-red-500/10 text-red-700 dark:text-red-300 border-red-500/30",
-                            item.category === "delivery" && "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30",
-                            item.category === "review" && "bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/30",
-                            item.category === "google" && "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30"
+                            item.category === "exam" && "bg-signal-danger/10 text-signal-danger border-signal-danger/30",
+                            item.category === "delivery" && "bg-accent-primary/10 text-accent-primary border-accent-primary/30",
+                            item.category === "review" && "bg-bg-surface-2 text-text-primary border-border-hairline",
+                            item.category === "google" && "bg-signal-ok/10 text-signal-ok border-signal-ok/30"
                           )}
                         >
                           <span
                             className={clsx(
                               "h-1.5 w-1.5 rounded-full shrink-0",
-                              item.category === "exam" && "bg-red-500",
-                              item.category === "delivery" && "bg-amber-500",
-                              item.category === "review" && "bg-indigo-500",
-                              item.category === "google" && "bg-emerald-500"
+                              item.category === "exam" && "bg-signal-danger",
+                              item.category === "delivery" && "bg-accent-primary",
+                              item.category === "review" && "bg-text-secondary",
+                              item.category === "google" && "bg-signal-ok"
                             )}
                           />
                           <span className="truncate">{item.title}</span>
@@ -560,8 +560,8 @@ export const CalendarPage: React.FC = () => {
 
           {/* Panel Lateral: Detalle del Día Seleccionado */}
           <div className="w-full lg:w-80 flex flex-col gap-4">
-            <div className="border border-border-subtle bg-bg-surface rounded-xl p-4 shadow-2xs">
-              <div className="flex items-center justify-between border-b border-border-subtle pb-3 mb-3">
+            <div className="border border-border-hairline bg-bg-surface-1 rounded-xl p-4 shadow-xs">
+              <div className="flex items-center justify-between border-b border-border-hairline pb-3 mb-3">
                 <div>
                   <h2 className="font-serif text-base font-semibold text-text-primary">
                     {selectedDayTimestamp
@@ -605,17 +605,17 @@ export const CalendarPage: React.FC = () => {
                 {selectedDayItems?.map((item) => (
                   <div
                     key={item.id}
-                    className="p-2.5 rounded-lg border border-border-subtle bg-bg-elevated/40 hover:bg-bg-elevated transition-colors flex items-start justify-between gap-2"
+                    className="p-2.5 rounded-lg border border-border-hairline bg-bg-surface-2 hover:bg-bg-surface-3 transition-colors flex items-start justify-between gap-2"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 mb-1">
                         <span
                           className={clsx(
-                            "px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider",
-                            item.category === "exam" && "bg-red-500/15 text-red-700 dark:text-red-300",
-                            item.category === "delivery" && "bg-amber-500/15 text-amber-700 dark:text-amber-300",
-                            item.category === "review" && "bg-indigo-500/15 text-indigo-700 dark:text-indigo-300",
-                            item.category === "google" && "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                            "px-1.5 py-0.5 rounded text-[10px] font-medium",
+                            item.category === "exam" && "bg-signal-danger/15 text-signal-danger",
+                            item.category === "delivery" && "bg-accent-primary/15 text-accent-primary",
+                            item.category === "review" && "bg-bg-surface-3 text-text-primary",
+                            item.category === "google" && "bg-signal-ok/15 text-signal-ok"
                           )}
                         >
                           {item.category === "exam" ? "Examen" : item.category === "delivery" ? "Entrega" : item.category === "review" ? "Repaso" : "G-Calendar"}
@@ -639,7 +639,7 @@ export const CalendarPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleDeleteItem(item)}
-                        className="text-text-muted hover:text-red-500 p-1 rounded transition-colors cursor-pointer"
+                        className="text-text-muted hover:text-signal-danger p-1 rounded transition-colors cursor-pointer"
                         title="Eliminar evento"
                       >
                         <Trash2 size={13} />
@@ -655,8 +655,8 @@ export const CalendarPage: React.FC = () => {
 
       {/* VISTA 2: AGENDA CRONOLÓGICA */}
       {viewMode === "agenda" && (
-        <div className="border border-border-subtle bg-bg-surface rounded-xl p-6 shadow-2xs">
-          <div className="flex items-center justify-between border-b border-border-subtle pb-4 mb-4">
+        <div className="border border-border-hairline bg-bg-surface-1 rounded-xl p-6 shadow-xs">
+          <div className="flex items-center justify-between border-b border-border-hairline pb-4 mb-4">
             <div>
               <h2 className="font-serif text-lg font-semibold text-text-primary">
                 Próximos Vencimientos & Hitos
@@ -665,7 +665,7 @@ export const CalendarPage: React.FC = () => {
                 Listado ordenado cronológicamente con cuenta regresiva
               </p>
             </div>
-            <span className="text-xs font-mono bg-bg-elevated px-2 py-1 rounded text-text-secondary border border-border-subtle">
+            <span className="text-xs font-mono bg-bg-surface-2 px-2 py-1 rounded text-text-secondary border border-border-hairline">
               Total: {filteredItems.length}
             </span>
           </div>
@@ -695,18 +695,18 @@ export const CalendarPage: React.FC = () => {
                     className={clsx(
                       "p-4 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4",
                       isOverdue
-                        ? "border-red-500/30 bg-red-500/5"
-                        : "border-border-subtle bg-bg-elevated/40 hover:bg-bg-elevated/80"
+                        ? "border-signal-danger/30 bg-signal-danger/5"
+                        : "border-border-hairline bg-bg-surface-2 hover:bg-bg-surface-3"
                     )}
                   >
                     <div className="flex items-start gap-3">
                       <div
                         className={clsx(
                           "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border",
-                          item.category === "exam" && "bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400",
-                          item.category === "delivery" && "bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400",
-                          item.category === "review" && "bg-indigo-500/10 border-indigo-500/20 text-indigo-600 dark:text-indigo-400",
-                          item.category === "google" && "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                          item.category === "exam" && "bg-signal-danger/10 border-signal-danger/20 text-signal-danger",
+                          item.category === "delivery" && "bg-accent-primary/10 border-accent-primary/20 text-accent-primary",
+                          item.category === "review" && "bg-bg-surface-3 border-border-hairline text-text-primary",
+                          item.category === "google" && "bg-signal-ok/10 border-signal-ok/20 text-signal-ok"
                         )}
                       >
                         {item.category === "exam" ? (
@@ -722,11 +722,11 @@ export const CalendarPage: React.FC = () => {
                         <div className="flex items-center gap-2 flex-wrap mb-1">
                           <span
                             className={clsx(
-                              "px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider",
-                              item.category === "exam" && "bg-red-500/15 text-red-700 dark:text-red-300",
-                              item.category === "delivery" && "bg-amber-500/15 text-amber-700 dark:text-amber-300",
-                              item.category === "review" && "bg-indigo-500/15 text-indigo-700 dark:text-indigo-300",
-                              item.category === "google" && "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                              "px-2 py-0.5 rounded text-[10px] font-medium",
+                              item.category === "exam" && "bg-signal-danger/15 text-signal-danger",
+                              item.category === "delivery" && "bg-accent-primary/15 text-accent-primary",
+                              item.category === "review" && "bg-bg-surface-3 text-text-primary",
+                              item.category === "google" && "bg-signal-ok/15 text-signal-ok"
                             )}
                           >
                             {item.category === "exam" ? "Examen" : item.category === "delivery" ? "Entrega" : item.category === "review" ? "Repaso" : "Google Calendar"}
@@ -755,8 +755,8 @@ export const CalendarPage: React.FC = () => {
                         className={clsx(
                           "px-2.5 py-1 rounded-md text-xs font-sans font-medium border",
                           isOverdue
-                            ? "bg-red-500/10 text-red-700 dark:text-red-300 border-red-500/20"
-                            : "bg-bg-surface text-text-secondary border-border-subtle"
+                            ? "bg-signal-danger/10 text-signal-danger border-signal-danger/20"
+                            : "bg-bg-surface-1 text-text-secondary border-border-hairline"
                         )}
                       >
                         {isOverdue ? `Venció: ${formatted}` : `Plazo: ${formatted}`}
@@ -766,7 +766,7 @@ export const CalendarPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleDeleteItem(item)}
-                          className="flex h-8 w-8 items-center justify-center rounded-md border border-border-subtle bg-bg-surface text-text-muted hover:text-red-500 hover:border-red-500/40 transition-colors cursor-pointer"
+                          className="flex h-8 w-8 items-center justify-center rounded-md border border-border-hairline bg-bg-surface-1 text-text-muted hover:text-signal-danger hover:border-signal-danger/40 transition-colors cursor-pointer"
                           title="Eliminar vencimiento"
                         >
                           <Trash2 size={14} />
@@ -788,10 +788,10 @@ export const CalendarPage: React.FC = () => {
           onClick={() => setIsModalOpen(false)}
         >
           <div
-            className="w-full max-w-md rounded-xl border border-border-subtle bg-bg-surface p-6 shadow-2xl space-y-4"
+            className="w-full max-w-md rounded-xl border border-border-hairline bg-bg-surface-1 p-6 shadow-lg space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-border-subtle pb-3">
+            <div className="flex items-center justify-between border-b border-border-hairline pb-3">
               <div className="flex items-center gap-2">
                 <CalendarIcon size={18} className="text-accent-primary" />
                 <h3 className="font-serif text-base font-semibold text-text-primary">
@@ -808,7 +808,7 @@ export const CalendarPage: React.FC = () => {
             </div>
 
             {errorMessage && (
-              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-xs">
+              <div className="p-3 rounded-lg bg-signal-danger/10 border border-signal-danger/30 text-signal-danger text-xs">
                 {errorMessage}
               </div>
             )}
@@ -824,7 +824,7 @@ export const CalendarPage: React.FC = () => {
                   placeholder="Ej: Primer Parcial de Química Orgánica"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full h-9 px-3 rounded-md border border-border-subtle bg-bg-elevated text-xs text-text-primary focus:outline-hidden focus:border-accent-primary"
+                  className="w-full h-9 px-3 rounded-md border border-border-hairline bg-bg-surface-2 text-xs text-text-primary focus:outline-hidden focus:border-accent-primary"
                 />
               </div>
 
@@ -850,13 +850,13 @@ export const CalendarPage: React.FC = () => {
                     placeholder="Ej: Biología Celular, Química (opcional)"
                     value={customSubjectName}
                     onChange={(e) => setCustomSubjectName(e.target.value)}
-                    className="w-full h-9 px-3 rounded-md border border-border-subtle bg-bg-elevated text-xs text-text-primary focus:outline-hidden focus:border-accent-primary"
+                    className="w-full h-9 px-3 rounded-md border border-border-hairline bg-bg-surface-2 text-xs text-text-primary focus:outline-hidden focus:border-accent-primary"
                   />
                 ) : (
                   <select
                     value={newSubjectId}
                     onChange={(e) => setNewSubjectId(e.target.value)}
-                    className="w-full h-9 px-2.5 rounded-md border border-border-subtle bg-bg-elevated text-xs text-text-primary focus:outline-hidden focus:border-accent-primary cursor-pointer truncate"
+                    className="w-full h-9 px-2.5 rounded-md border border-border-hairline bg-bg-surface-2 text-xs text-text-primary focus:outline-hidden focus:border-accent-primary cursor-pointer truncate"
                   >
                     <option value="">(Opcional) Sin cátedra asignada</option>
                     {folders.map((f) => (
@@ -879,7 +879,7 @@ export const CalendarPage: React.FC = () => {
                   <select
                     value={newType}
                     onChange={(e) => setNewType(e.target.value as any)}
-                    className="w-full h-9 px-2.5 rounded-md border border-border-subtle bg-bg-elevated text-xs text-text-primary focus:outline-hidden focus:border-accent-primary cursor-pointer"
+                    className="w-full h-9 px-2.5 rounded-md border border-border-hairline bg-bg-surface-2 text-xs text-text-primary focus:outline-hidden focus:border-accent-primary cursor-pointer"
                   >
                     <option value="Parcial">Parcial</option>
                     <option value="Final">Examen Final</option>
@@ -898,7 +898,7 @@ export const CalendarPage: React.FC = () => {
                     type="time"
                     value={newTime}
                     onChange={(e) => setNewTime(e.target.value)}
-                    className="w-full h-9 px-3 rounded-md border border-border-subtle bg-bg-elevated text-xs text-text-primary focus:outline-hidden focus:border-accent-primary"
+                    className="w-full h-9 px-3 rounded-md border border-border-hairline bg-bg-surface-2 text-xs text-text-primary focus:outline-hidden focus:border-accent-primary"
                   />
                 </div>
               </div>
@@ -934,7 +934,7 @@ export const CalendarPage: React.FC = () => {
                         setNewDate(formatLocalDate(parsed));
                       }
                     }}
-                    className="flex-1 h-9 px-3 rounded-md border border-border-subtle bg-bg-elevated text-xs font-mono text-text-primary focus:outline-hidden focus:border-accent-primary"
+                    className="flex-1 h-9 px-3 rounded-md border border-border-hairline bg-bg-surface-2 text-xs font-mono text-text-primary focus:outline-hidden focus:border-accent-primary"
                   />
                   <div className="relative">
                     <input
@@ -953,7 +953,7 @@ export const CalendarPage: React.FC = () => {
                     />
                     <button
                       type="button"
-                      className="h-9 px-3 rounded-md border border-border-subtle bg-bg-elevated hover:bg-bg-surface-2 text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1.5 text-xs font-sans cursor-pointer"
+                      className="h-9 px-3 rounded-md border border-border-hairline bg-bg-surface-2 hover:bg-bg-surface-3 text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1.5 text-xs font-sans cursor-pointer"
                     >
                       <CalendarIcon size={14} className="text-accent-primary" />
                       <span className="hidden sm:inline">Elegir</span>
@@ -965,18 +965,18 @@ export const CalendarPage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-border-subtle">
+              <div className="flex justify-end gap-2 pt-3 border-t border-border-hairline">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-3.5 py-1.5 rounded-md border border-border-subtle bg-bg-elevated text-xs font-sans text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-md border border-border-hairline bg-bg-surface-2 text-xs font-sans text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting || !newTitle.trim() || (!newDate && !inputDateText.trim())}
-                  className="px-4 py-1.5 rounded-md bg-accent-primary text-white text-xs font-sans font-medium hover:bg-accent-primary/90 transition-colors shadow-2xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-1.5 rounded-md bg-accent-primary text-bg-surface-1 text-xs font-sans font-medium hover:bg-accent-primary/90 transition-colors shadow-2xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? "Guardando..." : "Guardar Vencimiento"}
                 </button>

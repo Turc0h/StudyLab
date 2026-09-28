@@ -21,6 +21,8 @@ import {
   type DossierData,
   type DossierSectionConfig,
 } from "../../features/dossier/dossierGenerator.ts";
+import { compileAcademicDossierNative } from "../../platform/nativeDossier.ts";
+import { isDesktop } from "../../platform/platform.ts";
 
 interface DossierPreviewModalProps {
   isOpen: boolean;
@@ -63,9 +65,39 @@ export const DossierPreviewModal: React.FC<DossierPreviewModalProps> = ({
     setConfig((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const handlePrint = () => {
+  const getDossierHtmlCompiled = async (): Promise<string> => {
+    if (!dossierData) return "";
+    if (isDesktop()) {
+      try {
+        const native = await compileAcademicDossierNative({
+          subject_name: dossierData.title,
+          career: "Carrera Universitaria",
+          student_name: "Estudiante",
+          concepts: (dossierData.concepts || []).map((c) => ({
+            name: c.name,
+            mastery_score: c.masteryScore ?? 0.8,
+            status: c.status || "in_progress",
+            description: c.description || "",
+          })),
+          errors: (dossierData.errors || []).map((e) => ({
+            concept: e.conceptName,
+            category: e.category,
+            explanation: e.explanation,
+            fix: e.expectedAnswer || "Revisar concepto formal",
+          })),
+          proofs: [],
+        });
+        return native.html_content;
+      } catch (err) {
+        console.warn("Fallback a generador HTML frontend:", err);
+      }
+    }
+    return generateDossierHtml(dossierData, config);
+  };
+
+  const handlePrint = async () => {
     if (!dossierData) return;
-    const html = generateDossierHtml(dossierData, config);
+    const html = await getDossierHtmlCompiled();
     const printWindow = window.open("", "_blank");
     if (printWindow) {
       printWindow.document.write(html);
@@ -89,9 +121,9 @@ export const DossierPreviewModal: React.FC<DossierPreviewModalProps> = ({
     URL.revokeObjectURL(url);
   };
 
-  const handleDownloadHtml = () => {
+  const handleDownloadHtml = async () => {
     if (!dossierData) return;
-    const html = generateDossierHtml(dossierData, config);
+    const html = await getDossierHtmlCompiled();
     const blob = new Blob([html], { type: "text/html;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -123,6 +155,12 @@ export const DossierPreviewModal: React.FC<DossierPreviewModalProps> = ({
                   Exportador de Dossier Universitario
                 </h3>
                 <Badge variant="accent">A4 Print & Markdown</Badge>
+                {isDesktop() && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-accent-primary/10 px-2 py-0.5 text-[10px] font-mono font-medium text-accent-primary">
+                    <Sparkles size={10} />
+                    Compilador A4 Rust
+                  </span>
+                )}
               </div>
               <p className="text-xs text-text-secondary mt-0.5">
                 Genera un compendio de síntesis estructurado listo para imprimir o estudiar sin pantallas.

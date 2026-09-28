@@ -185,8 +185,8 @@ export const SelfExplanationMethod: React.FC<SelfExplanationMethodProps> = ({ on
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-            <div className="rounded-lg border border-sky-500/20 bg-sky-500/5 p-3 space-y-1.5">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-sky-400 flex items-center gap-1">
+            <div className="rounded-lg border border-border-hairline bg-bg-surface-2 p-3 space-y-1.5">
+              <span className="text-[10px] font-mono text-accent-primary flex items-center gap-1">
                 <HelpCircle className="h-3 w-3" />
                 <span>¿Por qué es válido este paso específico?</span>
               </span>
@@ -195,8 +195,8 @@ export const SelfExplanationMethod: React.FC<SelfExplanationMethodProps> = ({ on
               </p>
             </div>
 
-            <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 space-y-1.5">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 flex items-center gap-1">
+            <div className="rounded-lg border border-border-hairline bg-bg-surface-2 p-3 space-y-1.5">
+              <span className="text-[10px] font-mono text-text-secondary flex items-center gap-1">
                 <Sparkles className="h-3 w-3" />
                 <span>¿Qué cambiaría si la premisa varía?</span>
               </span>

@@ -2,14 +2,13 @@ import React, { useState } from "react";
 import { Card, CardTitle } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
+import { FlipCard } from "../shells";
 import { saveStudySession } from "../../lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "../../db/db";
 import { 
   Inbox, 
-  RotateCw, 
   CheckCircle2, 
-  XCircle, 
   Trophy, 
   Layers, 
   RefreshCcw
@@ -60,11 +59,11 @@ const DEFAULT_CARDS: LeitnerCard[] = [
 ];
 
 const BOX_SCHEDULES = [
-  { box: 1, label: "Caja 1", frequency: "Diario", color: "border-amber-500/30 bg-amber-500/5 text-amber-500" },
-  { box: 2, label: "Caja 2", frequency: "Cada 3 días", color: "border-sky-500/30 bg-sky-500/5 text-sky-500" },
-  { box: 3, label: "Caja 3", frequency: "Semanal", color: "border-indigo-500/30 bg-indigo-500/5 text-indigo-500" },
-  { box: 4, label: "Caja 4", frequency: "Quincenal", color: "border-purple-500/30 bg-purple-500/5 text-purple-500" },
-  { box: 5, label: "Caja 5", frequency: "Graduadas", color: "border-emerald-500/30 bg-emerald-500/5 text-emerald-500" },
+  { box: 1, label: "Caja 1", frequency: "Diario", color: "border-border-hairline bg-bg-surface-2 text-text-primary" },
+  { box: 2, label: "Caja 2", frequency: "Cada 3 días", color: "border-border-hairline bg-bg-surface-2 text-text-primary" },
+  { box: 3, label: "Caja 3", frequency: "Semanal", color: "border-border-hairline bg-bg-surface-2 text-text-primary" },
+  { box: 4, label: "Caja 4", frequency: "Quincenal", color: "border-border-hairline bg-bg-surface-2 text-text-primary" },
+  { box: 5, label: "Caja 5", frequency: "Graduadas", color: "border-accent-primary/40 bg-accent-primary/5 text-accent-primary" },
 ];
 
 export const LeitnerMethod: React.FC<LeitnerMethodProps> = ({ onSessionFinished }) => {
@@ -156,13 +155,13 @@ export const LeitnerMethod: React.FC<LeitnerMethodProps> = ({ onSessionFinished 
   const masteryPercentage = Math.round((graduatedCount / Math.max(1, cards.length)) * 100);
 
   return (
-    <Card elevated className="flex flex-col gap-6">
+    <Card className="flex flex-col gap-6 rounded-xl border border-border-hairline bg-bg-surface-1 p-5 shadow-xs">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border-subtle pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border-hairline pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <CardTitle>Método Leitner (Cajas de Flashcards)</CardTitle>
-            <Badge variant="accent">5 Compartimentos</Badge>
+            <CardTitle className="font-serif text-lg text-text-primary">Método Leitner (Cajas de Flashcards)</CardTitle>
+            <Badge variant="neutral" className="text-xs">5 Compartimentos</Badge>
           </div>
           <p className="text-xs text-text-secondary mt-1">
             Mecanismo físico de espaciado: el acierto asciende la tarjeta; el olvido la devuelve inmediatamente a la Caja 1.
@@ -192,7 +191,7 @@ export const LeitnerMethod: React.FC<LeitnerMethodProps> = ({ onSessionFinished 
             <div
               key={b.box}
               className={`rounded-lg border p-3 flex flex-col items-center text-center transition-all ${b.color} ${
-                isCurrentCardInThisBox ? "ring-2 ring-accent-primary scale-102" : "opacity-90"
+                isCurrentCardInThisBox ? "ring-2 ring-accent-primary scale-[1.02]" : "opacity-90"
               }`}
             >
               <div className="flex items-center gap-1.5 font-serif text-xs font-semibold">
@@ -219,74 +218,60 @@ export const LeitnerMethod: React.FC<LeitnerMethodProps> = ({ onSessionFinished 
             </span>
           </div>
 
-          {/* Flashcard Canvas */}
-          <div className="min-h-[220px] rounded-xl border border-border-subtle bg-bg-secondary p-6 flex flex-col justify-between shadow-xs transition-all">
-            <div>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted">
-                Anverso (Pregunta / Disparador)
-              </span>
-              <p className="mt-2 text-base sm:text-lg font-medium text-text-primary leading-relaxed">
-                {currentCard.front}
-              </p>
-            </div>
-
-            {showAnswer ? (
-              <div className="mt-4 pt-4 border-t border-border-subtle/60">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-accent-primary">
-                  Reverso (Respuesta Completa)
+          <FlipCard
+            front={
+              <div className="py-2">
+                <span className="text-xs text-text-muted font-sans">
+                  Anverso: pregunta o término disparador
                 </span>
-                <p className="mt-2 text-sm sm:text-base text-text-primary leading-relaxed font-sans bg-bg-elevated/70 p-3 rounded-lg border border-border-subtle">
+                <p className="mt-3 text-base sm:text-lg font-serif font-medium text-text-primary leading-relaxed">
+                  {currentCard.front}
+                </p>
+              </div>
+            }
+            back={
+              <div className="py-2">
+                <span className="text-xs text-accent-primary font-sans font-medium">
+                  Reverso: desarrollo conceptual completo
+                </span>
+                <p className="mt-3 text-sm sm:text-base text-text-primary leading-relaxed font-sans bg-bg-surface-2 p-3.5 rounded-lg border border-border-hairline">
                   {currentCard.back}
                 </p>
               </div>
-            ) : (
-              <div className="mt-6 flex justify-center">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setShowAnswer(true)}
-                  className="flex items-center gap-2 text-xs"
-                >
-                  <RotateCw className="h-3.5 w-3.5" />
-                  <span>Revelar Respuesta</span>
-                </Button>
-              </div>
-            )}
-          </div>
-
-          {/* Action Buttons */}
-          {showAnswer && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-              <Button
-                variant="outline"
-                onClick={() => handleGrade(false)}
-                className="flex items-center justify-center gap-2 border-rose-500/40 text-rose-400 hover:bg-rose-500/10"
-              >
-                <XCircle className="h-4 w-4 text-rose-500" />
-                <span>Me Equivoqué (Volver a Caja 1)</span>
-              </Button>
-
-              <Button
-                variant="primary"
-                onClick={() => handleGrade(true)}
-                className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white"
-              >
-                <CheckCircle2 className="h-4 w-4" />
-                <span>¡Acerté! (Avanzar a Caja {Math.min(5, currentCard.box + 1)})</span>
-              </Button>
-            </div>
-          )}
+            }
+            frontBadge={`Tarjeta ${currentCardIndex + 1} de ${cards.length} • Caja ${currentCard.box}`}
+            backBadge={`Reverso • Caja ${currentCard.box}`}
+            isFlipped={showAnswer}
+            onFlip={setShowAnswer}
+            ratings={[
+              {
+                value: false,
+                label: "Revisar nuevamente",
+                subtitle: "Volver a Caja 1",
+                keyHint: "1",
+                variant: "danger",
+              },
+              {
+                value: true,
+                label: "Respuesta correcta",
+                subtitle: `Avanzar a Caja ${Math.min(5, currentCard.box + 1)}`,
+                keyHint: "2",
+                variant: "success",
+              },
+            ]}
+            onRate={(correct) => handleGrade(Boolean(correct))}
+          />
         </div>
       ) : (
         /* Summary Screen */
-        <div className="rounded-xl border border-border-subtle bg-bg-secondary p-8 text-center space-y-6">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400">
+        <div className="rounded-xl border border-border-hairline bg-bg-surface-2 p-8 text-center space-y-6">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-signal-ok/10 text-signal-ok">
             <Trophy className="h-7 w-7" />
           </div>
 
           <div>
             <h3 className="font-serif text-xl font-semibold text-text-primary">
-              ¡Ronda Leitner Completada!
+              Ronda Leitner completada
             </h3>
             <p className="text-xs text-text-secondary mt-1">
               Has evaluado {reviewedCount} tarjetas. Las acertadas avanzaron hacia intervalos mayores, mientras que los fallos volvieron a la Caja 1 para consolidación inmediata.
@@ -294,15 +279,15 @@ export const LeitnerMethod: React.FC<LeitnerMethodProps> = ({ onSessionFinished 
           </div>
 
           <div className="grid grid-cols-3 gap-4 max-w-md mx-auto text-left">
-            <div className="rounded-lg border border-border-subtle bg-bg-elevated p-3 text-center">
+            <div className="rounded-lg border border-border-hairline bg-bg-surface-1 p-3 text-center">
               <span className="text-[10px] text-text-muted">Aciertos</span>
-              <div className="font-mono text-lg font-bold text-emerald-400">{correctCount}</div>
+              <div className="font-mono text-lg font-bold text-signal-ok">{correctCount}</div>
             </div>
-            <div className="rounded-lg border border-border-subtle bg-bg-elevated p-3 text-center">
+            <div className="rounded-lg border border-border-hairline bg-bg-surface-1 p-3 text-center">
               <span className="text-[10px] text-text-muted">Graduadas (Caja 5)</span>
               <div className="font-mono text-lg font-bold text-accent-primary">{graduatedCount}</div>
             </div>
-            <div className="rounded-lg border border-border-subtle bg-bg-elevated p-3 text-center">
+            <div className="rounded-lg border border-border-hairline bg-bg-surface-1 p-3 text-center">
               <span className="text-[10px] text-text-muted">Consolidación</span>
               <div className="font-mono text-lg font-bold text-text-primary">{masteryPercentage}%</div>
             </div>

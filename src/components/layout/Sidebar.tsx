@@ -18,8 +18,8 @@ import {
   PanelLeftClose,
   PanelLeft,
   Compass,
-  RotateCcw,
   Calendar,
+  PenTool,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { useTutorialStore } from "../../stores/useTutorialStore";
@@ -33,17 +33,17 @@ export const Sidebar: React.FC = () => {
   const toggleSidebar = useThemeStore((s) => s.toggleSidebar);
   const contextEngineEnabled = useContextEngineStore((s) => s.contextEngineEnabled);
 
-  // Pilares Principales: Inicio (arriba) + Estudiar, Organización, Biblioteca, Repasar, Progreso
+  // Pilares Principales: Estudiar (Métodos de Estudio), Organización, Biblioteca, Progreso
   const primaryPillars = [
-    { to: "/workspace", label: "Estudiar", icon: GraduationCap },
+    { to: "/methods", label: "Estudiar", icon: GraduationCap },
     { to: "/calendar", label: "Organización", icon: Calendar },
     { to: "/files", label: "Biblioteca", icon: FolderOpen },
-    { to: "/methods", label: "Repasar", icon: RotateCcw },
     { to: "/graph", label: "Progreso", icon: Network },
   ];
 
   const toolItems = [
     { to: "/session", label: "Sesión Activa", icon: Play },
+    { to: "/blackboard", label: "Pizarra Virtual", icon: PenTool },
     { to: "/pdf", label: "Anotador PDF", icon: FileText },
     { to: "/ocr", label: "Extracción OCR", icon: ScanText },
     { to: "/books", label: "Escanear Libros", icon: Library },
@@ -105,7 +105,7 @@ export const Sidebar: React.FC = () => {
           <span className="font-serif text-base font-semibold tracking-tight text-text-primary">
             StudyLab
           </span>
-          <span className="font-sans text-[10px] uppercase tracking-wider text-accent-ink bg-accent-ink/10 border border-accent-ink/20 px-1.5 py-0.5 rounded">
+          <span className="font-sans text-[10px] font-medium text-text-secondary bg-bg-surface-2 border border-border-hairline px-1.5 py-0.5 rounded">
             Desktop
           </span>
         </motion.div>
@@ -117,7 +117,7 @@ export const Sidebar: React.FC = () => {
         <NavLink
           to="/"
           end
-          title="Inicio / Dashboard (Home)"
+          title="Inicio / Dashboard"
           aria-label="Inicio / Dashboard"
           className={({ isActive }) =>
             clsx(
@@ -142,9 +142,9 @@ export const Sidebar: React.FC = () => {
                 initial={false}
                 animate={{ width: !isCollapsed ? "auto" : 0, opacity: !isCollapsed ? 1 : 0 }}
                 transition={{ duration: DURATION.base, ease: EASE_EXPO_OUT }}
-                className="overflow-hidden whitespace-nowrap tracking-wide uppercase text-[11px] font-bold"
+                className="overflow-hidden whitespace-nowrap text-xs font-medium"
               >
-                HOME
+                Inicio
               </motion.span>
             </>
           )}
@@ -159,7 +159,7 @@ export const Sidebar: React.FC = () => {
               transition={{ duration: DURATION.fast, ease: EASE_EXPO_OUT }}
               className="overflow-hidden whitespace-nowrap pointer-events-none"
             >
-              <span className="block px-2 pt-1 font-sans text-[10px] font-semibold uppercase tracking-wider text-text-muted whitespace-nowrap truncate select-none">
+              <span className="block px-2 pt-1 font-sans text-[11px] font-medium text-text-tertiary whitespace-nowrap truncate select-none">
                 {section.title}
               </span>
             </motion.div>

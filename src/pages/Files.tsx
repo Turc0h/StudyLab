@@ -69,7 +69,7 @@ export function Files() {
       <div className="grid gap-6 md:grid-cols-[220px_1fr]">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between px-1">
-            <span className="font-mono text-[11px] font-semibold text-text-tertiary uppercase tracking-wider">
+            <span className="font-mono text-xs font-medium text-text-secondary">
               Carpetas
             </span>
             <PanelGuide

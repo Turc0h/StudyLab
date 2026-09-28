@@ -40,7 +40,8 @@ export type StudyMethodId =
   | "local-ai"
   | "audio-flashcards"
   | "final-board"
-  | "math-blackboard";
+  | "math-blackboard"
+  | "split-screen";
 
 export interface StudyMethodInfo {
   id: StudyMethodId;

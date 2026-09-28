@@ -1,4 +1,4 @@
-import { db, type CardFsrsRecord, type ReviewLogRecord, type FlashcardRecord } from "../../db/db";
+import { db, type CardFsrsRecord, type ReviewLogRecord, type FlashcardRecord } from "../../db/db.ts";
 import {
   calculateHalfLife,
   calculateInitialDifficulty,
@@ -10,7 +10,7 @@ import {
   calculateRetrievability,
   DEFAULT_FSRS_PARAMS,
   type FsrsRating,
-} from "./fsrsModel";
+} from "./fsrsModel.ts";
 
 export interface ReviewResult {
   updatedCard: CardFsrsRecord;

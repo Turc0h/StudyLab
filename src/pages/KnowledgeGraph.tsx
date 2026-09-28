@@ -131,17 +131,17 @@ export function KnowledgeGraph() {
 
       {/* Critical Bottlenecks Banner */}
       {bottlenecks.length > 0 && (
-        <div className="rounded-xl border border-warning/40 bg-warning/10 p-5 backdrop-blur-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-lg">
+        <div className="rounded-xl border border-accent-primary/30 bg-accent-primary/5 p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs">
           <div className="flex items-start gap-3.5">
-            <div className="p-2.5 rounded-lg bg-warning/20 text-warning shrink-0 mt-0.5">
-              <AlertTriangle className="h-5 w-5 animate-pulse" />
+            <div className="p-2.5 rounded-lg bg-accent-primary/10 text-accent-primary shrink-0 mt-0.5">
+              <AlertTriangle className="h-5 w-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-display font-semibold text-text-primary text-sm">
+                <h3 className="font-serif font-semibold text-text-primary text-sm">
                   {bottlenecks.length} Cuello{bottlenecks.length > 1 ? "s" : ""} de Botella Cognitivo Detectado
                 </h3>
-                <Badge variant="warning">Impacto Sistémico</Badge>
+                <Badge variant="neutral" className="border-border-hairline text-accent-primary">Impacto Sistémico</Badge>
               </div>
               <p className="text-xs text-text-secondary mt-1">
                 El concepto <strong>"{bottlenecks[0].name}"</strong> está frenando el avance en conceptos dependientes.
@@ -151,12 +151,12 @@ export function KnowledgeGraph() {
           </div>
           <Button
             size="sm"
-            variant="secondary"
+            variant="outline"
             onClick={() => {
               const target = evaluatedConcepts.find((c) => c.id === bottlenecks[0].conceptId);
               if (target) setSelectedConcept(target);
             }}
-            className="shrink-0 border-warning/50 text-warning hover:bg-warning/20"
+            className="shrink-0 border-accent-primary/40 text-accent-primary hover:bg-accent-primary/10 text-xs"
           >
             Inspeccionar Bloqueo
           </Button>
@@ -165,7 +165,7 @@ export function KnowledgeGraph() {
 
       {/* Main Canvas View Header */}
       <div className="flex items-center justify-between px-1">
-        <span className="font-mono text-xs text-text-tertiary uppercase tracking-wider">
+        <span className="font-serif text-sm font-medium text-text-secondary">
           Lienzo Topológico Interactivo
         </span>
         <PanelGuide
@@ -194,13 +194,13 @@ export function KnowledgeGraph() {
 
       {/* Knowledge Graph Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="rounded-xl border border-border-subtle bg-bg-surface-2 p-5 flex items-center gap-4">
+        <div className="rounded-xl border border-border-hairline bg-bg-surface-1 p-5 flex items-center gap-4 shadow-xs">
           <div className="p-3 rounded-lg bg-accent-primary/10 text-accent-primary">
             <Network className="h-6 w-6" />
           </div>
           <div>
-            <span className="text-xs font-mono text-text-tertiary uppercase">Nodos Activos</span>
-            <p className="font-display text-2xl font-bold text-text-primary">
+            <span className="text-xs text-text-muted font-sans">Nodos activos</span>
+            <p className="font-serif text-2xl font-bold text-text-primary">
               {evaluatedConcepts.length}
             </p>
             <span className="text-[11px] text-text-secondary">
@@ -209,13 +209,13 @@ export function KnowledgeGraph() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border-subtle bg-bg-surface-2 p-5 flex items-center gap-4">
-          <div className="p-3 rounded-lg bg-danger/10 text-danger">
+        <div className="rounded-xl border border-border-hairline bg-bg-surface-1 p-5 flex items-center gap-4 shadow-xs">
+          <div className="p-3 rounded-lg bg-signal-danger/10 text-signal-danger">
             <Zap className="h-6 w-6" />
           </div>
           <div>
-            <span className="text-xs font-mono text-text-tertiary uppercase">Nodos Bloqueados</span>
-            <p className="font-display text-2xl font-bold text-text-primary">
+            <span className="text-xs text-text-muted font-sans">Nodos bloqueados</span>
+            <p className="font-serif text-2xl font-bold text-text-primary">
               {evaluatedConcepts.filter((c) => c.status === "locked").length}
             </p>
             <span className="text-[11px] text-text-secondary">
@@ -224,13 +224,13 @@ export function KnowledgeGraph() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border-subtle bg-bg-surface-2 p-5 flex items-center gap-4">
-          <div className="p-3 rounded-lg bg-success/10 text-success">
+        <div className="rounded-xl border border-border-hairline bg-bg-surface-1 p-5 flex items-center gap-4 shadow-xs">
+          <div className="p-3 rounded-lg bg-signal-ok/10 text-signal-ok">
             <CheckCircle2 className="h-6 w-6" />
           </div>
           <div>
-            <span className="text-xs font-mono text-text-tertiary uppercase">Retención Media del Grafo</span>
-            <p className="font-display text-2xl font-bold text-text-primary">
+            <span className="text-xs text-text-muted font-sans">Retención media del grafo</span>
+            <p className="font-serif text-2xl font-bold text-text-primary">
               {evaluatedConcepts.length > 0
                 ? (
                     (evaluatedConcepts.reduce((acc, c) => acc + c.currentRetrievability, 0) /

@@ -5,6 +5,7 @@ import { Badge } from "../ui/Badge";
 import { Input, Textarea } from "../ui/Input";
 import { saveStudySession } from "../../lib/db";
 import { Clock, Eye, EyeOff, Check, BookOpen, FileText, ArrowRight } from "lucide-react";
+import { SplitPanel } from "../shells";
 
 export interface CornellMethodProps {
   onSessionFinished?: () => void;
@@ -60,12 +61,12 @@ export const CornellMethod: React.FC<CornellMethodProps> = ({ onSessionFinished 
   return (
     <div className="space-y-6">
       {/* Editorial Header */}
-      <Card elevated className="flex flex-col gap-4 p-5">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border-subtle pb-4">
+      <Card className="flex flex-col gap-4 p-5 rounded-xl border border-border-hairline bg-bg-surface-1 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border-hairline pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <CardTitle className="font-serif text-lg">Método Cornell de Toma de Notas</CardTitle>
-              <Badge variant="accent">Escritura & Metacognición</Badge>
+              <CardTitle className="font-serif text-lg text-text-primary">Método Cornell de Toma de Notas</CardTitle>
+              <Badge variant="neutral" className="text-xs">Escritura & Metacognición</Badge>
             </div>
             <p className="text-xs text-text-secondary mt-0.5">
               Organización espacial en 3 zonas: Preguntas/Cues, Notas principales y Resumen sintetizador.
@@ -73,7 +74,7 @@ export const CornellMethod: React.FC<CornellMethodProps> = ({ onSessionFinished 
           </div>
 
           <div className="flex items-center gap-3 self-start sm:self-auto">
-            <div className="flex items-center gap-1.5 rounded-lg border border-border-subtle bg-bg-surface-2 px-3 py-1.5 text-xs font-mono text-text-primary">
+            <div className="flex items-center gap-1.5 rounded-lg border border-border-hairline bg-bg-surface-2 px-3 py-1.5 text-xs font-mono text-text-primary">
               <Clock className="h-3.5 w-3.5 text-accent-primary" />
               <span>{formatTimer(seconds)}</span>
             </div>
@@ -150,79 +151,87 @@ export const CornellMethod: React.FC<CornellMethodProps> = ({ onSessionFinished 
       </div>
 
       {/* Lienzo Cornell (Grid 30% / 70% + Resumen Inferior) */}
-      <div className="rounded-xl border border-border-subtle bg-bg-surface-2 overflow-hidden shadow-xs">
-        {/* Cuerpo Superior: Cues y Notas */}
-        <div className="grid grid-cols-1 md:grid-cols-12 min-h-[380px] divide-y md:divide-y-0 md:divide-x divide-border-subtle">
-          {/* Columna Izquierda: Cues / Preguntas (4 de 12 cols = ~33%) */}
-          <div className="md:col-span-4 p-4 bg-bg-secondary/20 flex flex-col gap-2">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-text-primary">
-              <BookOpen className="h-3.5 w-3.5 text-accent-primary" />
-              <span>Preguntas Clave & Cues</span>
-            </div>
-            <p className="text-[11px] text-text-muted">
-              Formulá preguntas de examen, términos gatillo o palabras disparadoras.
-            </p>
-            <Textarea
-              value={cues}
-              onChange={(e) => setCues(e.target.value)}
-              placeholder="ej:&#10;• ¿Qué ion despolariza la membrana?&#10;• Ley del Todo o Nada&#10;• Período refractario absoluto vs relativo"
-              className="flex-1 w-full text-xs font-sans resize-none p-3 min-h-[260px] bg-bg-primary/50"
-            />
-          </div>
-
-          {/* Columna Derecha: Notas de Clase (8 de 12 cols = ~67%) */}
-          <div className="md:col-span-8 p-4 flex flex-col gap-2 relative">
-            <div className="flex items-center justify-between">
+      <div className="rounded-xl border border-border-hairline bg-bg-surface-1 overflow-hidden shadow-xs">
+        {/* Cuerpo Superior: Cues y Notas usando SplitPanel */}
+        <SplitPanel
+          leftTitle="Preguntas Clave & Cues"
+          rightTitle="Notas Principales de Clase / Lectura"
+          defaultSplitRatio={35}
+          minRatio={20}
+          maxRatio={50}
+          showPresets={true}
+          className="border-0 rounded-none bg-transparent min-h-[380px]"
+          left={
+            <div className="p-4 bg-bg-surface-2/40 flex flex-col gap-2 h-full">
               <div className="flex items-center gap-1.5 text-xs font-semibold text-text-primary">
-                <FileText className="h-3.5 w-3.5 text-accent-primary" />
-                <span>Notas Principales de Clase / Lectura</span>
+                <BookOpen className="h-3.5 w-3.5 text-accent-primary" />
+                <span>Preguntas Clave & Cues</span>
               </div>
-              {isRecallModeActive && (
-                <Badge variant="warning">Notas Protegidas</Badge>
-              )}
-            </div>
-            <p className="text-[11px] text-text-muted">
-              Desarrollá las explicaciones, esquemas, teoremas y datos con tus palabras.
-            </p>
-
-            <div className="relative flex-1 flex flex-col">
+              <p className="text-[11px] text-text-muted">
+                Formulá preguntas de examen, términos gatillo o palabras disparadoras.
+              </p>
               <Textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Escribí aquí tus notas estructuradas durante la lectura del apunte o clase..."
-                className="flex-1 w-full text-xs font-sans resize-none p-3 min-h-[260px] bg-bg-primary"
+                value={cues}
+                onChange={(e) => setCues(e.target.value)}
+                placeholder="ej:&#10;• ¿Qué ion despolariza la membrana?&#10;• Ley del Todo o Nada&#10;• Período refractario absoluto vs relativo"
+                className="flex-1 w-full text-xs font-sans resize-none p-3 min-h-[260px] bg-bg-surface-2 border-border-hairline"
               />
-
-              {/* Telón de Ocultamiento en Modo Recall */}
-              {isRecallModeActive && (
-                <div className="absolute inset-0 rounded-lg backdrop-blur-md bg-bg-surface-2/95 border border-accent-primary/20 flex flex-col items-center justify-center p-6 text-center space-y-3 z-10 transition-all duration-200">
-                  <div className="h-10 w-10 rounded-full bg-accent-primary/10 text-accent-primary flex items-center justify-center">
-                    <EyeOff className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h5 className="text-xs font-semibold text-text-primary font-serif">
-                      Modo Autoevaluación Activo
-                    </h5>
-                    <p className="text-[11px] text-text-secondary mt-1 max-w-sm">
-                      Leé las preguntas de la columna izquierda e intentá responderlas mentalmente o en voz alta antes de destapar las notas.
-                    </p>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsRecallModeActive(false)}
-                    className="text-xs"
-                  >
-                    Descubrir Notas
-                  </Button>
-                </div>
-              )}
             </div>
-          </div>
-        </div>
+          }
+          right={
+            <div className="p-4 flex flex-col gap-2 relative bg-bg-surface-1 h-full">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-text-primary">
+                  <FileText className="h-3.5 w-3.5 text-accent-primary" />
+                  <span>Notas Principales de Clase / Lectura</span>
+                </div>
+                {isRecallModeActive && (
+                  <Badge variant="neutral" className="border-border-hairline text-accent-primary">Notas Protegidas</Badge>
+                )}
+              </div>
+              <p className="text-[11px] text-text-muted">
+                Desarrollá las explicaciones, esquemas, teoremas y datos con tus palabras.
+              </p>
+
+              <div className="relative flex-1 flex flex-col">
+                <Textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Escribí aquí tus notas estructuradas durante la lectura del apunte o clase..."
+                  className="flex-1 w-full text-xs font-sans resize-none p-3 min-h-[260px] bg-bg-surface-2 border-border-hairline"
+                />
+
+                {/* Telón de Ocultamiento en Modo Recall */}
+                {isRecallModeActive && (
+                  <div className="absolute inset-0 rounded-lg backdrop-blur-sm bg-bg-surface-1/95 border border-border-hairline flex flex-col items-center justify-center p-6 text-center space-y-3 z-10 transition-all duration-200">
+                    <div className="h-10 w-10 rounded-full bg-accent-primary/10 text-accent-primary flex items-center justify-center">
+                      <EyeOff className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h5 className="text-xs font-semibold text-text-primary font-serif">
+                        Modo Autoevaluación Activo
+                      </h5>
+                      <p className="text-[11px] text-text-secondary mt-1 max-w-sm">
+                        Leé las preguntas de la columna izquierda e intentá responderlas mentalmente o en voz alta antes de destapar las notas.
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsRecallModeActive(false)}
+                      className="text-xs"
+                    >
+                      Descubrir Notas
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          }
+        />
 
         {/* Franja Inferior: Resumen / Síntesis Final */}
-        <div className="border-t border-border-subtle p-4 bg-bg-secondary/40 space-y-2">
+        <div className="border-t border-border-hairline p-4 bg-bg-surface-2/30 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-text-primary font-serif">
               Resumen de Síntesis Final (Summary)
@@ -235,7 +244,7 @@ export const CornellMethod: React.FC<CornellMethodProps> = ({ onSessionFinished 
             value={summary}
             onChange={(e) => setSummary(e.target.value)}
             placeholder="Sintetizá brevemente la conclusión central o idea motriz del apunte..."
-            className="w-full text-xs font-sans resize-none p-2.5 min-h-[80px] bg-bg-primary"
+            className="w-full text-xs font-sans resize-none p-2.5 min-h-[80px] bg-bg-surface-2 border-border-hairline"
           />
         </div>
       </div>

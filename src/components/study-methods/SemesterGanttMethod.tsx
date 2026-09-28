@@ -136,17 +136,17 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Header del Método */}
-      <Card className="border-border-subtle bg-bg-surface/90 backdrop-blur-md">
+      <Card className="border border-border-hairline bg-bg-surface-1 shadow-sm">
         <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-3">
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-bg-surface-2 text-text-primary border border-border-hairline">
               <CalendarDays size={20} />
             </div>
             <div>
-              <CardTitle className="text-lg font-bold text-text-primary flex items-center gap-2">
+              <CardTitle className="text-lg font-bold text-text-primary flex items-center gap-2 font-serif">
                 Cronograma de Cuatrimestre & Diagrama Gantt
-                <Badge variant="accent" className="text-[10px] font-mono py-0">
-                  BALANCE DE CARGA
+                <Badge variant="neutral" className="text-xs font-mono py-0">
+                  Balance de carga
                 </Badge>
               </CardTitle>
               <p className="text-xs text-text-tertiary">
@@ -174,18 +174,18 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
         </CardHeader>
 
         {/* Selector de Presets de Cuatrimestre */}
-        <div className="px-5 pb-4 flex flex-wrap gap-2 pt-1 border-t border-border-subtle/50">
-          <span className="text-[11px] font-mono uppercase text-text-tertiary flex items-center mr-2">
-            Planes Modelo:
+        <div className="px-5 pb-4 flex flex-wrap gap-2 pt-1 border-t border-border-hairline">
+          <span className="text-xs font-mono text-text-tertiary flex items-center mr-2">
+            Planes modelo:
           </span>
           {PRESET_SEMESTER_PLANS.map((plan) => (
             <button
               key={plan.id}
               onClick={() => handleSelectPlan(plan.id)}
-              className={`text-xs px-2.5 py-1 rounded transition-colors font-medium ${
+              className={`text-xs px-2.5 py-1 rounded transition-colors font-mono ${
                 selectedPlanId === plan.id
-                  ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/40"
-                  : "bg-bg-surface-2 text-text-tertiary hover:text-text-primary hover:bg-bg-surface-2/80"
+                  ? "bg-bg-surface-3 text-text-primary border border-border-hairline font-semibold"
+                  : "bg-bg-surface-2 text-text-tertiary hover:text-text-primary border border-border-hairline"
               }`}
             >
               {plan.title}
@@ -196,14 +196,14 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
 
       {/* Formulario Rápido para Agregar Hito */}
       {isAddingMilestone && (
-        <Card className="p-4 border-indigo-500/30 bg-bg-surface/95 animate-in fade-in">
+        <Card className="p-4 border border-border-hairline bg-bg-surface-2 animate-in fade-in space-y-3">
           <form onSubmit={handleAddMilestoneSubmit} className="space-y-3">
-            <h4 className="text-xs font-bold text-text-primary flex items-center gap-1.5">
-              <Plus size={14} className="text-indigo-400" /> Registrar Nuevo Examen o Entrega
+            <h4 className="text-xs font-semibold text-text-primary flex items-center gap-1.5 font-serif">
+              <Plus size={14} className="text-accent-primary" /> Registrar nuevo examen o entrega
             </h4>
             <div className="grid gap-2.5 sm:grid-cols-3">
               <div>
-                <label className="text-[10px] font-mono uppercase text-text-tertiary block mb-1">
+                <label className="text-xs font-mono text-text-tertiary block mb-1">
                   Materia / Cátedra
                 </label>
                 <input
@@ -212,13 +212,13 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
                   onChange={(e) => setNewSubject(e.target.value)}
                   placeholder="Ej: Fisiología Humana"
                   required
-                  className="w-full rounded border border-border-subtle bg-bg-surface-2 px-2.5 py-1.5 text-xs text-text-primary focus:border-indigo-400 focus:outline-none"
+                  className="w-full rounded border border-border-hairline bg-bg-surface-1 px-2.5 py-1.5 text-xs text-text-primary focus:border-border-subtle focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] font-mono uppercase text-text-tertiary block mb-1">
-                  Descripción del Hito
+                <label className="text-xs font-mono text-text-tertiary block mb-1">
+                  Descripción del hito
                 </label>
                 <input
                   type="text"
@@ -226,18 +226,18 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="Ej: Parcial 1: Sistema Nervioso"
                   required
-                  className="w-full rounded border border-border-subtle bg-bg-surface-2 px-2.5 py-1.5 text-xs text-text-primary focus:border-indigo-400 focus:outline-none"
+                  className="w-full rounded border border-border-hairline bg-bg-surface-1 px-2.5 py-1.5 text-xs text-text-primary focus:border-border-subtle focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] font-mono uppercase text-text-tertiary block mb-1">
-                  Tipo de Evaluación
+                <label className="text-xs font-mono text-text-tertiary block mb-1">
+                  Tipo de evaluación
                 </label>
                 <select
                   value={newType}
                   onChange={(e) => setNewType(e.target.value as AcademicMilestoneType)}
-                  className="w-full rounded border border-border-subtle bg-bg-surface-2 px-2.5 py-1.5 text-xs text-text-primary focus:border-indigo-400 focus:outline-none"
+                  className="w-full rounded border border-border-hairline bg-bg-surface-1 px-2.5 py-1.5 text-xs text-text-primary focus:border-border-subtle focus:outline-none"
                 >
                   <option value="Primer Parcial">Primer Parcial</option>
                   <option value="Segundo Parcial">Segundo Parcial</option>
@@ -250,7 +250,7 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
 
             <div className="grid gap-2.5 sm:grid-cols-3 pt-1">
               <div>
-                <label className="text-[10px] font-mono uppercase text-text-tertiary block mb-1">
+                <label className="text-xs font-mono text-text-tertiary block mb-1">
                   Días hasta la fecha: {newDateDaysOffset} días
                 </label>
                 <input
@@ -259,13 +259,13 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
                   max="110"
                   value={newDateDaysOffset}
                   onChange={(e) => setNewDateDaysOffset(Number(e.target.value))}
-                  className="w-full accent-indigo-500"
+                  className="w-full accent-accent-primary"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] font-mono uppercase text-text-tertiary block mb-1">
-                  Horas de Preparación Estimadas: {newPrepHours}h
+                <label className="text-xs font-mono text-text-tertiary block mb-1">
+                  Horas de preparación estimadas: {newPrepHours}h
                 </label>
                 <input
                   type="range"
@@ -273,18 +273,18 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
                   max="50"
                   value={newPrepHours}
                   onChange={(e) => setNewPrepHours(Number(e.target.value))}
-                  className="w-full accent-indigo-500"
+                  className="w-full accent-accent-primary"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] font-mono uppercase text-text-tertiary block mb-1">
-                  Dificultad Percibida
+                <label className="text-xs font-mono text-text-tertiary block mb-1">
+                  Dificultad percibida
                 </label>
                 <select
                   value={newDifficulty}
                   onChange={(e) => setNewDifficulty(e.target.value as any)}
-                  className="w-full rounded border border-border-subtle bg-bg-surface-2 px-2.5 py-1.5 text-xs text-text-primary focus:border-indigo-400 focus:outline-none"
+                  className="w-full rounded border border-border-hairline bg-bg-surface-1 px-2.5 py-1.5 text-xs text-text-primary focus:border-border-subtle focus:outline-none"
                 >
                   <option value="Media">Media</option>
                   <option value="Alta">Alta</option>
@@ -307,16 +307,16 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
 
       {/* Alerta Destacada de Semanas de Colapso */}
       {criticalWeeks.length > 0 && (
-        <Card className="border-rose-500/40 bg-rose-500/10 p-4 space-y-3">
+        <Card className="border border-rubric-red/30 bg-rubric-red/10 p-4 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-rose-400" />
-              <h3 className="text-xs font-bold text-rose-300 font-mono uppercase tracking-wider">
+              <AlertTriangle className="h-4 w-4 text-rubric-red" />
+              <h3 className="text-xs font-semibold text-text-primary font-serif">
                 Alerta de Colapso Cognitivo Detectada ({criticalWeeks.length} semana(s) crítica(s))
               </h3>
             </div>
             <Badge variant="danger" className="text-[10px] font-mono">
-              CONCURRENCIA DE PARCIALES
+              Concurrencia de parciales
             </Badge>
           </div>
 
@@ -324,13 +324,13 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
             {criticalWeeks.map((cw) => (
               <div
                 key={cw.weekNumber}
-                className="rounded-lg bg-bg-surface-2/90 border border-rose-500/30 p-3 space-y-1.5"
+                className="rounded-lg bg-bg-surface-1 border border-border-hairline p-3 space-y-1.5"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-rose-200">
-                    Semana {cw.weekNumber} del Cuatrimestre
+                  <span className="text-xs font-semibold text-text-primary font-serif">
+                    Semana {cw.weekNumber} del cuatrimestre
                   </span>
-                  <span className="text-[10px] font-mono text-rose-400 font-semibold">
+                  <span className="text-xs font-mono text-rubric-red font-semibold">
                     {cw.totalRequiredHours}h de carga total
                   </span>
                 </div>
@@ -341,7 +341,7 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
                   {cw.milestones.map((m) => (
                     <span
                       key={m.id}
-                      className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30"
+                      className="text-[10px] font-mono px-2 py-0.5 rounded bg-rubric-red/15 text-rubric-red border border-rubric-red/30"
                     >
                       {m.subjectName} ({m.type})
                     </span>
@@ -351,17 +351,17 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
             ))}
           </div>
 
-          <div className="flex items-center justify-between pt-1">
-            <span className="text-xs text-rose-300/80">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 border-t border-rubric-red/20">
+            <span className="text-xs text-text-tertiary">
               ¿Tenés un examen en los próximos 7 días? Activá el protocolo de repaso relámpago.
             </span>
             <Button
               variant="outline"
               size="sm"
               onClick={() => navigate("/methods?run=cram")}
-              className="text-xs border-rose-500/50 text-rose-300 hover:bg-rose-500/20 flex items-center gap-1.5"
+              className="text-xs border-rubric-red/40 text-rubric-red hover:bg-rubric-red/15 flex items-center gap-1.5"
             >
-              <Flame size={13} className="text-rose-400" />
+              <Flame size={13} className="text-rubric-red" />
               <span>Activar Cram Mode (Repaso 7 Días)</span>
               <ChevronRight size={13} />
             </Button>
@@ -370,11 +370,11 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
       )}
 
       {/* ----------------- DIAGRAMA GANTT VISUAL (16 Semanas) ----------------- */}
-      <Card className="p-5 border-border-subtle bg-bg-surface/90 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border-subtle/60 pb-3">
+      <Card className="p-5 border border-border-hairline bg-bg-surface-1 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border-hairline pb-3">
           <div>
-            <h3 className="text-sm font-bold text-text-primary flex items-center gap-2">
-              <TrendingUp size={16} className="text-indigo-400" />
+            <h3 className="text-sm font-bold text-text-primary flex items-center gap-2 font-serif">
+              <TrendingUp size={16} className="text-accent-primary" />
               Diagrama de Gantt Semanal de Cátedras
             </h3>
             <span className="text-xs text-text-tertiary">
@@ -382,15 +382,15 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
             </span>
           </div>
 
-          <div className="flex items-center gap-2 text-xs">
-            <span className="flex items-center gap-1 text-[11px] text-text-tertiary">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 inline-block" /> Parcial 1
+          <div className="flex items-center gap-3 text-xs font-mono">
+            <span className="flex items-center gap-1 text-xs text-text-tertiary">
+              <span className="h-2 w-2 rounded-full bg-signal-ok inline-block" /> Parcial 1
             </span>
-            <span className="flex items-center gap-1 text-[11px] text-text-tertiary">
-              <span className="h-2 w-2 rounded-full bg-indigo-400 inline-block" /> Parcial 2
+            <span className="flex items-center gap-1 text-xs text-text-tertiary">
+              <span className="h-2 w-2 rounded-full bg-accent-primary inline-block" /> Parcial 2
             </span>
-            <span className="flex items-center gap-1 text-[11px] text-text-tertiary">
-              <span className="h-2 w-2 rounded-full bg-rose-400 inline-block" /> Final / Colapso
+            <span className="flex items-center gap-1 text-xs text-text-tertiary">
+              <span className="h-2 w-2 rounded-full bg-rubric-red inline-block" /> Final / Colapso
             </span>
           </div>
         </div>
@@ -399,17 +399,17 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
         <div className="overflow-x-auto pb-2">
           <div className="min-w-[700px] space-y-3">
             {/* Cabecera de Semanas 1 a 16 */}
-            <div className="grid grid-cols-16 gap-1 text-center text-[10px] font-mono text-text-tertiary border-b border-border-subtle/40 pb-2">
+            <div className="grid grid-cols-16 gap-1 text-center text-xs font-mono text-text-tertiary border-b border-border-hairline pb-2">
               {Array.from({ length: 16 }).map((_, idx) => {
                 const weekNum = idx + 1;
                 const isOverloaded = weeklyOverloads[idx]?.isOverloaded;
                 return (
                   <div
                     key={weekNum}
-                    className={`py-1 rounded ${
+                    className={`py-1 rounded font-mono ${
                       isOverloaded
-                        ? "bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30"
-                        : "bg-bg-surface-2/40"
+                        ? "bg-rubric-red/15 text-rubric-red font-bold border border-rubric-red/30"
+                        : "bg-bg-surface-2 text-text-tertiary"
                     }`}
                   >
                     S{weekNum}
@@ -421,7 +421,7 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
             {/* Filas por Materia */}
             {subjects.map((subj) => (
               <div key={subj.name} className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs font-semibold text-text-primary px-1">
+                <div className="flex items-center justify-between text-xs font-semibold text-text-primary px-1 font-serif">
                   <span className="flex items-center gap-2">
                     <span
                       className="h-2.5 w-2.5 rounded-sm"
@@ -429,13 +429,13 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
                     />
                     {subj.name}
                   </span>
-                  <span className="text-[10px] font-mono text-text-tertiary">
+                  <span className="text-xs font-mono text-text-tertiary font-normal">
                     {subj.milestones.length} hito(s)
                   </span>
                 </div>
 
                 {/* Grilla de 16 semanas para esta materia */}
-                <div className="grid grid-cols-16 gap-1 h-9 bg-bg-surface-2/20 rounded border border-border-subtle/30 p-1 items-center relative">
+                <div className="grid grid-cols-16 gap-1 h-9 bg-bg-surface-2/40 rounded border border-border-hairline p-1 items-center relative">
                   {subj.milestones.map((m) => {
                     const daysFromStart = Math.max(0, (m.dueDate - activePlan.startDate) / (24 * 60 * 60 * 1000));
                     const weekIdx = Math.min(15, Math.max(0, Math.floor(daysFromStart / 7)));
@@ -447,12 +447,12 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
                         onClick={() => setSelectedMilestone(m)}
                         style={{ gridColumnStart: weekIdx + 1 }}
                         title={`${m.title} (${m.type}) - ${m.estimatedPrepHours}h`}
-                        className={`h-7 rounded px-1.5 text-[10px] font-semibold text-white truncate shadow-2xs transition-transform hover:scale-105 cursor-pointer flex items-center justify-center ${
+                        className={`h-7 rounded px-1.5 text-[10px] font-semibold truncate transition-colors cursor-pointer flex items-center justify-center font-mono border ${
                           m.type.includes("Final")
-                            ? "bg-purple-600 border border-purple-400"
+                            ? "bg-rubric-red/20 text-rubric-red border-rubric-red/40 hover:bg-rubric-red/30"
                             : m.type.includes("Recuperatorio")
-                            ? "bg-amber-600 border border-amber-400"
-                            : "bg-indigo-600 border border-indigo-400"
+                            ? "bg-highlighter/20 text-text-primary border-highlighter/40 hover:bg-highlighter/30"
+                            : "bg-accent-primary/20 text-accent-primary border-accent-primary/40 hover:bg-accent-primary/30"
                         }`}
                       >
                         {m.type.includes("Primer")
@@ -473,10 +473,10 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
 
         {/* Detalle del Hito Seleccionado */}
         {selectedMilestone && (
-          <div className="rounded-lg bg-bg-surface-2 p-3.5 border border-indigo-500/40 space-y-2 animate-in fade-in">
+          <div className="rounded-lg bg-bg-surface-2 p-3.5 border border-border-hairline space-y-2 animate-in fade-in">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase text-indigo-400 font-bold block">
-                Detalle del Hito Académico:
+              <span className="text-xs font-mono text-accent-primary font-semibold block">
+                Detalle del hito académico:
               </span>
               <button
                 onClick={() => setSelectedMilestone(null)}
@@ -485,26 +485,26 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
                 Cerrar
               </button>
             </div>
-            <h4 className="text-sm font-bold text-text-primary">
+            <h4 className="text-sm font-bold text-text-primary font-serif">
               [{selectedMilestone.subjectName}] {selectedMilestone.title}
             </h4>
             <div className="grid gap-2 sm:grid-cols-4 text-xs pt-1">
               <div>
-                <span className="text-[10px] font-mono text-text-tertiary block">Tipo</span>
+                <span className="text-xs font-mono text-text-tertiary block">Tipo</span>
                 <span className="font-semibold text-text-secondary">{selectedMilestone.type}</span>
               </div>
               <div>
-                <span className="text-[10px] font-mono text-text-tertiary block">Horas Estimadas</span>
-                <span className="font-mono font-semibold text-indigo-300">
+                <span className="text-xs font-mono text-text-tertiary block">Horas estimadas</span>
+                <span className="font-mono font-semibold text-accent-primary">
                   {selectedMilestone.estimatedPrepHours} horas
                 </span>
               </div>
               <div>
-                <span className="text-[10px] font-mono text-text-tertiary block">Dificultad</span>
-                <span className="font-semibold text-amber-400">{selectedMilestone.difficultyLevel}</span>
+                <span className="text-xs font-mono text-text-tertiary block">Dificultad</span>
+                <span className="font-semibold text-text-primary">{selectedMilestone.difficultyLevel}</span>
               </div>
               <div>
-                <span className="text-[10px] font-mono text-text-tertiary block">Fecha</span>
+                <span className="text-xs font-mono text-text-tertiary block">Fecha</span>
                 <span className="font-mono text-text-secondary">
                   {new Date(selectedMilestone.dueDate).toLocaleDateString("es-AR")}
                 </span>
@@ -515,19 +515,19 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
       </Card>
 
       {/* ----------------- TABLA DE PROYECCIÓN DIARIA DE ESFUERZO ----------------- */}
-      <Card className="p-5 border-border-subtle bg-bg-surface/90 space-y-4">
-        <div className="flex items-center justify-between border-b border-border-subtle/60 pb-3">
+      <Card className="p-5 border border-border-hairline bg-bg-surface-1 shadow-sm space-y-4">
+        <div className="flex items-center justify-between border-b border-border-hairline pb-3">
           <div>
-            <h3 className="text-sm font-bold text-text-primary flex items-center gap-2">
-              <Clock size={16} className="text-cyan-400" />
+            <h3 className="text-sm font-bold text-text-primary flex items-center gap-2 font-serif">
+              <Clock size={16} className="text-accent-primary" />
               Tasa de Estudio Diario Requerida por Examen
             </h3>
             <span className="text-xs text-text-tertiary">
               Proyección matemática de horas por día requeridas para no llegar asfixiado al día del examen
             </span>
           </div>
-          <Badge variant="neutral" className="text-[10px] font-mono">
-            ALGORITMO DE DISTRIBUCIÓN
+          <Badge variant="neutral" className="text-xs font-mono">
+            Algoritmo de distribución
           </Badge>
         </div>
 
@@ -537,27 +537,27 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
               key={proj.milestoneId}
               className={`rounded-lg border p-3 flex flex-col justify-between gap-2 ${
                 proj.urgencyStatus === "Alerta Cramming"
-                  ? "bg-rose-500/10 border-rose-500/30"
+                  ? "bg-rubric-red/10 border-rubric-red/30"
                   : proj.urgencyStatus === "Moderado"
-                  ? "bg-amber-500/10 border-amber-500/30"
-                  : "bg-bg-surface-2 border-border-subtle"
+                  ? "bg-highlighter/10 border-highlighter/30"
+                  : "bg-bg-surface-2 border-border-hairline"
               }`}
             >
               <div>
-                <div className="flex items-center justify-between text-[10px] font-mono text-text-tertiary mb-0.5">
-                  <span className="font-bold text-text-secondary">{proj.subjectName}</span>
+                <div className="flex items-center justify-between text-xs font-mono text-text-tertiary mb-0.5">
+                  <span className="font-semibold text-text-secondary">{proj.subjectName}</span>
                   <span
                     className={
-                      proj.daysRemaining <= 7 ? "text-rose-400 font-bold" : "text-text-tertiary"
+                      proj.daysRemaining <= 7 ? "text-rubric-red font-semibold" : "text-text-tertiary"
                     }
                   >
                     {proj.daysRemaining} días restantes
                   </span>
                 </div>
-                <h4 className="text-xs font-semibold text-text-primary line-clamp-1">{proj.title}</h4>
+                <h4 className="text-xs font-semibold text-text-primary line-clamp-1 font-serif">{proj.title}</h4>
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-border-subtle/40 text-xs">
+              <div className="flex items-center justify-between pt-2 border-t border-border-hairline text-xs">
                 <span className="text-text-tertiary">Dedicación diaria:</span>
                 <span className="font-mono font-bold text-text-primary">
                   {proj.hoursNeededPerDay} h/día
@@ -570,7 +570,7 @@ export const SemesterGanttMethod: React.FC<SemesterGanttMethodProps> = ({ onSess
                       ? "warning"
                       : "success"
                   }
-                  className="text-[9px] font-mono py-0"
+                  className="text-[10px] font-mono py-0"
                 >
                   {proj.urgencyStatus}
                 </Badge>

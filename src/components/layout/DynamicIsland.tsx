@@ -309,7 +309,7 @@ export const DynamicIsland: React.FC = () => {
                       </span>
                       <span
                         className={clsx(
-                          "text-[10px] px-2 py-0.5 rounded-full font-medium uppercase tracking-wider",
+                          "text-[10px] px-2 py-0.5 rounded-full font-medium",
                           timerMode === "work"
                             ? "bg-accent-primary/20 text-accent-primary"
                             : "bg-emerald-500/20 text-emerald-400"

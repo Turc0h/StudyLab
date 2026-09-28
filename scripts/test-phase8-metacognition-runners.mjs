@@ -127,6 +127,23 @@ assert(typesFile.includes('"story-method"'), 'StudyMethodId incluye "story-metho
 assert(typesFile.includes('"pq4r"'), 'StudyMethodId incluye "pq4r"');
 
 // -----------------------------------------------------------------------------
+// Test 7: Persistencia Funcional Real de Chunking (chunkingStorage.ts)
+// -----------------------------------------------------------------------------
+console.log("\n[Test 7] Persistencia Funcional Real de Chunking (chunkingStorage.ts)");
+import {
+  DEFAULT_CHUNKS,
+  DEFAULT_CHUNKING_TOPIC,
+  buildChunkingSetId,
+} from "../src/features/study-methods/chunkingStorage.ts";
+
+assert(DEFAULT_CHUNKS.length >= 4, "DEFAULT_CHUNKS exporta 4 bloques de memoria");
+assert(typeof DEFAULT_CHUNKING_TOPIC === "string", "Eje temático por defecto definido");
+assert(buildChunkingSetId("med_anatomy") === "chunking_set_med_anatomy", "Aislamiento por carpeta validado");
+const chunkingFile = fs.readFileSync(path.join(root, "src/components/study-methods/ChunkingMethod.tsx"), "utf-8");
+assert(chunkingFile.includes("saveChunkingSet"), "ChunkingMethod conecta con saveChunkingSet");
+assert(chunkingFile.includes("getChunkingSet"), "ChunkingMethod conecta con getChunkingSet");
+
+// -----------------------------------------------------------------------------
 // Balance Final
 // -----------------------------------------------------------------------------
 console.log("\n================================================================================");

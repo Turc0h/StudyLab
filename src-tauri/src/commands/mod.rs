@@ -5,3 +5,6 @@ pub mod evaluation_commands;
 pub mod learning_state_commands;
 pub mod study_engine_commands;
 pub mod fsrs_commands;
+pub mod stroke_commands;
+pub mod search_commands;
+pub mod dossier_commands;

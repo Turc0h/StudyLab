@@ -124,8 +124,8 @@ export const DesktopEnvironmentContext: React.FC = () => {
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-accent-primary" />
-              <span className="text-xs font-semibold text-text-primary uppercase tracking-wider font-mono">
-                Postura Cognitiva Sugerida
+              <span className="text-xs font-semibold text-text-primary font-mono">
+                Postura cognitiva sugerida
               </span>
               <span className="text-[11px] px-2 py-0.5 rounded-full bg-accent-primary/20 text-accent-primary font-mono">
                 {Math.round(report.confidence * 100)}% Coincidencia
@@ -187,7 +187,7 @@ export const DesktopEnvironmentContext: React.FC = () => {
                       {app.process_name} • {app.category}
                     </div>
                   </div>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full border border-border-subtle bg-bg-elevated font-mono uppercase tracking-wider text-accent-primary shrink-0">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full border border-border-subtle bg-bg-elevated font-mono text-accent-primary shrink-0">
                     {app.suggested_profile.split("-")[0]}
                   </span>
                 </div>
@@ -208,8 +208,8 @@ export const DesktopEnvironmentContext: React.FC = () => {
         <div className="space-y-3 pt-3 border-t border-border-subtle">
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="text-xs font-semibold text-text-primary uppercase tracking-wider font-mono">
-                Metodologías Científicas Recomendadas para este Entorno
+              <h4 className="text-xs font-semibold text-text-primary font-mono">
+                Metodologías científicas recomendadas para este entorno
               </h4>
               <p className="text-[11px] text-text-muted mt-0.5">
                 Herramientas cognitivas optimizadas para el tipo de carga mental detectado.

@@ -78,7 +78,6 @@ async function runTests() {
       "/methods",
       "/session",
       "/academic",
-      "/workspace",
       "/graph",
       "/files",
       "/pdf",

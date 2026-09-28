@@ -39,7 +39,7 @@ export const MnemonicsMethod: React.FC<MnemonicsMethodProps> = ({ onSessionFinis
 
   const handleStartTest = () => {
     setIsTestMode(true);
-    setTestAnswers(new Array(itemsList.length).fill(""));
+    setTestAnswers(Array.from({ length: itemsList.length }, () => ""));
     setRevealed(false);
   };
 
