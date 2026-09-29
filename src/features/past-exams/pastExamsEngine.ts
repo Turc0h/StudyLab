@@ -91,6 +91,40 @@ export interface MockExamResult {
 
 export const PRESET_PAST_EXAMS: PastExamPaper[] = [];
 
+const CUSTOM_EXAMS_STORAGE_KEY = "studylab.custom-past-exams.v1";
+
+/** Recupera los exámenes que el estudiante guardó en este dispositivo. */
+export function loadCustomExams(): PastExamPaper[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const stored = window.localStorage.getItem(CUSTOM_EXAMS_STORAGE_KEY);
+    if (!stored) return [];
+    const parsed: unknown = JSON.parse(stored);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((exam): exam is PastExamPaper =>
+      Boolean(
+        exam &&
+        typeof exam === "object" &&
+        typeof exam.id === "string" &&
+        typeof exam.title === "string" &&
+        typeof exam.subject === "string" &&
+        Array.isArray(exam.questions),
+      ),
+    );
+  } catch (error) {
+    console.error("No se pudieron cargar los exámenes personalizados:", error);
+    return [];
+  }
+}
+
+/** Guarda o reemplaza un examen personalizado en el almacenamiento local. */
+export function saveCustomExam(exam: PastExamPaper): void {
+  if (typeof window === "undefined") throw new Error("El almacenamiento local no está disponible.");
+  const exams = loadCustomExams();
+  const next = [...exams.filter((item) => item.id !== exam.id), { ...exam, isCustom: true }];
+  window.localStorage.setItem(CUSTOM_EXAMS_STORAGE_KEY, JSON.stringify(next));
+}
+
 export function getAllPastExams(customExams?: PastExamPaper[]): PastExamPaper[] {
   const custom = customExams || loadCustomExams();
   return [...PRESET_PAST_EXAMS, ...custom];
