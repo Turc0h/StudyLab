@@ -15,7 +15,7 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseStyles =
-    "inline-flex items-center justify-center font-sans font-medium rounded-md border transition-colors duration-150 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-2xs";
+    "inline-flex items-center justify-center font-sans font-medium rounded-lg border transition-[color,background-color,border-color,box-shadow,transform] duration-150 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-xs active:translate-y-px";
 
   const sizeStyles = {
     sm: "px-2.5 py-1.5 text-xs",
@@ -25,9 +25,9 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variantStyles = {
     primary:
-      "bg-accent-primary text-bg-elevated border-transparent hover:bg-accent-hover focus-visible:ring-accent-primary",
+      "bg-accent-primary text-bg-primary border-transparent hover:bg-accent-hover focus-visible:ring-accent-primary",
     secondary:
-      "bg-accent-secondary text-bg-elevated border-transparent hover:opacity-90 focus-visible:ring-accent-secondary",
+      "bg-accent-secondary text-bg-primary border-transparent hover:opacity-90 focus-visible:ring-accent-secondary",
     outline:
       "bg-bg-elevated text-text-primary border-border-subtle hover:bg-bg-secondary focus-visible:ring-accent-primary",
     ghost:

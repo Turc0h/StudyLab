@@ -19,6 +19,10 @@ import {
   Flame,
   Calendar,
   Activity,
+  GraduationCap,
+  CalendarDays,
+  BrainCircuit,
+  PenTool,
 } from "lucide-react";
 import { Dashboard as TelemetryDashboard } from "./Dashboard";
 import { StudyTipsWidget } from "../components/study-tips/StudyTipsWidget";
@@ -167,7 +171,11 @@ export const DashboardPage: React.FC = () => {
     };
   }, []);
 
-  const totalMinutes = sessions.reduce((acc, s) => acc + s.durationMinutes, 0);
+  const weekStart = new Date();
+  weekStart.setHours(0, 0, 0, 0);
+  weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
+  const weeklySessions = sessions.filter((session) => session.completedAt >= weekStart.getTime());
+  const totalMinutes = weeklySessions.reduce((acc, s) => acc + s.durationMinutes, 0);
   const totalHours = (totalMinutes / 60).toFixed(1);
   const targetWeeklyHours = 20;
   const progressRatio = Math.min(100, Math.round((Number(totalHours) / targetWeeklyHours) * 100));
@@ -205,13 +213,13 @@ export const DashboardPage: React.FC = () => {
             <Calendar className="h-3.5 w-3.5" />
             <span>{todayString}</span>
             <span>•</span>
-            <span className="text-accent-secondary font-medium">Entorno Académico Activo</span>
+            <span className="text-accent-secondary font-medium">Semana universitaria</span>
           </div>
           <h2 className="mt-1 font-serif text-2xl md:text-3xl font-semibold text-text-primary tracking-tight">
-            Hub de Estudio y Gestión de Cátedras
+            Tu vida universitaria, en orden.
           </h2>
           <p className="mt-1 font-sans text-xs md:text-sm text-text-secondary max-w-3xl">
-            Espacio de trabajo unificado para lectura profunda, digitalización de apuntes físicos y aplicación de técnicas cognitivas sin fatiga visual.
+            Materias, apuntes, estudio y fechas importantes. Todo empieza acá.
           </p>
         </div>
 
@@ -219,22 +227,41 @@ export const DashboardPage: React.FC = () => {
           <PanelGuide
             id="dashboard-overview"
             title="Panel Principal (Dashboard)"
-            whatItDoes="Tu centro de control diario. Monitorea horas de estudio reales, te recomienda qué estudiar hoy y te da acceso inmediato a tus cátedras."
+            whatItDoes="Tu inicio para revisar el estudio de la semana y abrir las herramientas principales."
             howToUse={[
-              "Revisá tus horas acumuladas de la semana contra tu objetivo de 20 horas.",
-              "Leé la tarjeta '¿Qué estudiar hoy?' para ver el tema prioritario según la retención FSRS.",
-              "Tocá 'Iniciar Sesión' para abrir el temporizador con tu apunte elegido.",
+              "Revisá el tiempo y las sesiones registradas esta semana.",
+              "Usá los accesos rápidos para ir a tus materias, métodos, agenda o pizarra.",
+              "Iniciá una sesión para registrar un bloque de estudio.",
             ]}
             tip="Todos los datos de sesiones se guardan localmente en IndexedDB: no dependés de internet para estudiar."
           />
           <Link to="/session">
             <Button variant="primary" size="md" className="gap-2 text-xs font-semibold shadow-xs">
               <Play className="h-3.5 w-3.5 fill-current" />
-              <span>Iniciar Sesión de Estudio</span>
+              <span>Empezar una sesión</span>
             </Button>
           </Link>
         </div>
       </div>
+
+      <section aria-label="Accesos rápidos" className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+        {[
+          { to: "/academic", icon: BrainCircuit, title: "Espacio de estudio", description: "Leer, anotar y trabajar con tus materiales" },
+          { to: "/methods", icon: GraduationCap, title: "Encontrar un método", description: "Elegir cómo estudiar este tema" },
+          { to: "/calendar", icon: CalendarDays, title: "Organizar la semana", description: "Clases, parciales y entregas" },
+          { to: "/blackboard", icon: PenTool, title: "Abrir la pizarra", description: "Resolver y desarrollar ideas" },
+        ].map(({ to, icon: Icon, title, description }) => (
+          <Link key={to} to={to} className="group flex min-h-[94px] items-start gap-3 rounded-2xl border border-border-subtle/90 bg-bg-elevated/80 p-4 shadow-xs transition-[transform,border-color,background-color] duration-150 hover:-translate-y-0.5 hover:border-accent-primary/40 hover:bg-bg-elevated">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-primary/10 text-accent-primary transition-colors group-hover:bg-accent-primary group-hover:text-bg-primary">
+              <Icon size={18} strokeWidth={1.8} />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[13px] font-semibold text-text-primary">{title}</span>
+              <span className="mt-1 block text-[11px] leading-4 text-text-muted">{description}</span>
+            </span>
+          </Link>
+        ))}
+      </section>
 
       {/* Selector de Pestañas Universitario */}
       <div className="flex items-center gap-1.5 p-1 rounded-lg border border-border-hairline bg-bg-surface-2 self-start">
@@ -248,7 +275,7 @@ export const DashboardPage: React.FC = () => {
           }`}
         >
           <BookOpen className="h-3.5 w-3.5" />
-          <span>Hub de Estudio</span>
+          <span>Inicio</span>
         </button>
         <button
           type="button"
@@ -260,7 +287,7 @@ export const DashboardPage: React.FC = () => {
           }`}
         >
           <Activity className="h-3.5 w-3.5" />
-          <span>Telemetría y Control Cognitivo</span>
+          <span>Progreso</span>
         </button>
       </div>
 
@@ -271,27 +298,29 @@ export const DashboardPage: React.FC = () => {
           {/* Onboarding para estudiantes nuevos sin datos */}
           <OnboardingWelcomeCard />
 
+          <DailyStudyRecommendationCard />
+
           {/* Fila Superior: Métricas Clave Limpias (Sin gráficos pesados) */}
           <div className="flex items-center justify-between px-1">
             <span className="font-mono text-xs text-text-tertiary">
-              Métricas de aprendizaje
+              Tu semana hasta ahora
             </span>
         <PanelGuide
           id="study-metrics"
-          title="Métricas de Esfuerzo y Retención"
-          whatItDoes="Cuantifica tu dedicación real semanal sin distracciones ni métricas de vanidad."
+          title="Resumen de estudio semanal"
+          whatItDoes="Muestra el tiempo y las sesiones registradas durante esta semana."
           howToUse={[
-            "Horas de Estudio: Suma exacta de minutos de todas tus sesiones de Pomodoro y métodos activos.",
-            "Sesiones Totales: Cantidad de bloques de trabajo profundo concluidos.",
-            "Objetivo Semanal: Barra de progreso hacia la meta biológica recomendada de 20 horas.",
+            "Tiempo de estudio: duración acumulada de tus sesiones esta semana.",
+            "Sesiones completadas: bloques de estudio registrados esta semana.",
+              "Objetivo semanal: avance respecto de una meta de referencia de 20 horas.",
           ]}
-          tip="Estudiar en bloques de 25 o 45 minutos con descansos previene la fatiga cognitiva crónica."
+          tip="Ajusta la meta semanal a tu carga real de cursada para que el progreso te resulte útil."
         />
       </div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
         <Card elevated className="p-4 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="font-sans text-xs text-text-muted">Horas de Estudio</span>
+            <span className="font-sans text-xs text-text-muted">Tiempo de estudio</span>
             <Clock className="h-3.5 w-3.5 text-accent-primary" />
           </div>
           <div className="mt-2">
@@ -307,23 +336,23 @@ export const DashboardPage: React.FC = () => {
 
         <Card elevated className="p-4 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="font-sans text-xs text-text-muted">Sesiones Totales</span>
+            <span className="font-sans text-xs text-text-muted">Sesiones completadas</span>
             <CheckCircle2 className="h-3.5 w-3.5 text-success" />
           </div>
           <div className="mt-2">
             <span className="font-serif text-2xl md:text-3xl font-semibold text-text-primary">
-              {sessions.length}
+              {weeklySessions.length}
             </span>
             <span className="ml-1 text-xs font-sans text-text-muted">bloques</span>
           </div>
           <div className="mt-2 text-[11px] font-sans text-text-muted">
-            Guardado localmente en IndexedDB
+            Esta semana
           </div>
         </Card>
 
         <Card elevated className="p-4 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="font-sans text-xs text-text-muted">Objetivo Semanal</span>
+            <span className="font-sans text-xs text-text-muted">Objetivo semanal</span>
             <Flame className="h-3.5 w-3.5 text-warning" />
           </div>
           <div className="mt-2">
@@ -336,25 +365,7 @@ export const DashboardPage: React.FC = () => {
           </div>
         </Card>
 
-        <Card elevated className="p-4 flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="font-sans text-xs text-text-muted">Métodos con Respaldo</span>
-            <BookOpen className="h-3.5 w-3.5 text-accent-secondary" />
-          </div>
-          <div className="mt-2">
-            <span className="font-serif text-2xl md:text-3xl font-semibold text-text-primary">
-              8
-            </span>
-            <span className="ml-1 text-xs font-sans text-text-muted">técnicas</span>
-          </div>
-          <div className="mt-2 text-[11px] font-sans text-text-muted">
-            Feynman, Active Recall, Pomodoro...
-          </div>
-        </Card>
       </div>
-
-      {/* Cognitive OS v5.0: Recomendación Diaria Adaptativa "¿Qué debería estudiar hoy y por qué?" */}
-      <DailyStudyRecommendationCard />
 
       {/* Grid Principal Fluid: 2 Columnas Responsivas (Desktop: 7 col / 5 col) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -383,11 +394,11 @@ export const DashboardPage: React.FC = () => {
                     "Pomodoro: 4 ciclos de 25 min de foco + 5 min de descanso para no agotarte.",
                     "Práctica Intercalada: Para alternar temas y mejorar la discriminación de problemas.",
                   ]}
-                  tip="Hacé clic en 'Ver las 8 técnicas' para acceder al catálogo completo con FSRS, Leitner, Cornell y SQ3R."
+          tip="Abrí el catálogo para explorar los métodos disponibles y encontrar uno adecuado para tu tarea."
                 />
                 <Link to="/methods">
                   <Button variant="outline" size="sm" className="gap-1 text-xs">
-                    <span>Ver las 8 técnicas</span>
+                    <span>Ver todos los métodos</span>
                     <ArrowRight className="h-3 w-3" />
                   </Button>
                 </Link>

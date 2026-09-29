@@ -1,48 +1,48 @@
 @import "tailwindcss";
 
 :root {
-  /* Identidad académica de biblioteca / cuaderno de cátedra */
-  --color-paper: #F9F8F5;
+  /* StudyLab — papel claro, tinta azul petróleo y acentos minerales */
+  --color-paper: #F4F7F8;
   --color-page: #FFFFFF;
-  --color-ink: #1C1E21;
-  --color-ink-muted: #60646C;
-  --color-rule: #E2E0D8;
-  --color-highlighter: #D99426;
-  --color-seal: #2C4A6F;
-  --color-rubric-red: #9E3B3B;
-  --color-system-notice: #4A4D54;
-  --color-system-notice-bg: #EFECE6;
-  --color-system-notice-border: #D6D2C8;
+  --color-ink: #17252C;
+  --color-ink-muted: #53636B;
+  --color-rule: #DCE5E8;
+  --color-highlighter: #B68135;
+  --color-seal: #285E5B;
+  --color-rubric-red: #A94B52;
+  --color-system-notice: #495A62;
+  --color-system-notice-bg: #EAF0F1;
+  --color-system-notice-border: #D2DEE1;
 
   /* Aliases canónicos compatibles */
-  --bg-base: #F9F8F5;
+  --bg-base: #F4F7F8;
   --bg-panel: #FFFFFF;
-  --bg-panel-raised: #F4F3EF;
-  --border-hairline: #E2E0D8;
-  --text-primary: #1C1E21;
-  --text-secondary: #60646C;
-  --accent-ink: #2C4A6F;
-  --accent-ink-muted: #1E3450;
-  --signal-ok: #3B6347;
+  --bg-panel-raised: #EDF2F3;
+  --border-hairline: #DCE5E8;
+  --text-primary: #17252C;
+  --text-secondary: #53636B;
+  --accent-ink: #285E5B;
+  --accent-ink-muted: #1E4947;
+  --signal-ok: #36765F;
 
   /* Aliases de descanso visual y compatibilidad */
-  --bg-primary: #F9F8F5;
-  --bg-secondary: #F2F1EC;
+  --bg-primary: #F4F7F8;
+  --bg-secondary: #EDF2F3;
   --bg-elevated: #FFFFFF;
-  --bg-base-alt: #F2F1EC;
+  --bg-base-alt: #EDF2F3;
 
-  --text-muted: #757880;
-  --text-tertiary: #757880;
+  --text-muted: #65757D;
+  --text-tertiary: #75858C;
 
-  --accent-primary: #2C4A6F;
-  --accent-secondary: #4A5D45;
-  --accent-hover: #1E3450;
+  --accent-primary: #285E5B;
+  --accent-secondary: #8B6A3D;
+  --accent-hover: #1E4947;
 
-  --border-subtle: #E2E0D8;
+  --border-subtle: #DCE5E8;
 
-  --success: #3B6347;
-  --warning: #D99426;
-  --error: #9E3B3B;
+  --success: #36765F;
+  --warning: #B68135;
+  --error: #A94B52;
 
   /* Tokens de animación estandarizados */
   --duration-micro: 100ms;
@@ -55,45 +55,45 @@
   --ease-emphasis: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Modo oscuro sobrio — grafito mate y biblioteca */
+/* Modo oscuro — tinta profunda y superficies azul pizarra */
 .dark, [data-theme="dark"] {
-  --color-paper: #17181A;
-  --color-page: #1F2124;
-  --color-ink: #EDECE8;
-  --color-ink-muted: #94979E;
-  --color-rule: #2D3035;
-  --color-highlighter: #E0A33A;
-  --color-seal: #7398C2;
-  --color-rubric-red: #C95D5D;
-  --color-system-notice: #A8ABB3;
-  --color-system-notice-bg: #222428;
-  --color-system-notice-border: #35383F;
+  --color-paper: #11191E;
+  --color-page: #182329;
+  --color-ink: #E9F0F1;
+  --color-ink-muted: #A2B1B5;
+  --color-rule: #2A3A40;
+  --color-highlighter: #D5A653;
+  --color-seal: #83BDB2;
+  --color-rubric-red: #E07A7E;
+  --color-system-notice: #A2B1B5;
+  --color-system-notice-bg: #1B292F;
+  --color-system-notice-border: #304249;
 
-  --bg-base: #17181A;
-  --bg-panel: #1F2124;
-  --bg-panel-raised: #282A2E;
-  --border-hairline: #2D3035;
-  --text-primary: #EDECE8;
-  --text-secondary: #94979E;
-  --accent-ink: #7398C2;
-  --accent-ink-muted: #537599;
-  --signal-ok: #72A37E;
+  --bg-base: #11191E;
+  --bg-panel: #182329;
+  --bg-panel-raised: #202E34;
+  --border-hairline: #2A3A40;
+  --text-primary: #E9F0F1;
+  --text-secondary: #A2B1B5;
+  --accent-ink: #83BDB2;
+  --accent-ink-muted: #659B91;
+  --signal-ok: #76B89D;
 
-  --bg-primary: #17181A;
-  --bg-secondary: #1F2124;
-  --bg-elevated: #282A2E;
-  --bg-base-alt: #1F2124;
+  --bg-primary: #11191E;
+  --bg-secondary: #182329;
+  --bg-elevated: #202E34;
+  --bg-base-alt: #182329;
 
-  --text-muted: #858890;
-  --text-tertiary: #858890;
+  --text-muted: #A2B1B5;
+  --text-tertiary: #8C9DA2;
 
-  --border-subtle: #2D3035;
-  --accent-primary: #7398C2;
-  --accent-secondary: #6B8065;
-  --accent-hover: #8EB4DE;
-  --success: #72A37E;
-  --warning: #E0A33A;
-  --error: #C95D5D;
+  --border-subtle: #2A3A40;
+  --accent-primary: #83BDB2;
+  --accent-secondary: #D5A653;
+  --accent-hover: #A2D1C8;
+  --success: #76B89D;
+  --warning: #D5A653;
+  --error: #E07A7E;
 }
 
 @theme {
@@ -148,6 +148,27 @@ html, body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  color-scheme: light;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+html.dark, html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  background-image: radial-gradient(ellipse at 20% 0%, color-mix(in srgb, var(--accent-primary) 5%, transparent), transparent 36rem);
+}
+
+::selection {
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--accent-primary) 22%, transparent);
 }
 
 /* Transiciones sobrias y suaves */

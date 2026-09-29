@@ -17,6 +17,7 @@ export interface StrokeData {
   id: string;
   color: string;
   width: number;
+  tool?: "pen" | "eraser";
   points: NativePoint[];
 }
 
@@ -70,7 +71,7 @@ export async function compressStrokesNative(
   // Fallback determinista en TypeScript
   const raw = JSON.stringify(strokes);
   return {
-    payload: "V1\n" + strokes.map((s) => `${s.id}|${s.color}|${s.width}|${s.points.map((p) => `${Math.round(p.x * 10)},${Math.round(p.y * 10)}`).join(",")}`).join("\n"),
+    payload: "V2\n" + strokes.map((s) => `${s.id}|${s.color}|${s.width}|${s.tool || "pen"}|${s.points.map((p) => `${Math.round(p.x * 10)},${Math.round(p.y * 10)}`).join(",")}`).join("\n"),
     original_byte_size: raw.length,
     compressed_byte_size: Math.round(raw.length * 0.4),
     compression_ratio_pct: 60.0,
@@ -90,13 +91,16 @@ export async function decompressStrokesNative(payload: string): Promise<StrokeDa
 
   // Fallback TypeScript
   const lines = payload.split("\n");
-  if (lines[0] !== "V1") return [];
+  const version = lines[0];
+  if (version !== "V1" && version !== "V2") return [];
   const strokes: StrokeData[] = [];
 
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim();
     if (!line) continue;
-    const [id, color, widthStr, ptsStr] = line.split("|");
+    const [id, color, widthStr, toolOrPoints, v2Points] = line.split("|");
+    const tool = version === "V2" ? toolOrPoints : "pen";
+    const ptsStr = version === "V2" ? v2Points : toolOrPoints;
     if (!ptsStr) continue;
     const nums = ptsStr.split(",").map(Number);
     const points: NativePoint[] = [];
@@ -112,6 +116,7 @@ export async function decompressStrokesNative(payload: string): Promise<StrokeDa
       id: id || "s",
       color: color || "#000",
       width: parseFloat(widthStr) || 2,
+      tool: tool === "eraser" ? "eraser" : "pen",
       points,
     });
   }

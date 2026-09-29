@@ -1,236 +1,172 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
-import { motion } from "motion/react";
+import React, { useEffect, useMemo, useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import {
-  Home,
-  Play,
-  GraduationCap,
+  Activity,
+  BookOpen,
   BrainCircuit,
-  Network,
-  FolderOpen,
+  CalendarDays,
+  ChevronDown,
   FileText,
-  ScanText,
-  Library,
-  Volume2,
-  Settings,
-  ShieldCheck,
+  FolderOpen,
+  GraduationCap,
   HelpCircle,
+  Home,
+  Library,
   PanelLeftClose,
-  PanelLeft,
-  Compass,
-  Calendar,
+  PanelLeftOpen,
   PenTool,
+  Play,
+  ScanText,
+  Settings,
+  Volume2,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { clsx } from "clsx";
 import { useTutorialStore } from "../../stores/useTutorialStore";
 import { useThemeStore } from "../../stores/useThemeStore";
 import { useContextEngineStore } from "../../stores/useContextEngineStore";
-import { DURATION, EASE_EXPO_OUT } from "../../lib/motion-tokens";
+
+type SidebarLink = { to: string; label: string; icon: LucideIcon };
+
+const mainLinks: SidebarLink[] = [
+  { to: "/", label: "Inicio", icon: Home },
+  { to: "/methods", label: "Estudiar", icon: GraduationCap },
+  { to: "/academic", label: "Espacio de estudio", icon: BrainCircuit },
+  { to: "/calendar", label: "Agenda", icon: CalendarDays },
+  { to: "/files", label: "Biblioteca", icon: FolderOpen },
+  { to: "/blackboard", label: "Pizarra", icon: PenTool },
+  { to: "/graph", label: "Progreso", icon: Activity },
+];
+
+const baseTools: SidebarLink[] = [
+  { to: "/session", label: "Sesión de estudio", icon: Play },
+  { to: "/pdf", label: "Lector PDF", icon: FileText },
+  { to: "/ocr", label: "Digitalizar apuntes", icon: ScanText },
+  { to: "/books", label: "Separar capítulos", icon: Library },
+  { to: "/ambient", label: "Sonido de concentración", icon: Volume2 },
+];
+
+function SidebarItem({ item, collapsed }: { item: SidebarLink; collapsed: boolean }) {
+  const Icon = item.icon;
+  return (
+    <NavLink
+      to={item.to}
+      end={item.to === "/"}
+      title={collapsed ? item.label : undefined}
+      aria-label={item.label}
+      className={({ isActive }) => clsx(
+        "group relative flex h-10 items-center gap-3 rounded-lg px-3 text-[13px] font-medium transition-colors duration-150",
+        collapsed && "justify-center px-0",
+        isActive
+          ? "bg-accent-primary/10 text-accent-primary"
+          : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary",
+      )}
+    >
+      {({ isActive }) => (
+        <>
+          {isActive && <span className="absolute inset-y-2 left-0 w-[3px] rounded-full bg-accent-primary" aria-hidden="true" />}
+          <Icon size={18} strokeWidth={1.8} className="shrink-0" aria-hidden="true" />
+          {!collapsed && <span className="truncate">{item.label}</span>}
+        </>
+      )}
+    </NavLink>
+  );
+}
 
 export const Sidebar: React.FC = () => {
+  const location = useLocation();
   const openTutorial = useTutorialStore((s) => s.openTutorial);
   const isCollapsed = useThemeStore((s) => s.sidebarCollapsed);
   const toggleSidebar = useThemeStore((s) => s.toggleSidebar);
   const contextEngineEnabled = useContextEngineStore((s) => s.contextEngineEnabled);
+  const tools = useMemo(() => contextEngineEnabled
+    ? [...baseTools, { to: "/context", label: "Asistente de planificación", icon: BrainCircuit }]
+    : baseTools, [contextEngineEnabled]);
+  const isToolRoute = tools.some((item) => location.pathname.startsWith(item.to));
+  const [toolsOpen, setToolsOpen] = useState(isToolRoute);
 
-  // Pilares Principales: Estudiar (Métodos de Estudio), Organización, Biblioteca, Progreso
-  const primaryPillars = [
-    { to: "/methods", label: "Estudiar", icon: GraduationCap },
-    { to: "/calendar", label: "Organización", icon: Calendar },
-    { to: "/files", label: "Biblioteca", icon: FolderOpen },
-    { to: "/graph", label: "Progreso", icon: Network },
-  ];
-
-  const toolItems = [
-    { to: "/session", label: "Sesión Activa", icon: Play },
-    { to: "/blackboard", label: "Pizarra Virtual", icon: PenTool },
-    { to: "/pdf", label: "Anotador PDF", icon: FileText },
-    { to: "/ocr", label: "Extracción OCR", icon: ScanText },
-    { to: "/books", label: "Escanear Libros", icon: Library },
-    { to: "/ambient", label: "Sonido Ambiente", icon: Volume2 },
-    { to: "/academic", label: "Academic Hub", icon: BrainCircuit },
-  ];
-
-  if (contextEngineEnabled) {
-    toolItems.push({ to: "/context", label: "Motor Contexto", icon: Compass });
-  }
-
-  const navSections = [
-    {
-      title: "Estudio Principal",
-      items: primaryPillars,
-    },
-    {
-      title: "Herramientas",
-      items: toolItems,
-    },
-    {
-      title: "Sistema",
-      items: [
-        { to: "/settings", label: "Configuración", icon: Settings },
-        { to: "/qa", label: "Consola QA", icon: ShieldCheck },
-      ],
-    },
-  ];
+  useEffect(() => {
+    if (isToolRoute) setToolsOpen(true);
+  }, [isToolRoute]);
 
   return (
     <aside
       className={clsx(
-        "hidden md:flex shrink-0 flex-col border-r border-border-subtle bg-bg-secondary/70 h-screen sticky top-0 transition-[width] duration-200 ease-in-out select-none motion-layer",
-        isCollapsed ? "w-16" : "w-64",
+        "hidden h-screen shrink-0 flex-col border-r border-border-subtle bg-bg-elevated/80 transition-[width] duration-200 ease-out md:flex",
+        isCollapsed ? "w-[76px]" : "w-[264px]",
       )}
-      aria-expanded={!isCollapsed}
-      aria-label="Menú lateral principal"
+      aria-label="Navegación principal"
     >
-      {/* Header con Marca y Botón de Colapsar */}
-      <div className="flex h-16 items-center border-b border-border-subtle px-3 justify-between">
-        <div className="w-10 h-10 flex items-center justify-center shrink-0">
-          <button
-            type="button"
-            onClick={toggleSidebar}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-text-muted hover:text-text-primary hover:bg-bg-elevated transition-colors cursor-pointer"
-            title={isCollapsed ? "Expandir menú lateral (Ctrl+B)" : "Colapsar menú lateral (Ctrl+B)"}
-            aria-label={isCollapsed ? "Expandir menú lateral" : "Colapsar menú lateral"}
-          >
-            {isCollapsed ? <PanelLeft size={18} strokeWidth={1.75} /> : <PanelLeftClose size={18} strokeWidth={1.75} />}
-          </button>
-        </div>
-
-        <motion.div
-          initial={false}
-          animate={{ width: !isCollapsed ? "auto" : 0, opacity: !isCollapsed ? 1 : 0 }}
-          transition={{ duration: DURATION.base, ease: EASE_EXPO_OUT }}
-          className="overflow-hidden whitespace-nowrap flex items-center gap-2 pr-2"
+      <div className={clsx("flex h-[72px] shrink-0 items-center border-b border-border-subtle", isCollapsed ? "justify-center px-2" : "justify-between px-4")}>
+        {!isCollapsed && (
+          <NavLink to="/" className="flex min-w-0 items-center gap-3" aria-label="StudyLab, inicio">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-primary text-white shadow-sm">
+              <BookOpen size={19} strokeWidth={1.8} />
+            </span>
+            <span className="min-w-0">
+              <span className="block font-serif text-[17px] font-semibold leading-5 tracking-tight text-text-primary">StudyLab</span>
+              <span className="mt-0.5 block text-[10px] font-medium uppercase tracking-[0.14em] text-text-muted">Campus personal</span>
+            </span>
+          </NavLink>
+        )}
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-text-muted hover:bg-bg-secondary hover:text-text-primary"
+          title={isCollapsed ? "Expandir navegación (Ctrl+B)" : "Contraer navegación (Ctrl+B)"}
+          aria-label={isCollapsed ? "Expandir navegación" : "Contraer navegación"}
         >
-          <span className="font-serif text-base font-semibold tracking-tight text-text-primary">
-            StudyLab
-          </span>
-          <span className="font-sans text-[10px] font-medium text-text-secondary bg-bg-surface-2 border border-border-hairline px-1.5 py-0.5 rounded">
-            Desktop
-          </span>
-        </motion.div>
+          {isCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+        </button>
       </div>
 
-      {/* Navegación Principal */}
-      <nav className="flex-1 space-y-3 p-3 overflow-y-auto overflow-x-hidden">
-        {/* Botón Destacado HOME */}
-        <NavLink
-          to="/"
-          end
-          title="Inicio / Dashboard"
-          aria-label="Inicio / Dashboard"
-          className={({ isActive }) =>
-            clsx(
-              "group flex items-center h-10 rounded-md transition-all duration-150 font-sans cursor-pointer overflow-hidden",
-              isActive
-                ? "bg-accent-primary text-white shadow-2xs font-semibold"
-                : "bg-bg-elevated/60 border border-border-subtle/60 text-text-primary hover:bg-bg-elevated hover:border-accent-primary/50 hover:text-accent-primary",
-            )
-          }
-        >
-          {({ isActive }) => (
+      <nav className="flex-1 space-y-1 overflow-y-auto overflow-x-hidden px-3 py-5">
+        {!isCollapsed && <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-text-tertiary">Tu universidad</p>}
+        {mainLinks.map((item) => <SidebarItem key={item.to} item={item} collapsed={isCollapsed} />)}
+
+        <div className="pt-4">
+          {!isCollapsed ? (
             <>
-              <div className="w-10 h-10 flex items-center justify-center shrink-0">
-                <Home
-                  className={clsx(
-                    "h-4 w-4 transition-transform duration-150 group-hover:scale-105",
-                    isActive ? "text-white" : "text-accent-primary",
-                  )}
-                />
-              </div>
-              <motion.span
-                initial={false}
-                animate={{ width: !isCollapsed ? "auto" : 0, opacity: !isCollapsed ? 1 : 0 }}
-                transition={{ duration: DURATION.base, ease: EASE_EXPO_OUT }}
-                className="overflow-hidden whitespace-nowrap text-xs font-medium"
+              <button
+                type="button"
+                onClick={() => setToolsOpen((open) => !open)}
+                className="flex h-9 w-full items-center justify-between rounded-lg px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-text-tertiary hover:bg-bg-secondary hover:text-text-secondary"
+                aria-expanded={toolsOpen}
               >
-                Inicio
-              </motion.span>
+                <span>Más herramientas</span>
+                <ChevronDown size={14} className={clsx("transition-transform duration-150", toolsOpen && "rotate-180")} />
+              </button>
+              {toolsOpen && <div className="mt-1 space-y-1">{tools.map((item) => <SidebarItem key={item.to} item={item} collapsed={false} />)}</div>}
             </>
+          ) : (
+            <div className="space-y-1 border-t border-border-subtle pt-3" aria-label="Más herramientas">
+              {tools.map((item) => <SidebarItem key={item.to} item={item} collapsed />)}
+            </div>
           )}
-        </NavLink>
-
-        {/* Secciones de Navegación */}
-        {navSections.map((section) => (
-          <div key={section.title} className="space-y-1">
-            <motion.div
-              initial={false}
-              animate={{ opacity: !isCollapsed ? 1 : 0, height: !isCollapsed ? "auto" : 0 }}
-              transition={{ duration: DURATION.fast, ease: EASE_EXPO_OUT }}
-              className="overflow-hidden whitespace-nowrap pointer-events-none"
-            >
-              <span className="block px-2 pt-1 font-sans text-[11px] font-medium text-text-tertiary whitespace-nowrap truncate select-none">
-                {section.title}
-              </span>
-            </motion.div>
-
-            {section.items.map(({ to, label, icon: Icon }) => (
-              <NavLink
-                key={to}
-                to={to}
-                title={label}
-                aria-label={label}
-                className={({ isActive }) =>
-                  clsx(
-                    "flex items-center h-10 rounded-md transition-colors duration-150 text-xs font-sans font-medium cursor-pointer overflow-hidden",
-                    isActive
-                      ? "bg-bg-elevated text-accent-primary border border-border-subtle shadow-2xs font-semibold"
-                      : "text-text-secondary hover:bg-bg-elevated/80 hover:text-text-primary",
-                  )
-                }
-              >
-                <div className="w-10 h-10 flex items-center justify-center shrink-0">
-                  <Icon className="h-4 w-4" strokeWidth={1.75} />
-                </div>
-                <motion.span
-                  initial={false}
-                  animate={{ width: !isCollapsed ? "auto" : 0, opacity: !isCollapsed ? 1 : 0 }}
-                  transition={{ duration: DURATION.base, ease: EASE_EXPO_OUT }}
-                  className="overflow-hidden whitespace-nowrap truncate pr-2 text-xs"
-                >
-                  {label}
-                </motion.span>
-              </NavLink>
-            ))}
-          </div>
-        ))}
+        </div>
       </nav>
 
-      {/* Footer / Tutorial Trigger */}
-      <div className="border-t border-border-subtle p-3 space-y-2">
+      <div className={clsx("shrink-0 border-t border-border-subtle p-3", isCollapsed && "flex flex-col items-center gap-1")}>
+        <SidebarItem item={{ to: "/settings", label: "Configuración", icon: Settings }} collapsed={isCollapsed} />
         <button
           type="button"
           onClick={() => openTutorial(0, "tour")}
-          title="Guía y Tutoriales (8 pasos)"
-          aria-label="Guía y Tutoriales"
-          className="flex items-center h-10 w-full rounded-md border border-accent-primary/30 bg-accent-primary/5 text-xs font-sans font-medium text-accent-primary hover:bg-accent-primary/10 transition-colors duration-150 cursor-pointer overflow-hidden"
+          title={isCollapsed ? "Guía de inicio" : undefined}
+          aria-label="Abrir guía de inicio"
+          className={clsx(
+            "mt-1 flex h-10 w-full items-center gap-3 rounded-lg px-3 text-[13px] font-medium text-text-secondary hover:bg-bg-secondary hover:text-text-primary",
+            isCollapsed && "w-10 justify-center px-0",
+          )}
         >
-          <div className="w-10 h-10 flex items-center justify-center shrink-0">
-            <HelpCircle className="h-4 w-4 text-accent-primary" />
-          </div>
-          <motion.span
-            initial={false}
-            animate={{ width: !isCollapsed ? "auto" : 0, opacity: !isCollapsed ? 1 : 0 }}
-            transition={{ duration: DURATION.base, ease: EASE_EXPO_OUT }}
-            className="overflow-hidden whitespace-nowrap truncate pr-2 text-xs"
-          >
-            Guía (8 pasos)
-          </motion.span>
+          <HelpCircle size={18} strokeWidth={1.8} />
+          {!isCollapsed && <span>Guía de inicio</span>}
         </button>
-
-        <div className="flex items-center h-8 rounded-md border border-border-subtle bg-bg-primary/50 overflow-hidden">
-          <div className="w-10 h-8 flex items-center justify-center shrink-0" title="100% Local-First">
-            <span className="h-2 w-2 rounded-full bg-signal-ok inline-block" />
+        {!isCollapsed && (
+          <div className="mt-3 flex items-center gap-2 rounded-lg bg-bg-secondary/70 px-3 py-2 text-[11px] text-text-muted">
+            <span className="h-2 w-2 rounded-full bg-success" />
+            <span>Datos guardados en este equipo</span>
           </div>
-          <motion.div
-            initial={false}
-            animate={{ width: !isCollapsed ? "auto" : 0, opacity: !isCollapsed ? 1 : 0 }}
-            transition={{ duration: DURATION.base, ease: EASE_EXPO_OUT }}
-            className="overflow-hidden whitespace-nowrap text-[11px] text-text-secondary font-mono truncate pr-2"
-          >
-            Local-First (SQLite)
-          </motion.div>
-        </div>
+        )}
       </div>
     </aside>
   );

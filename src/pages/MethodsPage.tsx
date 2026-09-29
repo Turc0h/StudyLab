@@ -418,14 +418,14 @@ export const MethodsPage: React.FC = () => {
             className="text-xs flex items-center gap-2 border-border-subtle hover:bg-bg-elevated"
           >
             <Compass className="h-3.5 w-3.5 text-accent-primary" />
-            <span>Asistente de Triaje Cognitivo</span>
+            <span>Encontrar mi método</span>
           </Button>
           <PanelGuide
             id="methods-catalog-guide"
             title="Catálogo de Métodos Cognitivos"
             whatItDoes="Catálogo integral de 30 métodos de estudio con respaldo neurocognitivo formal, fichas descriptivas y vinculación con FSRS y el grafo."
             howToUse={[
-              "El bloque superior destaca el método prioritario sugerido para hoy según tu carga biológica de repaso.",
+              "El bloque superior muestra una sugerencia para empezar, basada en tus repasos pendientes.",
               "En 'Herramientas de Cátedra' encontrás simuladores específicos de parcial, pizarra y coloquio.",
               "En el catálogo inferior podés buscar cualquier técnica y consultar sus pasos o iniciar sesión.",
             ]}
@@ -449,7 +449,7 @@ export const MethodsPage: React.FC = () => {
               <p className="text-xs md:text-sm text-text-secondary leading-relaxed">
                 {dueFsrsCount > 0
                   ? `Tenés ${dueFsrsCount} ${dueFsrsCount === 1 ? "tarjeta pendiente" : "tarjetas pendientes"} de repaso hoy según tu curva de retención R(t). Resolverlas a tiempo previene el decaimiento de memoria antes de los exámenes.`
-                  : "No tenés repasos FSRS vencidos en este momento. Es el intervalo ideal para asimilar conceptos densos con explicación en lenguaje llano o abordar una unidad nueva."}
+                  : "No tenés repasos pendientes. Si querés empezar un tema nuevo, podés probar la técnica Feynman o encontrar un método que se ajuste mejor a tu tarea."}
               </p>
             </div>
 

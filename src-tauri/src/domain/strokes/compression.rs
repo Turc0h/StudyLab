@@ -6,7 +6,13 @@ pub struct StrokeData {
     pub id: String,
     pub color: String,
     pub width: f64,
+    #[serde(default = "default_tool")]
+    pub tool: String,
     pub points: Vec<Point>,
+}
+
+fn default_tool() -> String {
+    "pen".to_string()
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -50,12 +56,12 @@ pub fn compress_strokes(strokes: &[StrokeData]) -> CompressedStrokesResult {
             prev_y = cur_y;
         }
 
-        let stroke_repr = format!("{}|{}|{:.1}|{}", s.id, s.color, s.width, pt_deltas);
+        let stroke_repr = format!("{}|{}|{:.1}|{}|{}", s.id, s.color, s.width, s.tool, pt_deltas);
         parts.push(stroke_repr);
     }
 
-    // Cabecera v1 + delimitador newline entre trazos
-    let payload = format!("V1\n{}", parts.join("\n"));
+    // V2 conserva la herramienta; el lector también acepta payloads V1 existentes.
+    let payload = format!("V2\n{}", parts.join("\n"));
     let compressed_byte_size = payload.len();
     let compression_ratio_pct = if original_byte_size > 0 {
         ((original_byte_size.saturating_sub(compressed_byte_size)) as f64 / original_byte_size as f64) * 100.0
@@ -77,7 +83,7 @@ pub fn compress_strokes(strokes: &[StrokeData]) -> CompressedStrokesResult {
 pub fn decompress_strokes(payload: &str) -> Result<Vec<StrokeData>, String> {
     let mut lines = payload.lines();
     let version = lines.next().ok_or("Payload vacío")?;
-    if version != "V1" {
+    if version != "V1" && version != "V2" {
         return Err(format!("Versión de compresión desconocida: {}", version));
     }
 
@@ -89,14 +95,18 @@ pub fn decompress_strokes(payload: &str) -> Result<Vec<StrokeData>, String> {
         }
 
         let parts: Vec<&str> = line.split('|').collect();
-        if parts.len() < 4 {
+        if parts.len() < if version == "V2" { 5 } else { 4 } {
             continue;
         }
 
         let id = parts[0].to_string();
         let color = parts[1].to_string();
         let width = parts[2].parse::<f64>().unwrap_or(2.0);
-        let pt_str = parts[3];
+        let (tool, pt_str) = if version == "V2" {
+            (parts[3].to_string(), parts[4])
+        } else {
+            (default_tool(), parts[3])
+        };
 
         let coords: Vec<&str> = pt_str.split(',').collect();
         if coords.len() < 2 {
@@ -132,6 +142,7 @@ pub fn decompress_strokes(payload: &str) -> Result<Vec<StrokeData>, String> {
             id,
             color,
             width,
+            tool,
             points,
         });
     }
@@ -150,6 +161,7 @@ mod tests {
                 id: "stroke-1".into(),
                 color: "#f5f5f0".into(),
                 width: 3.0,
+                tool: "pen".into(),
                 points: vec![
                     Point { x: 10.0, y: 15.0, time: None },
                     Point { x: 12.5, y: 18.2, time: None },

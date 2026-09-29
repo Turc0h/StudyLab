@@ -60,9 +60,9 @@ export const DailyStudyRecommendationCard: React.FC = () => {
     return (
       <Card elevated className="p-5 border-l-4 border-l-accent-primary animate-pulse flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <BrainCircuit className="h-5 w-5 text-accent-primary animate-spin" />
-          <span className="font-mono text-xs text-text-secondary">
-            Calculando mapa de dominio 4D y evaluando deuda cognitiva...
+          <BrainCircuit className="h-5 w-5 text-accent-primary" />
+          <span className="font-sans text-sm text-text-secondary">
+            Preparando tu plan de estudio...
           </span>
         </div>
       </Card>
@@ -86,10 +86,10 @@ export const DailyStudyRecommendationCard: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <span className="font-mono text-[10px] text-accent-primary font-semibold">
-                CognitiveOS · Motor de recomendación
+                PARA HOY
               </span>
               <Badge variant="accent" className="font-mono text-[10px]">
-                Adaptive Engine
+                Plan de estudio
               </Badge>
             </div>
             <h3 className="font-serif text-lg md:text-xl font-semibold text-text-primary tracking-tight">
@@ -101,7 +101,7 @@ export const DailyStudyRecommendationCard: React.FC = () => {
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-bg-surface-2 border border-border-subtle text-xs font-mono">
             <Clock className="h-3.5 w-3.5 text-warning" />
-            <span className="text-text-muted">Deuda de estudio:</span>
+            <span className="text-text-muted">Repasos pendientes:</span>
             <span className="font-bold text-text-primary">
               {agenda.totalDebtMinutes > 0 ? `${agenda.totalDebtMinutes} min` : "0 min (Al día)"}
             </span>

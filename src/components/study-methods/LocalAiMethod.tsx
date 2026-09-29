@@ -30,6 +30,7 @@ import {
   executeAcademicQuery,
   saveAiStudySessionRecord,
   RECOMMENDED_LOCAL_MODELS,
+  type ExtractiveQuestion,
   type AiStudyMode,
 } from "../../features/ai-bridge/localAiEngine";
 
@@ -52,6 +53,9 @@ export const LocalAiMethod: React.FC<LocalAiMethodProps> = ({ onSessionFinished 
   const [contextNotes, setContextNotes] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [streamedText, setStreamedText] = useState("");
+  const [offlineQuestions, setOfflineQuestions] = useState<ExtractiveQuestion[]>([]);
+  const [revealedQuestions, setRevealedQuestions] = useState<Record<number, boolean>>({});
+  const [questionRatings, setQuestionRatings] = useState<Record<number, "knew" | "partial" | "missed">>({});
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [copied, setCopied] = useState(false);
   const [sessionSaved, setSessionSaved] = useState(false);
@@ -98,6 +102,9 @@ export const LocalAiMethod: React.FC<LocalAiMethodProps> = ({ onSessionFinished 
     setInputPrompt("");
     setIsGenerating(true);
     setStreamedText("");
+    setOfflineQuestions([]);
+    setRevealedQuestions({});
+    setQuestionRatings({});
     setSessionSaved(false);
 
     // Update chat history if in socratic tutor mode
@@ -119,6 +126,7 @@ export const LocalAiMethod: React.FC<LocalAiMethodProps> = ({ onSessionFinished 
       });
 
       setStreamedText(result.text);
+      setOfflineQuestions(result.offlineQuestions || []);
 
       if (activeMode === "socratic_tutor") {
         setChatHistory([...updatedHistory, { role: "assistant", content: result.text }]);
@@ -166,7 +174,7 @@ export const LocalAiMethod: React.FC<LocalAiMethodProps> = ({ onSessionFinished 
             </h1>
           </div>
           <p className="text-text-secondary text-sm mt-1">
-            Inteligencia artificial 100% privada, ejecutada localmente en tu máquina sin enviar datos a la nube ni consumir saldo.
+              Con Ollama, tus consultas se procesan en el host que configures. Sin Ollama, la autoevaluación extractiva funciona en el equipo.
           </p>
         </div>
 
@@ -184,7 +192,7 @@ export const LocalAiMethod: React.FC<LocalAiMethodProps> = ({ onSessionFinished 
               <>
                 <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
                 <span className="text-xs font-medium text-amber-300">
-                  Simulador Offline Activo
+                  Modo sin Ollama
                 </span>
               </>
             )}
@@ -332,7 +340,7 @@ export const LocalAiMethod: React.FC<LocalAiMethodProps> = ({ onSessionFinished 
           </div>
           <div>
             <h3 className="text-xs font-bold text-text-primary">Generador de Parcial</h3>
-            <p className="text-[11px] text-text-muted mt-0.5">Crea preguntas múltiple opción, desarrollo y casos.</p>
+            <p className="text-[11px] text-text-muted mt-0.5">Practica con preguntas basadas en tus apuntes.</p>
           </div>
         </button>
 
@@ -399,7 +407,7 @@ export const LocalAiMethod: React.FC<LocalAiMethodProps> = ({ onSessionFinished 
               className="w-full text-xs p-3 rounded-lg bg-bg-surface-2 border border-border-subtle text-text-primary placeholder:text-text-muted focus:outline-none focus:border-indigo-500 resize-y"
             />
             <p className="text-[11px] text-text-muted">
-              El motor enviará estos apuntes a tu modelo local para que responda con fundamento en tu programa.
+              Si Ollama está activo, estos apuntes se envían al modelo local. Sin Ollama, las preguntas se extraen del texto aquí mismo.
             </p>
           </Card>
 
@@ -410,7 +418,7 @@ export const LocalAiMethod: React.FC<LocalAiMethodProps> = ({ onSessionFinished 
                 {activeMode === "socratic_tutor"
                   ? "¿Qué tema o duda querés razonar?"
                   : activeMode === "exam_question_generator"
-                  ? "Especifique el tema sobre el cual generar preguntas:"
+                    ? "¿Qué querés practicar?"
                   : activeMode === "rubric_evaluator"
                   ? "Tu respuesta escrita a evaluar:"
                   : "Material o tema para generar flashcards:"}
@@ -427,7 +435,7 @@ export const LocalAiMethod: React.FC<LocalAiMethodProps> = ({ onSessionFinished 
                   activeMode === "socratic_tutor"
                     ? "ej. 'No entiendo por qué en Raft se necesita quórum de mayoría en vez de consenso unánime...'"
                     : activeMode === "exam_question_generator"
-                    ? "ej. 'Insuficiencia Cardíaca y uso de inhibidores SGLT2...'"
+                    ? "Pegá apuntes en el cuadro de arriba y escribí aquí qué tema querés practicar."
                     : activeMode === "rubric_evaluator"
                     ? "ej. 'Consigna: Imprevisión. Mi respuesta: Se aplica cuando el contrato se vuelve muy caro por inflación...'"
                     : "ej. 'Extraé las fórmulas de dilatación térmica y los coeficientes de volumen...'"
@@ -456,7 +464,7 @@ export const LocalAiMethod: React.FC<LocalAiMethodProps> = ({ onSessionFinished 
                   className="text-xs ml-auto flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500"
                 >
                   <Send className="h-3.5 w-3.5" />
-                  <span>{isGenerating ? "Generando..." : "Consultar IA Local"}</span>
+                  <span>{isGenerating ? "Procesando..." : "Consultar"}</span>
                 </Button>
               </div>
             </form>
@@ -475,7 +483,7 @@ export const LocalAiMethod: React.FC<LocalAiMethodProps> = ({ onSessionFinished 
                 </span>
                 {isGenerating && (
                   <Badge variant="accent" className="text-[10px] animate-pulse">
-                    Generando Tokens...
+                    Procesando...
                   </Badge>
                 )}
               </div>
@@ -531,7 +539,43 @@ export const LocalAiMethod: React.FC<LocalAiMethodProps> = ({ onSessionFinished 
               )}
 
               {/* Live Streaming Response / Current Output */}
-              {streamedText ? (
+              {offlineQuestions.length > 0 ? (
+                <div className="space-y-3">
+                  <div className="rounded-lg border border-accent-primary/25 bg-accent-primary/5 p-3">
+                    <p className="font-semibold text-text-primary">Autoevaluación basada en tus apuntes</p>
+                    <p className="mt-1 text-text-muted">Respondé sin mirar y revelá la referencia para compararla. La valoración es tuya; no se calcula una nota automática.</p>
+                  </div>
+                  {offlineQuestions.map((item, index) => (
+                    <div key={`${index}-${item.question}`} className="rounded-xl border border-border-subtle bg-bg-surface-2 p-4 space-y-3">
+                      <p className="font-medium text-text-primary"><span className="mr-2 text-text-muted">{index + 1}.</span>{item.question}</p>
+                      {revealedQuestions[index] ? (
+                        <div className="rounded-lg border border-border-subtle bg-bg-surface-1 p-3 text-text-secondary">
+                          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-text-muted">Referencia del apunte</p>
+                          {item.answer}
+                        </div>
+                      ) : (
+                        <Button size="sm" variant="outline" onClick={() => setRevealedQuestions((current) => ({ ...current, [index]: true }))}>
+                          Revelar respuesta
+                        </Button>
+                      )}
+                      {revealedQuestions[index] && (
+                        <div className="flex flex-wrap gap-2" aria-label={`Autoevaluación de la pregunta ${index + 1}`}>
+                          {([
+                            ["knew", "La sabía"],
+                            ["partial", "A medias"],
+                            ["missed", "No la sabía"],
+                          ] as const).map(([rating, label]) => (
+                            <Button key={rating} size="sm" variant={questionRatings[index] === rating ? "primary" : "outline"} onClick={() => setQuestionRatings((current) => ({ ...current, [index]: rating }))}>
+                              {label}
+                            </Button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  <p className="text-[11px] text-text-muted">Preguntas marcadas: {Object.keys(questionRatings).length} de {offlineQuestions.length}</p>
+                </div>
+              ) : streamedText ? (
                 <div className="p-4 bg-bg-surface-2/80 rounded-xl border border-indigo-500/30 whitespace-pre-wrap font-sans text-xs">
                   {streamedText}
                 </div>
@@ -543,7 +587,7 @@ export const LocalAiMethod: React.FC<LocalAiMethodProps> = ({ onSessionFinished 
                       Esperando tu consulta para activar el motor local
                     </p>
                     <p className="text-[11px] text-text-muted mt-1">
-                      Elegí un modo, redactá tu consigna o duda a la izquierda y recibí respuestas en tiempo real generadas en tu CPU/GPU local.
+                      Elegí un modo y escribí tu consigna. Sin Ollama, la autoevaluación se arma desde tus apuntes sin inventar respuestas.
                     </p>
                   </div>
                 </div>
@@ -556,7 +600,7 @@ export const LocalAiMethod: React.FC<LocalAiMethodProps> = ({ onSessionFinished 
             <div className="border-t border-border-subtle pt-3 flex items-center justify-between text-[11px] text-text-muted">
               <span className="flex items-center gap-1">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-                Procesado localmente con cero transmisión externa.
+                Los datos se envían únicamente al host que configuraste.
               </span>
               {onSessionFinished && (
                 <Button size="sm" variant="outline" onClick={onSessionFinished}>

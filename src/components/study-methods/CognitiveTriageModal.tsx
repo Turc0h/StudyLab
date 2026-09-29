@@ -35,30 +35,72 @@ interface CognitiveTriageModalProps {
   onSelectMethod: (methodId: string) => void;
 }
 
+const METHOD_REASONS: Record<string, string> = {
+  "practice-testing": "Te permite practicar como en una evaluación y detectar qué temas conviene repasar.",
+  blurting: "Intentás escribir lo que recordás antes de consultar los apuntes y luego completás lo que faltó.",
+  "active-recall": "Practica recuperar la información de memoria en vez de limitarse a releerla.",
+  feynman: "Explicar la idea con palabras simples ayuda a encontrar partes que todavía no están claras.",
+  leitner: "Organiza tarjetas según cuánto te cuesta recordarlas, para dedicar más tiempo a las difíciles.",
+  "spaced-repetition": "Programa repasos en distintos momentos para volver sobre lo que estás aprendiendo.",
+  "distributed-practice": "Reparte el estudio en varias sesiones en lugar de concentrarlo todo en una sola.",
+  "desirable-difficulties": "Combina estrategias que te obligan a recuperar y relacionar ideas, no solo reconocerlas.",
+  "concept-maps": "Ordena conceptos y muestra cómo se relacionan entre sí.",
+  "problem-based-learning": "Parte de un problema concreto para identificar y aplicar lo que necesitás aprender.",
+  "deep-work": "Reserva un bloque largo sin interrupciones para una tarea que requiere concentración.",
+  pq4r: "Guía la lectura con preguntas, reflexión y repasos para trabajar textos extensos.",
+  sq3r: "Divide la lectura en pasos: explorar, preguntar, leer, recordar y repasar.",
+  "story-method": "Usa una historia para enlazar datos que necesitás recordar en secuencia.",
+  "method-of-loci": "Asocia conceptos con lugares conocidos para ayudarte a recordar una lista o un recorrido.",
+  chunking: "Agrupa datos relacionados en unidades más fáciles de manejar y recordar.",
+  "dual-coding": "Combina palabras e imágenes para representar un mismo tema.",
+  "multisensory-learning": "Propone trabajar el contenido con más de un formato, como texto, audio o esquemas.",
+  "segmentation-principle": "Divide un contenido largo en partes breves que podés revisar una por una.",
+  cornell: "Organiza apuntes, preguntas clave y un resumen en una misma página.",
+  interleaving: "Alterna temas o tipos de ejercicios para practicar cómo elegir el enfoque adecuado.",
+  "protege-effect": "Preparar una explicación para otra persona te ayuda a ordenar tus propias ideas.",
+  zettelkasten: "Conecta notas breves para conservar y relacionar ideas a lo largo del tiempo.",
+  "kwl-method": "Te ayuda a registrar lo que ya sabés, lo que querés averiguar y lo que aprendiste.",
+  "self-explanation": "Te pide explicar por qué funciona cada paso de un ejemplo o procedimiento.",
+  pomodoro: "Alterna períodos de trabajo y pausas para organizar una sesión de estudio.",
+  "elaborative-interrogation": "Usa preguntas como «¿por qué?» para relacionar datos con sus causas.",
+  "mind-maps": "Presenta un tema de forma visual, con una idea central y sus ramificaciones.",
+  mnemonics: "Crea asociaciones o frases para recordar listas y secuencias.",
+  "sleep-consolidation": "Te recuerda planificar el repaso con tiempo y dejar espacio para descansar.",
+};
+
+const METHOD_CATEGORY_LABELS: Record<string, string> = {
+  memorizacion: "Memoria",
+  comprension: "Comprensión",
+  "gestion-tiempo": "Gestión del tiempo",
+  escritura: "Escritura",
+  evaluacion: "Evaluación",
+  metacognicion: "Estrategia",
+};
+
 const TRIAGE_STEPS: StepItem[] = [
   {
     id: "urgency",
-    title: "1. Urgencia",
-    subtitle: "Horizonte",
-    description: "El tiempo disponible determina si necesitás fijación a largo plazo o técnicas de choque de memoria inmediata."
+    title: "1. Fecha",
+    subtitle: "Plazo",
+    description: "Elegí cuándo necesitás tener este tema preparado."
   },
   {
     id: "material",
-    title: "2. Contenido",
-    subtitle: "Material",
-    description: "Cada red sináptica procesa de manera diferente fórmulas deductivas vs. listas taxonómicas de memoria."
+    title: "2. Tarea",
+    subtitle: "Contenido",
+    description: "Contanos qué necesitás hacer con el material."
   },
   {
     id: "mastery",
-    title: "3. Dominio",
-    subtitle: "Familiaridad",
-    description: "Abordar un tema nuevo requiere principios de segmentación; pulir un tema conocido requiere dificultades deseables."
+    title: "3. Familiaridad",
+    subtitle: "Punto de partida",
+    description: "La recomendación cambia según cuánto conozcas el tema."
   },
   {
     id: "energy",
-    title: "4. Energía",
-    subtitle: "Biofoco",
-    description: "Estudiar con fatiga forzando tareas de alta carga ejecutiva genera bloqueo; los métodos biofisiológicos salvan el día."
+    title: "4. Tiempo y energía",
+    subtitle: "Ahora",
+    description: "Ajustamos la sugerencia al tiempo y la concentración que tenés hoy."
   }
 ];
 
@@ -110,12 +152,12 @@ export const CognitiveTriageModal: React.FC<CognitiveTriageModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-serif text-base font-bold text-text-primary">
-                  Asistente de Triaje Cognitivo
+                  Encontrá una forma de estudiar
                 </h3>
                 <Badge variant="neutral" className="text-xs font-mono py-0">30 Métodos</Badge>
               </div>
               <p className="text-xs text-text-tertiary mt-0.5">
-                Orientación estructurada en 4 pasos para identificar tu metodología óptima inmediata.
+                Respondé cuatro preguntas y te sugerimos por dónde empezar. Podés elegir otra opción si no te convence.
               </p>
             </div>
           </div>
@@ -135,8 +177,8 @@ export const CognitiveTriageModal: React.FC<CognitiveTriageModalProps> = ({
           {/* FASES 1 A 4: GESTIONADAS POR STEPPER SHELL */}
           {step <= 4 ? (
             <StepperShell
-              title="Diagnóstico de Perfil de Aprendizaje"
-              badgeText={`Paso {step} de 4: ${step === 1 ? "Horizonte Temporal" : step === 2 ? "Tipo de Contenido" : step === 3 ? "Nivel de Dominio" : "Nivel de Energía"}`}
+              title="¿Qué necesitás estudiar?"
+              badgeText={`Paso ${step} de 4: ${step === 1 ? "Fecha" : step === 2 ? "Tarea" : step === 3 ? "Familiaridad" : "Tiempo y energía"}`}
               steps={TRIAGE_STEPS}
               currentStepIndex={step - 1}
               onStepChange={(newIdx) => setStep(newIdx + 1)}
@@ -150,10 +192,10 @@ export const CognitiveTriageModal: React.FC<CognitiveTriageModalProps> = ({
                   <div className="space-y-4">
                     <div>
                       <h4 className="font-serif text-base font-semibold text-text-primary">
-                        1. ¿Cuánto tiempo falta para tu examen o entrega?
+                        1. ¿Cuándo necesitás tener este tema preparado?
                       </h4>
                       <p className="text-xs text-text-tertiary mt-1">
-                        El tiempo disponible determina si necesitás fijación a largo plazo o técnicas de choque de memoria inmediata.
+                        Puede ser una fecha de examen, una entrega o una meta personal.
                       </p>
                     </div>
 
@@ -161,24 +203,24 @@ export const CognitiveTriageModal: React.FC<CognitiveTriageModalProps> = ({
                       {[
                         {
                           id: "urgent" as TriageUrgency,
-                          title: "Menos de 24 horas (¡Mañana rindo!)",
-                          desc: "Situación de emergencia. Necesitás detección instantánea de brechas y evocación rápida sin adornos.",
+                          title: "Mañana o pasado",
+                          desc: "Necesito priorizar lo esencial y comprobar qué recuerdo.",
                           icon: AlertTriangle,
-                          badge: "Modo Choque"
+                          badge: "Urgente"
                         },
                         {
                           id: "medium" as TriageUrgency,
-                          title: "2 a 7 días (Semana de parciales)",
-                          desc: "Plazo intermedio. Tiempo ideal para aislar errores en cajas de estudio, intercalar temas y autoexplicar.",
+                          title: "Durante esta semana",
+                          desc: "Tengo algunos días para practicar y corregir dudas.",
                           icon: Calendar,
-                          badge: "Consolidación Fina"
+                          badge: "Esta semana"
                         },
                         {
                           id: "long" as TriageUrgency,
-                          title: "Más de 2 semanas (Cursada regular / Finales)",
-                          desc: "Horizonte amplio. Máxima efectividad para práctica distribuida, FSRS y mapas conceptuales duraderos.",
+                          title: "Más adelante o sin fecha",
+                          desc: "Quiero entender y recordar el tema a largo plazo.",
                           icon: Compass,
-                          badge: "Largo Plazo"
+                          badge: "Con tiempo"
                         }
                       ].map((opt) => {
                         const Icon = opt.icon;
@@ -225,10 +267,10 @@ export const CognitiveTriageModal: React.FC<CognitiveTriageModalProps> = ({
                   <div className="space-y-4">
                     <div>
                       <h4 className="font-serif text-base font-semibold text-text-primary">
-                        2. ¿Qué tipo de contenido estás estudiando?
+                        2. ¿Qué necesitás hacer con el material?
                       </h4>
                       <p className="text-xs text-text-tertiary mt-1">
-                        Cada red sináptica procesa de manera diferente fórmulas deductivas vs. listas taxonómicas de memoria.
+                        Elegí la opción que más se parece a tu tarea de hoy.
                       </p>
                     </div>
 
@@ -236,26 +278,26 @@ export const CognitiveTriageModal: React.FC<CognitiveTriageModalProps> = ({
                       {[
                         {
                           id: "logical" as TriageMaterial,
-                          title: "Lógico-Deductivo / Fórmulas",
-                          desc: "Matemáticas, física, programación, algoritmos o demostraciones de teoremas.",
+                          title: "Resolver o aplicar",
+                          desc: "Ejercicios, problemas, fórmulas o casos prácticos.",
                           icon: Cpu
                         },
                         {
                           id: "factual" as TriageMaterial,
-                          title: "Fáctico / Memorístico Puro",
-                          desc: "Anatomía, artículos de leyes, fechas históricas, términos médicos o vocabulario.",
+                          title: "Recordar datos",
+                          desc: "Fechas, vocabulario, definiciones, nombres o listas.",
                           icon: Bookmark
                         },
                         {
                           id: "doctrinal" as TriageMaterial,
-                          title: "Doctrinal / Textos Densos",
-                          desc: "Derecho, filosofía, sociología, ensayos o manuales científicos extensos.",
+                          title: "Leer y comprender",
+                          desc: "Textos largos, teorías, argumentos o capítulos.",
                           icon: BookOpen
                         },
                         {
                           id: "multimodal" as TriageMaterial,
-                          title: "Integrador / Visual / Esquemas",
-                          desc: "Mapas de procesos, diseño, conceptos interrelacionados con diagramas y esquemas.",
+                          title: "Conectar ideas",
+                          desc: "Temas que se relacionan y conviene ordenar en esquemas o mapas.",
                           icon: Layers
                         }
                       ].map((opt) => {
@@ -298,10 +340,10 @@ export const CognitiveTriageModal: React.FC<CognitiveTriageModalProps> = ({
                   <div className="space-y-4">
                     <div>
                       <h4 className="font-serif text-base font-semibold text-text-primary">
-                        3. ¿Cuál es tu grado de familiaridad con el tema?
+                        3. ¿Cuánto conocés del tema?
                       </h4>
                       <p className="text-xs text-text-tertiary mt-1">
-                        Abordar un tema nuevo requiere principios de segmentación; pulir un tema conocido requiere dificultades deseables.
+                        No hace falta saberlo con exactitud: elegí lo que mejor te describa.
                       </p>
                     </div>
 
@@ -309,20 +351,20 @@ export const CognitiveTriageModal: React.FC<CognitiveTriageModalProps> = ({
                       {[
                         {
                           id: "initial" as TriageMastery,
-                          title: "Primer contacto (Aprendiendo desde cero)",
-                          desc: "Nunca viste este material o no entendés la lógica base. Necesitás despiece en tramos pequeños y analogías.",
+                          title: "Estoy empezando",
+                          desc: "Todavía no entiendo bien las ideas principales.",
                           icon: Compass
                         },
                         {
                           id: "intermediate" as TriageMastery,
-                          title: "Intermedio (Consolidando y conectando)",
-                          desc: "Entendés los conceptos sueltos pero te cuesta relacionarlos o resolver problemas cuando se mezclan.",
+                          title: "Conozco lo básico",
+                          desc: "Entiendo algunas partes, pero me cuesta relacionarlas o usarlas.",
                           icon: CheckCircle2
                         },
                         {
                           id: "advanced" as TriageMastery,
-                          title: "Avanzado (Detectando lagunas finas y puliendo)",
-                          desc: "Dominás el temario general pero necesitás ponerte a prueba bajo presión de examen con rúbricas de cátedra.",
+                          title: "Quiero ponerme a prueba",
+                          desc: "Ya estudié el tema y quiero detectar qué me falta.",
                           icon: Award
                         }
                       ].map((opt) => {
@@ -365,10 +407,10 @@ export const CognitiveTriageModal: React.FC<CognitiveTriageModalProps> = ({
                   <div className="space-y-4">
                     <div>
                       <h4 className="font-serif text-base font-semibold text-text-primary">
-                        4. ¿Cuál es tu nivel de energía y foco en este momento?
+                        4. ¿Con cuánto tiempo y energía contás ahora?
                       </h4>
                       <p className="text-xs text-text-tertiary mt-1">
-                        Estudiar con fatiga forzando tareas de alta carga ejecutiva genera bloqueo; los métodos biofisiológicos salvan el día.
+                        Pensá en esta sesión, no en cómo te sentís todos los días.
                       </p>
                     </div>
 
@@ -376,20 +418,20 @@ export const CognitiveTriageModal: React.FC<CognitiveTriageModalProps> = ({
                       {[
                         {
                           id: "high" as TriageEnergy,
-                          title: "Alta energía / Foco pleno (Pico matutino)",
-                          desc: "Mente despejada y capacidad óptima de resolución. Momento ideal para deep work, resolución de problemas y simulacros.",
+                          title: "Tengo tiempo y estoy con energía",
+                          desc: "Puedo concentrarme en una tarea exigente.",
                           icon: Zap
                         },
                         {
                           id: "medium" as TriageEnergy,
-                          title: "Energía media / Ritmo de trabajo sostenido",
-                          desc: "Nivel equilibrado estándar. Óptimo para intervalos Pomodoro, cajas de Leitner y práctica intercalada.",
+                          title: "Tengo un rato, pero no mucho",
+                          desc: "Me sirve una sesión con pausas y objetivos concretos.",
                           icon: Battery
                         },
                         {
                           id: "low" as TriageEnergy,
-                          title: "Fatiga mental / Noche / Cansancio",
-                          desc: "Atención mermada tras el día. Es el momento para consolidación por sueño, estímulo multisensorial o repaso suave.",
+                          title: "Estoy cansado/a",
+                          desc: "Necesito una tarea liviana o conviene dejarlo para después.",
                           icon: Moon
                         }
                       ].map((opt) => {
@@ -434,8 +476,8 @@ export const CognitiveTriageModal: React.FC<CognitiveTriageModalProps> = ({
               <div className="space-y-6 animate-in fade-in duration-200">
                 {/* Caution Alert */}
                 {result.cautionAlert && (
-                  <div className="rounded-xl border border-rubric-red/30 bg-rubric-red/10 p-4 flex items-start gap-3">
-                    <AlertTriangle className="h-5 w-5 text-rubric-red shrink-0 mt-0.5" />
+                  <div className="rounded-xl border border-accent-primary/30 bg-bg-surface-2 p-4 flex items-start gap-3">
+                    <Compass className="h-5 w-5 text-accent-primary shrink-0 mt-0.5" />
                     <p className="text-xs text-text-primary leading-relaxed font-medium">
                       {result.cautionAlert}
                     </p>
@@ -446,17 +488,17 @@ export const CognitiveTriageModal: React.FC<CognitiveTriageModalProps> = ({
                 <div className="rounded-xl border border-border-hairline bg-bg-surface-2 p-4">
                   <div className="flex items-center gap-2 text-xs font-mono font-semibold text-text-primary">
                     <Compass className="h-3.5 w-3.5 text-accent-primary" />
-                    <span>Prescripción Pedagógica</span>
+                    <span>Sugerencia orientativa</span>
                   </div>
                   <p className="text-xs text-text-primary mt-1.5 leading-relaxed font-sans">
-                    {result.diagnosticSummary}
+                    {result.diagnosticSummary.replace(/^Diagnóstico:\s*/, "")}
                   </p>
                 </div>
 
                 {/* Top 3 Matches Podium */}
                 <div className="space-y-3">
                   <h4 className="text-xs font-semibold text-text-primary font-serif">
-                    Tus 3 Metodologías Óptimas Recomendadas
+                    Estas opciones pueden servirte. Elegí la que te resulte más cómoda.
                   </h4>
 
                   <div className="space-y-3">
@@ -478,10 +520,10 @@ export const CognitiveTriageModal: React.FC<CognitiveTriageModalProps> = ({
                                   ? "bg-bg-surface-1 text-text-primary border border-border-hairline font-semibold"
                                   : "bg-bg-surface-1 border border-border-hairline text-text-tertiary"
                               }`}>
-                                #{idx + 1} • {match.matchPercentage}% Compatibilidad
+                                {idx === 0 ? "Para empezar" : "Otra opción"}
                               </span>
                               <span className="text-[10px] font-mono text-text-tertiary">
-                                {match.method.category}
+                                {METHOD_CATEGORY_LABELS[match.method.category] ?? match.method.category}
                               </span>
                             </div>
 
@@ -490,13 +532,8 @@ export const CognitiveTriageModal: React.FC<CognitiveTriageModalProps> = ({
                             </h5>
 
                             <p className="text-xs text-text-secondary leading-relaxed font-sans">
-                              {match.rationale}
+                              {METHOD_REASONS[match.method.id] ?? "Puede ser una opción para tu tarea. Abrí la ficha para ver cómo se usa."}
                             </p>
-
-                            <div className="pt-1 text-[11px] text-text-tertiary flex items-center gap-1.5 font-mono">
-                              <span className="font-semibold text-text-primary">Clave:</span>
-                              <span>{match.keyBenefit}</span>
-                            </div>
                           </div>
 
                           <div className="shrink-0 sm:self-center">
@@ -510,7 +547,7 @@ export const CognitiveTriageModal: React.FC<CognitiveTriageModalProps> = ({
                               className="text-xs flex items-center gap-1.5 w-full sm:w-auto justify-center"
                             >
                               <Play className="h-3.5 w-3.5" />
-                              <span>Iniciar Runner</span>
+                              <span>Empezar con este método</span>
                             </Button>
                           </div>
                         </div>
@@ -528,7 +565,7 @@ export const CognitiveTriageModal: React.FC<CognitiveTriageModalProps> = ({
                     className="text-xs flex items-center gap-1.5"
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
-                    <span>Reiniciar Triaje</span>
+                    <span>Probar otras respuestas</span>
                   </Button>
 
                   <Button

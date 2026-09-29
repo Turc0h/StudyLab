@@ -3,7 +3,8 @@ import {
   FolderOpen,
   GraduationCap,
   Home,
-  Network,
+  BrainCircuit,
+  PenTool,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -15,8 +16,9 @@ export interface NavItem {
 
 export const navItems: NavItem[] = [
   { to: "/", label: "Inicio", icon: Home },
+  { to: "/academic", label: "Espacio", icon: BrainCircuit },
   { to: "/methods", label: "Estudiar", icon: GraduationCap },
-  { to: "/calendar", label: "Organización", icon: Calendar },
-  { to: "/files", label: "Biblioteca", icon: FolderOpen },
-  { to: "/graph", label: "Progreso", icon: Network },
+  { to: "/calendar", label: "Agenda", icon: Calendar },
+  { to: "/files", label: "Archivos", icon: FolderOpen },
+  { to: "/blackboard", label: "Pizarra", icon: PenTool },
 ];

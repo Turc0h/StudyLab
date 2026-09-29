@@ -95,84 +95,82 @@ A partir del material de estudio suministrado:
 }
 
 // -----------------------------------------------------------------------------
-// DETERMINISTIC OFFLINE SIMULATION FALLBACK (Cero Bloqueos si Ollama no corre)
+// Offline fallback: extractive prompts only, no fabricated grades or facts.
 // -----------------------------------------------------------------------------
 
-export function generateOfflineDeterministicResponse(
+export function generateOfflineResponse(
   mode: AiStudyMode,
   userInput: string,
+  contextNotes = "",
 ): string {
+  const source = (contextNotes.trim() || userInput.trim()).replace(/[ \t]+/g, " ");
+
+  if (mode === "exam_question_generator" || mode === "flashcard_generator") {
+    const cards = generateExtractiveQuestions(source);
+    if (cards.length === 0) {
+      return "No pude crear preguntas fiables con este texto. Pegá apuntes con definiciones o explicaciones completas; no voy a inventar respuestas cuando el material no las contiene.";
+    }
+    const heading = mode === "exam_question_generator" ? "Autoevaluación a partir de tus apuntes" : "Tarjetas de repaso a partir de tus apuntes";
+    const items = cards.map((card, index) =>
+      (index + 1) + ". Pregunta: " + card.question + "\n   Respuesta de referencia: " + card.answer,
+    );
+    return heading + "\n\n" + items.join("\n\n") + "\n\nPráctica: intentá responder sin mirar y después compará con la respuesta de referencia. Esto no asigna una nota ni reemplaza la revisión del material.";
+  }
+
   switch (mode) {
     case "socratic_tutor":
-      return `[Modo Simulación Académica Local - Ollama Offline]
-
-Analizando tu planteo sobre: "${userInput.slice(0, 80)}..."
-
-💡 **Pregunta Socrática Guía:**
-¿Qué principio fisiopatológico o dogmático fundamental entra en juego en esta situación? 
-Antes de concluir sobre el resultado final, intentá descomponer el problema:
-1. ¿Cuáles son las variables o presupuestos iniciales que no podés alterar?
-2. Si aplicás la regla general, ¿qué efecto colateral o excepción prevista por la cátedra se manifestaría?
-
-*Intenta responder esta premisa y continuamos construyendo la demostración paso a paso.*`;
-
-    case "exam_question_generator":
-      return `[Modo Simulación Académica Local - Ollama Offline]
-
-Generación de Preguntas de Examen basadas en tu material:
-
-### 1. Opción Múltiple (Active Recall Directo)
-**Pregunta:** Respecto a los mecanismos centrales de ${userInput.slice(0, 50)}..., ¿cuál es el postulado con mayor consenso bibliográfico?
-- A) Se produce una compensación refleja sin modificación del gasto metabólico.
-- B) Constituye la vía primaria priorizada en guías internacionales por su beneficio pronóstico. [CORRECTA]
-- C) Queda contraindicado en todos los casos por toxicidad sinérgica acumulativa.
-- D) Opera exclusivamente como mecanismo secundario sin respaldo empírico.
-*Justificación:* La opción B sintetiza la conducta de primera línea establecida por la cátedra.
-
-### 2. Pregunta de Desarrollo Conceptual
-**Consigna:** Explique la relación de causalidad y diferencie el efecto inmediato del efecto diferido a mediano plazo en este escenario.
-
-### 3. Caso Práctico / Viñeta de Aplicación
-**Consigna:** Se presenta un caso donde las condiciones iniciales varían en un 30%. Formule el dictamen resolutivo justificando en base a la normativa o algoritmo clínico correspondiente.`;
-
+      return "Modo sin modelo de lenguaje. Para no inventar contenido, baso la guía en lo que escribiste:\n\n" +
+        (source
+          ? "¿Cómo explicarías la idea principal de este planteo con tus propias palabras?\n\n¿Qué parte de tu respuesta podrías justificar directamente con el material disponible?"
+          : "Escribí una duda concreta o pegá apuntes para recibir una pregunta basada en ellos.");
     case "rubric_evaluator":
-      return `[Modo Simulación Académica Local - Evaluador de Cátedra]
-
-Evaluación diagnóstica de tu respuesta:
-- **Calificación Estimada:** 8.5 / 10 (Aprobado Destacado)
-
-✅ **Fortalezas Conceptuales:**
-- Uso adecuado del vocabulario técnico de la materia.
-- Comprensión clara del nudo problemático y delimitación del alcance.
-
-⚠️ **Aspectos a Profundizar:**
-- Faltó explicitar el fundamento doctrinal/normativo o la referencia a guías de práctica clínica de primera línea.
-- Podrías enriquecer la fundamentación mencionando las excepciones o contraindicaciones relativas.
-
-📖 **Criterio de Excelencia (10/10):**
-En un examen final, articulá la respuesta comenzando por la definición canónica, seguida de los 3 requisitos de procedencia y concluyendo con el impacto directo sobre el caso.`;
-
-    case "flashcard_generator":
-      return `[Modo Simulación Académica Local - Flashcards FSRS]
-
-Q: ¿Cuál es el concepto clave subyacente en: "${userInput.slice(0, 60)}..."?
-A: Representa el principio rector mediante el cual se articulan las excepciones y se optimiza el resultado de cátedra.
-
----
-Q: ¿Cuáles son los dos requisitos sine qua non para su aplicación válida?
-A: 1) Existencia de presupuesto habilitante probado; 2) Ausencia de causales de exclusión o contraindicaciones directas.
-
----
-Q: ¿Qué diferencia este enfoque frente a la doctrina o terapia convencional previa?
-A: Mayor especificidad, menor tasa de efectos adversos y respaldo empírico de primer orden según la bibliografía oficial.`;
-
+      return "La evaluación con nota requiere un modelo de lenguaje. El modo offline no puede juzgar la calidad conceptual de una respuesta y no va a mostrar una calificación inventada. Compará tu respuesta con los apuntes y marcá qué conceptos o relaciones te faltaron.";
     default:
-      return "Respuesta académica generada por el motor local de StudyLab.";
+      return "Esta función requiere un modelo de lenguaje disponible. Iniciá Ollama y volvé a intentarlo.";
   }
 }
 
-// -----------------------------------------------------------------------------
-// UNIFIED QUERY EXECUTOR (Con Streaming y Fallback Resiliente)
+export interface ExtractiveQuestion {
+  question: string;
+  answer: string;
+}
+
+/** Crea preguntas conservadoras cuyas respuestas salen de los apuntes. */
+export function generateExtractiveQuestions(material: string, limit = 5): ExtractiveQuestion[] {
+  const sentences = material
+    .split(/(?<=[.!?])\s+|\n+/)
+    .map((part) => part.replace(/^[-*#\d.)\s]+/, "").trim())
+    .filter((part) => part.length >= 35 && part.length <= 500);
+  const questions: ExtractiveQuestion[] = [];
+  const seen = new Set<string>();
+
+  for (const sentence of sentences) {
+    let question: string;
+    let answer = sentence;
+    const definition = sentence.match(/^(.{2,100}?)\s+(?:se define como|se entiende como|consiste en|significa)\s+(.+)$/i);
+    const causal = sentence.match(/^(.{4,180}?)\s+(?:porque|ya que|debido a que)\s+(.+)$/i);
+
+    if (definition) {
+      question = "¿En qué consiste " + definition[1].trim() + "?";
+      answer = definition[2].trim();
+    } else if (causal) {
+      question = "¿Por qué " + causal[1].trim() + "?";
+      answer = causal[2].trim().replace(/[.!?]$/, "");
+    } else {
+      const words = sentence.split(/\s+/);
+      question = "Explicá esta idea sin mirar los apuntes: “" + words.slice(0, 8).join(" ") + (words.length > 8 ? "…" : "") + "”";
+    }
+
+    const key = question.toLocaleLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    questions.push({ question, answer });
+    if (questions.length >= limit) break;
+  }
+
+  return questions;
+}
+// UNIFIED QUERY EXECUTOR (Con streaming y fallback offline)
 // -----------------------------------------------------------------------------
 
 export interface AcademicQueryOptions {
@@ -185,7 +183,8 @@ export interface AcademicQueryOptions {
 
 export interface AcademicQueryResult {
   text: string;
-  isSimulated: boolean;
+  isOfflineFallback: boolean;
+  offlineQuestions?: ExtractiveQuestion[];
   modelUsed: string;
   durationMs: number;
 }
@@ -204,25 +203,20 @@ export async function executeAcademicQuery(
     status = { isRunning: false, host: config.host, models: [] };
   }
 
-  // 2. Si Ollama NO está corriendo o no hay modelos, usar simulación local determinista
+  // 2. Sin Ollama, usar preguntas extractivas o explicar las limitaciones del modo offline.
   if (!status.isRunning || status.models.length === 0) {
-    const simulatedText = generateOfflineDeterministicResponse(options.mode, options.prompt);
-
-    // Simular un suave streaming si hay listener de chunks
-    if (options.onChunk) {
-      const words = simulatedText.split(" ");
-      let acc = "";
-      for (let i = 0; i < words.length; i++) {
-        const chunk = (i === 0 ? "" : " ") + words[i];
-        acc += chunk;
-        options.onChunk(chunk, acc);
-      }
-    }
+    const offlineText = generateOfflineResponse(options.mode, options.prompt, options.contextNotes);
+    options.onChunk?.(offlineText, offlineText);
+    const source = options.contextNotes?.trim() || options.prompt;
+    const offlineQuestions = options.mode === "exam_question_generator" || options.mode === "flashcard_generator"
+      ? generateExtractiveQuestions(source)
+      : undefined;
 
     return {
-      text: simulatedText,
-      isSimulated: true,
-      modelUsed: "Offline Academic Simulator",
+      text: offlineText,
+      isOfflineFallback: true,
+      offlineQuestions,
+      modelUsed: "Herramienta offline basada en apuntes",
       durationMs: Date.now() - startTime,
     };
   }
@@ -271,20 +265,23 @@ export async function executeAcademicQuery(
 
     return {
       text: resultText,
-      isSimulated: false,
+      isOfflineFallback: false,
       modelUsed: targetModel,
       durationMs: Date.now() - startTime,
     };
   } catch (err: any) {
     // Fallback de contingencia si falla la llamada
-    const fallbackText = generateOfflineDeterministicResponse(options.mode, options.prompt);
-    if (options.onChunk) {
-      options.onChunk(fallbackText, fallbackText);
-    }
+    const fallbackText = generateOfflineResponse(options.mode, options.prompt, options.contextNotes);
+    options.onChunk?.(fallbackText, fallbackText);
+    const source = options.contextNotes?.trim() || options.prompt;
+    const offlineQuestions = options.mode === "exam_question_generator" || options.mode === "flashcard_generator"
+      ? generateExtractiveQuestions(source)
+      : undefined;
 
     return {
       text: fallbackText,
-      isSimulated: true,
+      isOfflineFallback: true,
+      offlineQuestions,
       modelUsed: `Fallback (${err.message || "error de comunicación"})`,
       durationMs: Date.now() - startTime,
     };

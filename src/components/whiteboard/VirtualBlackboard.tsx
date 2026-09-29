@@ -26,7 +26,6 @@ import {
   type SurfaceTheme,
   CHALKBOARD_PALETTE,
   NOTEBOOK_PALETTE,
-  applyEmaFilter,
   renderStrokeToContext,
   renderBackgroundGrid,
   recognizeWhiteboardCanvas,
@@ -51,6 +50,7 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
   initialSurface = "chalkboard",
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const backgroundCanvasRef = useRef<HTMLCanvasElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Estados de dibujo y lienzo
@@ -68,7 +68,7 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
   const [redoStack, setRedoStack] = useState<Stroke[][]>([]);
 
   // Trazo activo
-  const [isDrawing, setIsDrawing] = useState<boolean>(false);
+  const isDrawingRef = useRef(false);
   const currentPointsRef = useRef<Point[]>([]);
 
   // Estado de herramientas experimentales de laboratorio (desactivado por defecto)
@@ -94,20 +94,19 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
   // Redibujado completo del lienzo
   const redrawCanvas = useCallback(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const backgroundCanvas = backgroundCanvasRef.current;
+    if (!canvas || !backgroundCanvas) return;
     const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const backgroundCtx = backgroundCanvas.getContext("2d");
+    if (!ctx || !backgroundCtx) return;
 
     const dpr = window.devicePixelRatio || 1;
-    const width = canvas.width / dpr;
-    const height = canvas.height / dpr;
-
-    // Resetear transformaciones antes de dibujar fondo
-    ctx.save();
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    backgroundCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    renderBackgroundGrid(backgroundCtx, width, height, surface, gridType);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    // Fondo y Cuadrícula
-    renderBackgroundGrid(ctx, width, height, surface, gridType);
+    ctx.clearRect(0, 0, width, height);
 
     // Renderizar trazos confirmados
     for (const stroke of strokes) {
@@ -126,15 +125,29 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
       renderStrokeToContext(ctx, liveStroke, surface);
     }
 
-    ctx.restore();
   }, [strokes, surface, gridType, color, brushWidth, tool]);
+
+  const createCompositeCanvas = useCallback(() => {
+    const background = backgroundCanvasRef.current;
+    const ink = canvasRef.current;
+    if (!background || !ink) return null;
+    const composite = document.createElement("canvas");
+    composite.width = background.width;
+    composite.height = background.height;
+    const ctx = composite.getContext("2d");
+    if (!ctx) return null;
+    ctx.drawImage(background, 0, 0);
+    ctx.drawImage(ink, 0, 0);
+    return composite;
+  }, []);
 
   // Sincronización del tamaño del canvas con soporte para HiDPI/Retina y SplitPanel resize
   useEffect(() => {
     const updateSize = () => {
       const container = containerRef.current;
       const canvas = canvasRef.current;
-      if (!container || !canvas) return;
+      const backgroundCanvas = backgroundCanvasRef.current;
+      if (!container || !canvas || !backgroundCanvas) return;
 
       const rect = container.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
@@ -145,8 +158,12 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
 
       canvas.width = displayWidth * dpr;
       canvas.height = displayHeight * dpr;
+      backgroundCanvas.width = displayWidth * dpr;
+      backgroundCanvas.height = displayHeight * dpr;
       canvas.style.width = `${displayWidth}px`;
       canvas.style.height = `${displayHeight}px`;
+      backgroundCanvas.style.width = `${displayWidth}px`;
+      backgroundCanvas.style.height = `${displayHeight}px`;
 
       redrawCanvas();
     };
@@ -166,6 +183,10 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
       if (observer) observer.disconnect();
       window.removeEventListener("resize", updateSize);
     };
+  }, []);
+
+  useEffect(() => {
+    redrawCanvas();
   }, [redrawCanvas]);
 
   // Actualizar paleta al cambiar superficie
@@ -201,15 +222,39 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
     if (e.button !== 0 && e.pointerType === "mouse") return;
 
     e.currentTarget.setPointerCapture(e.pointerId);
-    setIsDrawing(true);
+    isDrawingRef.current = true;
 
     const pt = getCanvasCoords(e);
     currentPointsRef.current = [pt];
-    redrawCanvas();
+    drawPointerSegment(pt, pt);
+  };
+
+  const drawPointerSegment = (from: Point, to: Point) => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
+    const dpr = window.devicePixelRatio || 1;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.globalCompositeOperation = tool === "eraser" ? "destination-out" : "source-over";
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = brushWidth * (tool === "eraser" ? 2.5 : 1);
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    if (from.x === to.x && from.y === to.y) {
+      ctx.arc(to.x, to.y, ctx.lineWidth / 2, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(to.x, to.y);
+      ctx.stroke();
+    }
+    ctx.globalCompositeOperation = "source-over";
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (!isDrawing) return;
+    if (!isDrawingRef.current) return;
 
     const pt = getCanvasCoords(e);
     const pts = currentPointsRef.current;
@@ -221,21 +266,19 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
       if (dist < 1.5) return;
     }
 
+    const previous = pts[pts.length - 1];
     pts.push(pt);
-
-    // Aplicar filtro EMA en caliente sobre los últimos puntos
-    currentPointsRef.current = applyEmaFilter(pts, 0.65);
-    redrawCanvas();
+    drawPointerSegment(previous, pt);
   };
 
   const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (!isDrawing) return;
+    if (!isDrawingRef.current) return;
     try {
       e.currentTarget.releasePointerCapture(e.pointerId);
     } catch {
       // Ignorar si el puntero ya fue liberado
     }
-    setIsDrawing(false);
+    isDrawingRef.current = false;
 
     const pts = currentPointsRef.current;
     if (pts.length > 0) {
@@ -303,7 +346,7 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
       return;
     }
 
-    const canvas = canvasRef.current;
+    const canvas = createCompositeCanvas();
     if (!canvas) return;
 
     setIsOcrModalOpen(true);
@@ -337,7 +380,7 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
 
   // Exportar como imagen PNG limpia
   const handleExportPng = () => {
-    const canvas = canvasRef.current;
+    const canvas = createCompositeCanvas();
     if (!canvas) return;
 
     exportCanvasToPng(canvas, `pizarra_estudio_${Date.now()}.png`);
@@ -350,7 +393,7 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
       showToast("La pizarra está vacía.");
       return;
     }
-    const canvas = canvasRef.current;
+    const canvas = createCompositeCanvas();
     if (!canvas) return;
 
     setIsSaving(true);
@@ -359,6 +402,7 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
         id: s.id,
         color: s.color,
         width: s.width,
+        tool: s.tool,
         points: s.points.map((p) => ({ x: p.x, y: p.y, time: p.time })),
       }));
 
@@ -398,7 +442,7 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
         id: sd.id,
         color: sd.color,
         width: sd.width,
-        tool: "pen" as const,
+        tool: (sd.tool || "pen") as Stroke["tool"],
         points: sd.points.map((p) => ({ x: p.x, y: p.y, time: p.time })),
       }));
 
@@ -705,6 +749,11 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
 
       {/* Lienzo Interactivo HTML5 */}
       <div className="flex-1 w-full h-full relative cursor-crosshair overflow-hidden touch-none">
+        <canvas
+          ref={backgroundCanvasRef}
+          aria-hidden="true"
+          className="absolute inset-0 block w-full h-full pointer-events-none"
+        />
         <canvas
           ref={canvasRef}
           onPointerDown={handlePointerDown}

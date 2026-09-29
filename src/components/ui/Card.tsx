@@ -14,7 +14,7 @@ export const Card: React.FC<CardProps> = ({
   return (
     <div
       className={clsx(
-        "rounded-lg border border-border-subtle p-5 md:p-6 transition-colors duration-150 shadow-2xs",
+        "rounded-2xl border border-border-subtle/90 p-5 md:p-6 transition-[border-color,background-color,box-shadow] duration-200 shadow-sm",
         elevated ? "bg-bg-elevated" : "bg-bg-secondary",
         className,
       )}

@@ -1,6 +1,18 @@
-import React, { useMemo } from "react";
-import { Moon, Sun, HardDrive, Maximize2, Sparkles, Pin, Bell, Search, EyeOff } from "lucide-react";
-import { Badge } from "../ui/Badge";
+import React, { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Bell,
+  CalendarDays,
+  Ellipsis,
+  EyeOff,
+  Maximize2,
+  Moon,
+  Search,
+  Sparkles,
+  Sun,
+  Play,
+} from "lucide-react";
+import { clsx } from "clsx";
 import { SyncStatusIndicator } from "./SyncStatusIndicator";
 import { useFocusModeStore } from "../../stores/useFocusModeStore";
 import { useGuideModeStore } from "../../stores/useGuideModeStore";
@@ -8,7 +20,6 @@ import { useOrganizationStore } from "../../stores/useOrganizationStore";
 import { useNotificationStore } from "../../stores/useNotificationStore";
 import { useCommandPaletteStore } from "../../stores/useCommandPaletteStore";
 import { hideMainWindow } from "../../platform/islandWindow";
-import { clsx } from "clsx";
 
 export interface HeaderProps {
   title: string;
@@ -17,12 +28,7 @@ export interface HeaderProps {
   onToggleTheme: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({
-  title,
-  subtitle,
-  isDark,
-  onToggleTheme,
-}) => {
+export const Header: React.FC<HeaderProps> = ({ title, subtitle, isDark, onToggleTheme }) => {
   const enterFocusMode = useFocusModeStore((s) => s.enterFocusMode);
   const isGuideMode = useGuideModeStore((s) => s.isGuideMode);
   const toggleGuideMode = useGuideModeStore((s) => s.toggleGuideMode);
@@ -32,131 +38,111 @@ export const Header: React.FC<HeaderProps> = ({
   const toggleNotif = useNotificationStore((s) => s.toggleOpen);
   const notifications = useNotificationStore((s) => s.notifications);
   const openCommandPalette = useCommandPaletteStore((s) => s.open);
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const unreadCount = useMemo(() => notifications.filter((n) => !n.read).length, [notifications]);
 
-  const unreadCount = useMemo(
-    () => notifications.filter((n) => !n.read).length,
-    [notifications],
-  );
+  const iconButton = "relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border-subtle bg-bg-elevated/70 text-text-secondary transition-colors hover:border-accent-primary/40 hover:bg-bg-elevated hover:text-text-primary";
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between border-b border-border-subtle bg-bg-primary/95 px-6 backdrop-blur-xs md:px-10">
-      <div className="flex items-center gap-3">
-        <div>
-          <h1 className="font-serif text-xl font-semibold text-text-primary">{title}</h1>
-          {subtitle && <p className="text-xs text-text-muted">{subtitle}</p>}
-        </div>
+    <header className="sticky top-0 z-30 flex h-[72px] shrink-0 items-center justify-between gap-4 border-b border-border-subtle/80 bg-bg-primary/90 px-4 backdrop-blur-xl md:px-6 xl:px-8">
+      <div className="min-w-0">
+        <h1 className="truncate font-serif text-[18px] font-semibold leading-6 tracking-tight text-text-primary md:text-[20px]">{title}</h1>
+        {subtitle && <p className="hidden max-w-[40rem] truncate text-[11px] leading-4 text-text-muted sm:block">{subtitle}</p>}
       </div>
 
-      <div className="flex items-center gap-3">
-        {/* Botón Paleta de Comandos Universal (Ctrl+K) */}
+      <div className="flex shrink-0 items-center gap-1.5 md:gap-2">
         <button
           type="button"
           onClick={openCommandPalette}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-subtle bg-bg-elevated text-xs font-sans text-text-secondary hover:text-text-primary hover:border-accent-primary transition-colors shadow-2xs cursor-pointer"
-          title="Buscar técnicas, apuntes o comandos (Ctrl+K)"
-          aria-label="Abrir paleta de comandos"
+          className="flex h-10 items-center gap-2 rounded-xl border border-border-subtle bg-bg-elevated/70 px-3 text-text-muted transition-colors hover:border-accent-primary/40 hover:text-text-primary"
+          title="Buscar en StudyLab (Ctrl+K)"
+          aria-label="Buscar en StudyLab"
         >
-          <Search className="h-3.5 w-3.5 text-accent-primary" />
-          <span className="hidden md:inline">Buscar...</span>
-          <kbd className="hidden sm:inline-block rounded bg-bg-secondary px-1.5 py-0.5 text-[10px] font-mono text-text-muted border border-border-subtle">
-            ⌘K
-          </kbd>
+          <Search size={17} />
+          <span className="hidden text-xs lg:inline">Buscar</span>
+          <kbd className="hidden rounded-md border border-border-subtle bg-bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-text-tertiary xl:inline">Ctrl K</kbd>
         </button>
 
-        {/* Botón Minimizar a Iconos Ocultos / Segundo Plano */}
-        <button
-          type="button"
-          onClick={() => void hideMainWindow()}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-border-subtle bg-bg-elevated text-xs font-sans text-text-secondary hover:text-text-primary hover:border-accent-primary transition-colors shadow-2xs cursor-pointer"
-          title="Ocultar StudyLab en iconos ocultos (la Isla Flotante seguirá en tu pantalla)"
-          aria-label="Minimizar en segundo plano"
-        >
-          <EyeOff className="h-3.5 w-3.5 text-accent-primary" />
-          <span className="hidden xl:inline">Segundo plano</span>
-        </button>
-
-        {/* Botón Modo Guía Interactivo */}
-        <button
-          type="button"
-          onClick={toggleGuideMode}
-          className={clsx(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-sans transition-all duration-200 cursor-pointer shadow-2xs",
-            isGuideMode
-              ? "bg-accent-primary text-white border border-accent-primary shadow-[0_0_15px_rgba(47,93,124,0.4)]"
-              : "border border-border-subtle bg-bg-elevated text-text-secondary hover:text-text-primary hover:border-accent-primary",
-          )}
-          title="Activa o desactiva la explicación directa sobre cada panel en pantalla"
-        >
-          <Sparkles className={clsx("h-3.5 w-3.5", isGuideMode ? "text-white" : "text-accent-primary")} />
-          <span className="hidden sm:inline">
-            {isGuideMode ? "Modo Guía: ON" : "Modo Guía"}
-          </span>
-        </button>
-
-        {/* Botón Modo Enfoque */}
-        <button
-          type="button"
-          onClick={enterFocusMode}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border-subtle bg-bg-elevated text-xs font-sans text-text-secondary hover:text-text-primary hover:border-accent-primary transition-colors shadow-2xs cursor-pointer"
-          title="Ocultar paneles y distracciones para lectura y estudio profundo"
-        >
-          <Maximize2 className="h-3.5 w-3.5 text-accent-primary" />
-          <span className="hidden sm:inline">Modo Enfoque</span>
-        </button>
-
-        {/* Botón Centro de Organización */}
         <button
           type="button"
           onClick={toggleOrganization}
-          className={clsx(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-sans transition-all duration-200 cursor-pointer shadow-2xs",
-            isOrganizationOpen
-              ? "bg-accent-primary text-white border border-accent-primary shadow-[0_0_15px_rgba(47,93,124,0.4)]"
-              : "border border-border-subtle bg-bg-elevated text-text-secondary hover:text-text-primary hover:border-accent-primary",
-          )}
-          title="Centro de Organización: Vencimientos, Exámenes y Fechas Límite (Ctrl+O)"
-          aria-label="Abrir centro de organización"
+          className={clsx("hidden sm:flex", iconButton, isOrganizationOpen && "border-accent-primary/40 bg-accent-primary/10 text-accent-primary")}
+          title="Agenda y fechas importantes"
+          aria-label="Abrir agenda y fechas importantes"
+          aria-pressed={isOrganizationOpen}
         >
-          <Pin className={clsx("h-3.5 w-3.5", isOrganizationOpen ? "text-white" : "text-accent-primary")} />
-          <span className="hidden sm:inline">Organización</span>
+          <CalendarDays size={17} />
         </button>
 
-        {/* Botón Notificaciones */}
+        <Link
+          to="/session"
+          className="flex h-10 items-center justify-center gap-2 rounded-xl bg-accent-primary px-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-hover md:px-4"
+          title="Iniciar una sesión de estudio"
+        >
+          <Play size={15} fill="currentColor" />
+          <span className="hidden lg:inline">Nueva sesión</span>
+        </Link>
+
         <button
           type="button"
           onClick={toggleNotif}
-          className={clsx(
-            "relative flex h-8 w-8 items-center justify-center rounded-md border text-xs font-sans transition-all duration-200 cursor-pointer shadow-2xs",
-            isNotifOpen
-              ? "bg-accent-primary text-white border-accent-primary shadow-[0_0_15px_rgba(47,93,124,0.4)]"
-              : "border-border-subtle bg-bg-elevated text-text-secondary hover:text-text-primary hover:border-accent-primary",
-          )}
-          title="Bandeja de Notificaciones (Ctrl+N)"
-          aria-label="Bandeja de Notificaciones"
+          className={clsx(iconButton, isNotifOpen && "border-accent-primary/40 bg-accent-primary/10 text-accent-primary")}
+          title="Notificaciones (Ctrl+N)"
+          aria-label={`Notificaciones${unreadCount ? `, ${unreadCount} sin leer` : ""}`}
+          aria-pressed={isNotifOpen}
         >
-          <Bell className={clsx("h-4 w-4", isNotifOpen ? "text-white" : "text-text-secondary")} />
-          {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent-primary px-1 text-[10px] font-mono font-bold text-white shadow-xs">
-              {unreadCount > 9 ? "9+" : unreadCount}
-            </span>
-          )}
+          <Bell size={17} />
+          {unreadCount > 0 && <span className="absolute -right-1 -top-1 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-error px-1 text-[9px] font-semibold text-white">{unreadCount > 9 ? "9+" : unreadCount}</span>}
         </button>
-
-        <SyncStatusIndicator />
-
-        <Badge variant="secondary" className="hidden sm:inline-flex items-center gap-1.5 py-1">
-          <HardDrive className="h-3 w-3 text-accent-secondary" />
-          <span>Local-First</span>
-        </Badge>
 
         <button
           type="button"
           onClick={onToggleTheme}
           aria-label={isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
-          className="rounded-md border border-border-subtle p-2 text-text-secondary hover:bg-bg-secondary hover:text-text-primary transition-colors"
+          className={clsx("hidden sm:flex", iconButton)}
         >
-          {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          {isDark ? <Sun size={17} /> : <Moon size={17} />}
         </button>
+
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setIsMoreOpen((open) => !open)}
+            className={clsx(iconButton, isMoreOpen && "bg-bg-secondary text-text-primary")}
+            aria-label="Más opciones"
+            aria-expanded={isMoreOpen}
+            title="Más opciones"
+          >
+            <Ellipsis size={19} />
+          </button>
+          {isMoreOpen && (
+            <>
+              <button className="fixed inset-0 z-30 cursor-default" aria-label="Cerrar menú" onClick={() => setIsMoreOpen(false)} />
+              <div className="absolute right-0 top-12 z-40 w-60 rounded-2xl border border-border-subtle bg-bg-elevated p-2 shadow-xl">
+                <button type="button" onClick={() => { toggleGuideMode(); setIsMoreOpen(false); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-text-secondary hover:bg-bg-secondary hover:text-text-primary">
+                  <Sparkles size={16} className={isGuideMode ? "text-accent-primary" : "text-text-muted"} />
+                  <span className="flex-1">Guía en pantalla</span>
+                  {isGuideMode && <span className="text-[10px] font-medium text-accent-primary">Activa</span>}
+                </button>
+                <button type="button" onClick={() => { onToggleTheme(); setIsMoreOpen(false); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-text-secondary hover:bg-bg-secondary hover:text-text-primary sm:hidden">
+                  {isDark ? <Sun size={16} className="text-text-muted" /> : <Moon size={16} className="text-text-muted" />}
+                  <span>{isDark ? "Usar tema claro" : "Usar tema oscuro"}</span>
+                </button>
+                <button type="button" onClick={() => { enterFocusMode(); setIsMoreOpen(false); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-text-secondary hover:bg-bg-secondary hover:text-text-primary">
+                  <Maximize2 size={16} className="text-text-muted" />
+                  <span>Modo de concentración</span>
+                </button>
+                <button type="button" onClick={() => { setIsMoreOpen(false); void hideMainWindow(); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-text-secondary hover:bg-bg-secondary hover:text-text-primary">
+                  <EyeOff size={16} className="text-text-muted" />
+                  <span>Dejar StudyLab en segundo plano</span>
+                </button>
+                <div className="mt-1 border-t border-border-subtle px-3 py-2.5">
+                  <SyncStatusIndicator />
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </header>
   );

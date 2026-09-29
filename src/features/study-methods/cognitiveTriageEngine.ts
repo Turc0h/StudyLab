@@ -312,21 +312,22 @@ export function calculateMethodRecommendations(answers: TriageAnswers): TriageRe
 
   const topMatches = allRanked.slice(0, 3);
 
-  // Diagnóstico textual
+  // Explain the recommendation in everyday language. The score ranks options;
+  // it is not a measure of learning ability or a scientifically validated fit.
   const urgencyLabel =
-    urgency === "urgent" ? "menos de 24 horas para rendir" : urgency === "medium" ? "2 a 7 días disponibles" : "más de 2 semanas de horizonte";
+    urgency === "urgent" ? "poco tiempo" : urgency === "medium" ? "algunos días" : "más tiempo";
   const materialLabel =
-    material === "logical" ? "materia lógica o computacional" : material === "factual" ? "contenido de alta memorización fáctica" : material === "doctrinal" ? "textos doctrinales densos" : "conceptos abstractos o multimodales";
+    material === "logical" ? "resolver o aplicar" : material === "factual" ? "recordar datos" : material === "doctrinal" ? "leer y comprender" : "conectar ideas";
   const energyLabel =
-    energy === "high" ? "foco mental pleno" : energy === "medium" ? "ritmo cognitivo sostenido" : "fatiga mental o estudio nocturno";
+    energy === "high" ? "bastante concentración" : energy === "medium" ? "un ritmo tranquilo" : "poca energía";
 
-  const diagnosticSummary = `Diagnóstico: Para una situación con ${urgencyLabel}, sobre ${materialLabel} y con ${energyLabel}, tu prioridad pedagógica es maximizar la eficiencia y proteger la memoria de trabajo.`;
+  const diagnosticSummary = `Buscás ${materialLabel}, tenés ${urgencyLabel} y hoy contás con ${energyLabel}. Estas sugerencias son un punto de partida: elegí la que te resulte más cómoda.`;
 
   let cautionAlert: string | undefined;
   if (urgency === "urgent" && energy === "low") {
-    cautionAlert = "¡Alerta de Fatiga Extrema! Intentar sesiones masivas de última hora con baja energía produce ilusión de competencia y bloqueo sináptico. Te recomendamos repasar los simulacros o activar Consolidación por Sueño.";
+    cautionAlert = "Con poco tiempo y poca energía, quizá te convenga hacer un repaso breve y descansar. No hace falta intentar cubrir todo en una sola sesión.";
   } else if (urgency === "urgent" && mastery === "initial") {
-    cautionAlert = "¡Precaución por tiempo crítico! Al ser la primera vez que ves el tema, concentrate en el Principio de Segmentación o Feynman básico en vez de intentar abarcar todo el manual.";
+    cautionAlert = "Si el tema es nuevo y el examen está cerca, priorizá algunos conceptos clave y comprobá qué entendiste. No intentes abarcar todo de una vez.";
   }
 
   return {

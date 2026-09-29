@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { VirtualBlackboard } from "../components/whiteboard/VirtualBlackboard";
-import { Maximize2, Minimize2, Sparkles, BookOpen } from "lucide-react";
+import { Maximize2, Minimize2, BookOpen } from "lucide-react";
 import { Button } from "../components/ui/Button";
 
 export const BlackboardPage: React.FC = () => {
@@ -23,13 +23,9 @@ export const BlackboardPage: React.FC = () => {
             <h1 className="font-serif text-2xl font-semibold tracking-tight text-text-primary">
               Pizarra Virtual & Demostraciones
             </h1>
-            <span className="inline-flex items-center gap-1 rounded-full bg-accent-primary/10 px-2 py-0.5 text-[11px] font-mono font-medium text-accent-primary">
-              <Sparkles size={11} />
-              Acelerada en Rust
-            </span>
           </div>
           <p className="mt-1 font-sans text-xs sm:text-sm text-text-secondary">
-            Lienzo libre para resolución matemática, esquemas conceptuales y demostraciones manuscritas de alta fidelidad.
+            Un espacio para escribir, resolver ejercicios y ordenar ideas a mano.
           </p>
         </div>
 
@@ -58,9 +54,8 @@ export const BlackboardPage: React.FC = () => {
       <div className="flex items-center justify-between text-[11px] text-text-muted px-1 font-sans">
         <span className="flex items-center gap-1">
           <BookOpen size={12} />
-          <span>Tip: Puedes alternar entre Pizarra Verde y Cuaderno Marfil desde la barra superior del lienzo.</span>
+          <span>Elegí entre pizarra o cuaderno y corregí tus trazos con el borrador.</span>
         </span>
-        <span className="font-mono">Ramer-Douglas-Peucker + EMA Activo</span>
       </div>
     </div>
   );

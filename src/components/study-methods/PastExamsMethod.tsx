@@ -30,7 +30,6 @@ import type {
 } from "../../features/past-exams/pastExamsEngine";
 import {
   getAllPastExams,
-  getAvailableSubjects,
   calculateParetoTopicAnalysis,
   generateCompositeHighYieldExam,
   gradeMockExamSubmission,
@@ -47,8 +46,8 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
 
   // Repository & Filters
   const [allExams, setAllExams] = useState<PastExamPaper[]>(() => getAllPastExams());
-  const subjects = useMemo(() => getAvailableSubjects(), []);
-  const [selectedSubject, setSelectedSubject] = useState<string>(subjects[0] || "Farmacología & Cardiología Clínica");
+  const subjects = useMemo(() => Array.from(new Set(allExams.map((exam) => exam.subject))), [allExams]);
+  const [selectedSubject, setSelectedSubject] = useState<string>(() => subjects[0] || "");
   const [inspectedExam, setInspectedExam] = useState<PastExamPaper | null>(null);
 
   // New Exam Modal
@@ -56,8 +55,8 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
   const [newExamTitle, setNewExamTitle] = useState("");
   const [newExamSubject, setNewExamSubject] = useState(selectedSubject);
   const [newExamProfessor, setNewExamProfessor] = useState("");
-  const [newExamTerm, setNewExamTerm] = useState("1° Cuatrimestre 2024");
-  const [newExamYear, setNewExamYear] = useState(2024);
+  const [newExamTerm, setNewExamTerm] = useState("");
+  const [newExamYear, setNewExamYear] = useState(new Date().getFullYear());
   const [newExamTime, setNewExamTime] = useState(60);
   const [newExamQuestionsText, setNewExamQuestionsText] = useState("");
 
@@ -144,29 +143,17 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
 
     // Parse simple line-separated questions if provided
     const lines = newExamQuestionsText.split("\n").filter((l) => l.trim().length > 0);
+    if (lines.length === 0) return;
+
     const parsedQuestions: PastExamQuestion[] = lines.map((line, idx) => ({
       id: `custom-q-${Date.now()}-${idx}`,
       questionText: line.trim(),
-      topic: "Tema General de Cátedra",
+      topic: "Sin clasificar",
       type: "essay" as const,
-      points: 2.5,
-      rubricCriteria: ["Claridad conceptual y terminología técnica", "Fundamentación y ejemplos"],
-      modelAnswer: "Respuesta modelo ingresada por el estudiante.",
+      points: 1,
+      rubricCriteria: ["La respuesta aborda la consigna", "Incluye conceptos relevantes", "Fundamenta la explicación"],
       difficulty: 3 as const,
     }));
-
-    if (parsedQuestions.length === 0) {
-      parsedQuestions.push({
-        id: `custom-q-${Date.now()}-0`,
-        questionText: "Pregunta principal a desarrollo del examen.",
-        topic: "Tema Evaluado",
-        type: "essay",
-        points: 10,
-        rubricCriteria: ["Desarrollo completo"],
-        modelAnswer: "Criterio de aprobación de la cátedra.",
-        difficulty: 3,
-      });
-    }
 
     const totalPts = parsedQuestions.reduce((a, b) => a + b.points, 0);
 
@@ -174,7 +161,7 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
       id: `custom_${Date.now()}`,
       title: newExamTitle.trim(),
       subject: newExamSubject.trim(),
-      chairOrProfessor: newExamProfessor.trim() || "Cátedra Docente",
+      chairOrProfessor: newExamProfessor.trim() || "Sin especificar",
       term: newExamTerm.trim(),
       examType: "parcial_1",
       year: Number(newExamYear) || 2024,
@@ -182,11 +169,12 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
       passingScore: Math.round(totalPts * 0.6),
       timeLimitMinutes: Number(newExamTime) || 60,
       questions: parsedQuestions,
-      sourceNotes: "Parcial cargado manualmente por el estudiante.",
+      sourceNotes: "Cargado por el estudiante. La autoevaluación usa criterios orientativos.",
     };
 
     saveCustomExam(customExamObj);
     setAllExams(getAllPastExams());
+    setSelectedSubject(newExamSubject.trim());
     setIsAddingExam(false);
     setNewExamTitle("");
     setNewExamQuestionsText("");
@@ -288,7 +276,7 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
           <Button
             size="sm"
             variant="outline"
-            onClick={() => setIsAddingExam(true)}
+            onClick={() => { setNewExamSubject(selectedSubject); setIsAddingExam(true); }}
             className="text-xs font-mono flex items-center gap-1.5 border-border-hairline bg-bg-surface-1 text-text-primary hover:bg-bg-surface-2"
           >
             <PlusCircle className="h-3.5 w-3.5 text-text-secondary" />
@@ -300,6 +288,19 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
       {/* TAB 1: REPOSITORY */}
       {activeTab === "repository" && (
         <div className="space-y-4">
+          {currentSubjectExams.length === 0 && (
+            <Card className="p-8 border-dashed border-border-subtle text-center space-y-3">
+              <BookOpen className="mx-auto h-8 w-8 text-text-muted" />
+              <div>
+                <h3 className="font-semibold text-text-primary">Todavía no cargaste exámenes</h3>
+                <p className="mt-1 text-sm text-text-muted">Agregá consignas reales de tu cátedra para armar simulacros y autoevaluarte.</p>
+              </div>
+              <Button size="sm" variant="primary" onClick={() => { setNewExamSubject(selectedSubject); setIsAddingExam(true); }} className="mx-auto">
+                <PlusCircle className="mr-1.5 h-4 w-4" />
+                Cargar un examen
+              </Button>
+            </Card>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {currentSubjectExams.map((exam) => (
               <Card
@@ -386,7 +387,7 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
                 <div>
                   <h4 className="font-semibold text-text-primary text-sm flex items-center gap-2">
                     <FileText className="h-4 w-4 text-indigo-400" />
-                    Consignas Oficiales: {inspectedExam.title}
+                    Consignas: {inspectedExam.title}
                   </h4>
                   <p className="text-xs text-text-muted mt-0.5">
                     {inspectedExam.chairOrProfessor} • {inspectedExam.term}
@@ -431,7 +432,7 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
 
                     {q.modelAnswer && (
                       <div className="mt-2 p-2 bg-indigo-950/20 border border-indigo-500/20 rounded text-xs text-text-secondary">
-                        <span className="font-semibold text-indigo-300">Criterio Oficial de Cátedra: </span>
+                        <span className="font-semibold text-indigo-300">Respuesta de referencia: </span>
                         {q.modelAnswer}
                       </div>
                     )}
@@ -840,7 +841,7 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
                             <div className="p-3 bg-bg-surface-2/80 rounded-lg border border-border-subtle space-y-2">
                               <span className="text-xs font-semibold text-text-muted flex items-center gap-1.5">
                                 <HelpCircle className="h-3.5 w-3.5 text-indigo-400" />
-                                Criterios de Corrección de la Cátedra (Marcar los conceptos incluidos):
+                                Autoevaluación (criterios orientativos):
                               </span>
                               <div className="space-y-1.5">
                                 {q.rubricCriteria.map((crit, cIdx) => {
@@ -880,7 +881,7 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
                           {examFinished && q.modelAnswer && (
                             <div className="p-3 bg-indigo-950/20 border border-indigo-500/20 rounded-lg text-xs space-y-1">
                               <span className="font-semibold text-indigo-300">
-                                Respuesta Modelo Oficial de Cátedra:
+                                Respuesta de referencia:
                               </span>
                               <p className="text-text-secondary leading-relaxed">{q.modelAnswer}</p>
                             </div>
@@ -1008,9 +1009,10 @@ export const PastExamsMethod: React.FC<PastExamsMethodProps> = ({ onSessionFinis
                 </label>
                 <textarea
                   rows={4}
+                  required
                   value={newExamQuestionsText}
                   onChange={(e) => setNewExamQuestionsText(e.target.value)}
-                  placeholder="Pegá aquí las preguntas del parcial reconstruido..."
+                  placeholder="Pegá las consignas reales, una por línea. Se agregará una lista de autoevaluación orientativa."
                   className="w-full p-2 bg-bg-surface-2 rounded border border-border-subtle text-text-primary resize-y"
                 />
               </div>

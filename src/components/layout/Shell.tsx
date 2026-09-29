@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { motion } from "motion/react";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
+import { MobileNav } from "../nav/MobileNav";
 import { AnimatedOutlet } from "./AnimatedOutlet";
 import { GuideStatusBar } from "../guide/GuideStatusBar";
 import { OrganizationDrawer } from "../organization/OrganizationDrawer";
@@ -161,36 +162,42 @@ export const Shell: React.FC = () => {
   const getPageMeta = () => {
     const path = location.pathname;
     if (path.startsWith("/academic")) {
-      return { title: "Academic Hub", subtitle: "Ingesta PDF, visor interactivo con citas y tutor socrático" };
+      return { title: "Espacio de estudio", subtitle: "Leé, anotá y trabajá con tus materiales" };
     }
     if (path.startsWith("/workspace") || path.startsWith("/methods")) {
-      return { title: "Métodos de Estudio", subtitle: "Catálogo de técnicas con respaldo empírico y protocolos guiados" };
+      return { title: "Estudiar", subtitle: "Elegí qué aprender hoy y cómo encararlo" };
     }
     if (path.startsWith("/graph")) {
-      return { title: "Grafo Causal", subtitle: "Topología DAG de conceptos y barreras de retención FSRS" };
+      return { title: "Progreso", subtitle: "Seguimiento de tus materias y temas" };
     }
     if (path.startsWith("/files")) {
-      return { title: "Archivos Universitarios", subtitle: "Jerarquía de cátedras, documentos y notas marginales" };
+      return { title: "Biblioteca", subtitle: "Materias, apuntes y documentos en un mismo lugar" };
     }
     if (path.startsWith("/session")) {
-      return { title: "Sesión de Estudio", subtitle: "Entorno Deep Work temporizado y registro cognitivo" };
+      return { title: "Sesión de estudio", subtitle: "Un bloque de concentración, a tu ritmo" };
     }
     if (path.startsWith("/pdf")) {
-      return { title: "Anotador de PDF", subtitle: "Lectura pausada, zoom y notas marginales persistentes" };
+      return { title: "Lector PDF", subtitle: "Leé y anotá tus documentos" };
     }
     if (path.startsWith("/ocr")) {
-      return { title: "Extracción OCR", subtitle: "Digitalización de apuntes físicos 100% en el cliente" };
+      return { title: "Digitalizar apuntes", subtitle: "Convertí páginas escaneadas en texto" };
     }
     if (path.startsWith("/books")) {
-      return { title: "Escanear Libros", subtitle: "Identificación de capítulos, separación en archivos y guardado en carpetas" };
+      return { title: "Separar capítulos", subtitle: "Organizá libros extensos por capítulos" };
     }
     if (path.startsWith("/ambient")) {
-      return { title: "Sonido Ambiente", subtitle: "Aislamiento acústico sintetizado mediante Web Audio API" };
+      return { title: "Sonido de concentración", subtitle: "Elegí un ambiente para acompañar tu sesión" };
     }
     if (path.startsWith("/settings")) {
-      return { title: "Configuración", subtitle: "Pesos del algoritmo FSRS v4.5 y gestión de IndexedDB" };
+      return { title: "Configuración", subtitle: "Preferencias y datos de StudyLab" };
     }
-    return { title: "Panel Principal", subtitle: "Registro de estudio, métricas cognitivas y progreso personal" };
+    if (path.startsWith("/calendar") || path.startsWith("/organization")) {
+      return { title: "Agenda", subtitle: "Clases, exámenes y fechas importantes" };
+    }
+    if (path.startsWith("/blackboard") || path.startsWith("/whiteboard")) {
+      return { title: "Pizarra", subtitle: "Desarrollá ideas y resolvé ejercicios" };
+    }
+    return { title: "Inicio", subtitle: "Tu vida universitaria, en un solo lugar" };
   };
 
   const isColdBoot = !hasBooted;
@@ -242,18 +249,20 @@ export const Shell: React.FC = () => {
         )}
 
         {/* Contenido Principal con Fluid Layout Responsivo */}
-        <main className={clsx("flex-1 overflow-y-auto transition-all", isFocusMode ? "p-4 md:p-8" : "p-4 md:p-6 lg:p-8")}>
+        <main className={clsx("flex-1 overflow-y-auto transition-all", isFocusMode ? "p-4 pb-8 md:p-8" : "px-4 pb-24 pt-5 md:px-6 md:pb-8 md:pt-6 xl:px-8")}>
           <motion.div
             variants={blockVariants}
             className={clsx(
               "mx-auto w-full transition-all",
-              isFocusMode ? "max-w-4xl" : "max-w-[1600px]",
+              isFocusMode ? "max-w-4xl" : "max-w-[1440px]",
             )}
           >
             <AnimatedOutlet />
           </motion.div>
         </main>
       </div>
+
+      {!isFocusMode && <MobileNav />}
 
       {/* Panel Lateral de Organización Discreto */}
       <OrganizationDrawer />
