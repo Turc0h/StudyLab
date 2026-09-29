@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback } from "react";
+import React, { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import {
   Pen,
   Eraser,
@@ -14,6 +14,7 @@ import {
   FlaskConical,
   Save,
   FolderOpen,
+  Move,
 } from "lucide-react";
 import { Button } from "../ui/Button";
 import { Modal } from "../ui/Modal";
@@ -44,6 +45,15 @@ export interface VirtualBlackboardProps {
   initialSurface?: SurfaceTheme;
 }
 
+const BOARD_CHUNK_SIZE = 1024;
+const BOARD_CHUNK_RADIUS = 8;
+const BOARD_WORLD_LIMIT = BOARD_CHUNK_SIZE * BOARD_CHUNK_RADIUS;
+type BlackboardTool = "pen" | "eraser" | "pan";
+
+function chunkKey(x: number, y: number) {
+  return `${x}:${y}`;
+}
+
 export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
   onInsertLatex,
   className = "",
@@ -55,7 +65,12 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
 
   // Estados de dibujo y lienzo
   const [surface, setSurface] = useState<SurfaceTheme>(initialSurface);
-  const [tool, setTool] = useState<"pen" | "eraser">("pen");
+  const [tool, setTool] = useState<BlackboardTool>("pen");
+  const [isPanning, setIsPanning] = useState(false);
+  const [viewOffset, setViewOffset] = useState({ x: 0, y: 0 });
+  const viewOffsetRef = useRef(viewOffset);
+  const isPanningRef = useRef(false);
+  const panStartRef = useRef<{ clientX: number; clientY: number; x: number; y: number } | null>(null);
   const [brushWidth, setBrushWidth] = useState<number>(3);
   const [color, setColor] = useState<string>(
     initialSurface === "chalkboard" ? CHALKBOARD_PALETTE[0].value : NOTEBOOK_PALETTE[0].value,
@@ -91,6 +106,38 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
 
   const savedBoards = useLiveQuery(() => db.blackboards?.reverse().sortBy("updatedAt"), []) || [];
 
+  // Índice espacial: cada trazo se asigna solo a los bloques que atraviesa.
+  const strokesByChunk = useMemo(() => {
+    const index = new Map<string, Stroke[]>();
+    for (const stroke of strokes) {
+      if (stroke.points.length === 0) continue;
+      const margin = stroke.width * (stroke.tool === "eraser" ? 1.25 : 0.5);
+      let minX = Infinity;
+      let minY = Infinity;
+      let maxX = -Infinity;
+      let maxY = -Infinity;
+      for (const point of stroke.points) {
+        minX = Math.min(minX, point.x - margin);
+        minY = Math.min(minY, point.y - margin);
+        maxX = Math.max(maxX, point.x + margin);
+        maxY = Math.max(maxY, point.y + margin);
+      }
+      const left = Math.floor(minX / BOARD_CHUNK_SIZE);
+      const top = Math.floor(minY / BOARD_CHUNK_SIZE);
+      const right = Math.floor(maxX / BOARD_CHUNK_SIZE);
+      const bottom = Math.floor(maxY / BOARD_CHUNK_SIZE);
+      for (let cy = top; cy <= bottom; cy++) {
+        for (let cx = left; cx <= right; cx++) {
+          const key = chunkKey(cx, cy);
+          const bucket = index.get(key);
+          if (bucket) bucket.push(stroke);
+          else index.set(key, [stroke]);
+        }
+      }
+    }
+    return index;
+  }, [strokes]);
+
   // Redibujado completo del lienzo
   const redrawCanvas = useCallback(() => {
     const canvas = canvasRef.current;
@@ -103,13 +150,25 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
     const dpr = window.devicePixelRatio || 1;
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
+    const { x: offsetX, y: offsetY } = viewOffsetRef.current;
     backgroundCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    renderBackgroundGrid(backgroundCtx, width, height, surface, gridType);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, width, height);
+    renderBackgroundGrid(backgroundCtx, width, height, surface, gridType, offsetX, offsetY);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(dpr, 0, 0, dpr, -offsetX * dpr, -offsetY * dpr);
 
-    // Renderizar trazos confirmados
-    for (const stroke of strokes) {
+    // Renderizar solo bloques visibles y un bloque de margen en cada borde.
+    const firstChunkX = Math.floor(offsetX / BOARD_CHUNK_SIZE) - 1;
+    const firstChunkY = Math.floor(offsetY / BOARD_CHUNK_SIZE) - 1;
+    const lastChunkX = Math.floor((offsetX + width) / BOARD_CHUNK_SIZE) + 1;
+    const lastChunkY = Math.floor((offsetY + height) / BOARD_CHUNK_SIZE) + 1;
+    const visibleStrokes = new Set<Stroke>();
+    for (let cy = firstChunkY; cy <= lastChunkY; cy++) {
+      for (let cx = firstChunkX; cx <= lastChunkX; cx++) {
+        for (const stroke of strokesByChunk.get(chunkKey(cx, cy)) || []) visibleStrokes.add(stroke);
+      }
+    }
+    for (const stroke of visibleStrokes) {
       renderStrokeToContext(ctx, stroke, surface);
     }
 
@@ -120,12 +179,12 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
         points: currentPointsRef.current,
         color,
         width: brushWidth,
-        tool,
+        tool: tool === "eraser" ? "eraser" : "pen",
       };
       renderStrokeToContext(ctx, liveStroke, surface);
     }
 
-  }, [strokes, surface, gridType, color, brushWidth, tool]);
+  }, [strokesByChunk, surface, gridType, color, brushWidth, tool, viewOffset]);
 
   const createCompositeCanvas = useCallback(() => {
     const background = backgroundCanvasRef.current;
@@ -211,10 +270,19 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: e.clientX - rect.left + viewOffsetRef.current.x,
+      y: e.clientY - rect.top + viewOffsetRef.current.y,
       time: Date.now(),
     };
+  };
+
+  const updateViewOffset = (x: number, y: number) => {
+    const next = {
+      x: Math.max(-BOARD_WORLD_LIMIT, Math.min(BOARD_WORLD_LIMIT, x)),
+      y: Math.max(-BOARD_WORLD_LIMIT, Math.min(BOARD_WORLD_LIMIT, y)),
+    };
+    viewOffsetRef.current = next;
+    setViewOffset(next);
   };
 
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -222,6 +290,17 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
     if (e.button !== 0 && e.pointerType === "mouse") return;
 
     e.currentTarget.setPointerCapture(e.pointerId);
+    if (tool === "pan") {
+      isPanningRef.current = true;
+      setIsPanning(true);
+      panStartRef.current = {
+        clientX: e.clientX,
+        clientY: e.clientY,
+        x: viewOffsetRef.current.x,
+        y: viewOffsetRef.current.y,
+      };
+      return;
+    }
     isDrawingRef.current = true;
 
     const pt = getCanvasCoords(e);
@@ -232,9 +311,9 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
   const drawPointerSegment = (from: Point, to: Point) => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
-    if (!canvas || !ctx) return;
+    if (!canvas || !ctx || tool === "pan") return;
     const dpr = window.devicePixelRatio || 1;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.setTransform(dpr, 0, 0, dpr, -viewOffsetRef.current.x * dpr, -viewOffsetRef.current.y * dpr);
     ctx.globalCompositeOperation = tool === "eraser" ? "destination-out" : "source-over";
     ctx.strokeStyle = color;
     ctx.fillStyle = color;
@@ -254,6 +333,13 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (isPanningRef.current && panStartRef.current) {
+      updateViewOffset(
+        panStartRef.current.x - (e.clientX - panStartRef.current.clientX),
+        panStartRef.current.y - (e.clientY - panStartRef.current.clientY),
+      );
+      return;
+    }
     if (!isDrawingRef.current) return;
 
     const pt = getCanvasCoords(e);
@@ -272,6 +358,13 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
   };
 
   const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (isPanningRef.current) {
+      isPanningRef.current = false;
+      panStartRef.current = null;
+      setIsPanning(false);
+      try { e.currentTarget.releasePointerCapture(e.pointerId); } catch { /* El puntero ya fue liberado. */ }
+      return;
+    }
     if (!isDrawingRef.current) return;
     try {
       e.currentTarget.releasePointerCapture(e.pointerId);
@@ -287,7 +380,7 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
         points: [...pts],
         color,
         width: brushWidth,
-        tool,
+        tool: tool === "eraser" ? "eraser" : "pen",
       };
 
       setHistory((prev) => [...prev, strokes]);
@@ -418,6 +511,7 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
         strokeCount: strokes.length,
         pointCount: compressed.point_count,
         surfaceTheme: surface,
+        viewOffset: viewOffsetRef.current,
         previewDataUrl,
         createdAt: Date.now(),
         updatedAt: Date.now(),
@@ -447,6 +541,7 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
       }));
 
       setSurface(record.surfaceTheme);
+      updateViewOffset(record.viewOffset?.x ?? 0, record.viewOffset?.y ?? 0);
       setStrokes(restoredStrokes);
       setHistory([]);
       setRedoStack([]);
@@ -509,6 +604,19 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
               title="Borrador de Tiza"
             >
               <Eraser className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setTool("pan")}
+              className={`p-1.5 rounded transition-colors cursor-pointer ${
+                tool === "pan"
+                  ? "bg-accent-primary text-text-inverted"
+                  : "text-text-secondary hover:text-text-primary hover:bg-bg-surface-3"
+              }`}
+              title="Mover lienzo"
+              aria-label="Mover lienzo"
+            >
+              <Move className="w-3.5 h-3.5" />
             </button>
           </div>
 
@@ -748,7 +856,7 @@ export const VirtualBlackboard: React.FC<VirtualBlackboardProps> = ({
       </div>
 
       {/* Lienzo Interactivo HTML5 */}
-      <div className="flex-1 w-full h-full relative cursor-crosshair overflow-hidden touch-none">
+      <div className={`flex-1 w-full h-full relative ${tool === "pan" ? (isPanning ? "cursor-grabbing" : "cursor-grab") : "cursor-crosshair"} overflow-hidden touch-none`}>
         <canvas
           ref={backgroundCanvasRef}
           aria-hidden="true"

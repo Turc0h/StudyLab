@@ -434,6 +434,174 @@ export const MethodsPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Catálogo y filtros disponibles de inmediato */}
+      {/* 3. REPERTORIO METODOLÓGICO COMPLETO */}
+      <section className="space-y-4" aria-labelledby="catalog-section-title">
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between border-b border-border-subtle pb-3">
+          <div>
+            <h2 id="catalog-section-title" className="font-serif text-lg font-semibold text-text-primary">
+              Repertorio Metodológico
+            </h2>
+            <span className="text-xs text-text-muted">
+              {filteredMethods.length} de {allMethods.length} técnicas catalogadas
+            </span>
+          </div>
+
+          <div className="relative w-full sm:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-muted" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Buscar por nombre, objetivo o materia..."
+              className="w-full rounded border border-border-subtle bg-bg-secondary/60 pl-9 pr-3 py-1.5 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-colors"
+            />
+          </div>
+        </div>
+
+        {/* Filtros de Categoría y Estado */}
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-1.5">
+            {CATEGORIES.map((tab) => {
+              const count = tab.id === "all"
+                ? allMethods.length
+                : allMethods.filter((m) => m.category === tab.id).length;
+
+              const isSelected = selectedCategory === tab.id;
+
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setSelectedCategory(tab.id)}
+                  className={`rounded px-2.5 py-1 text-xs font-sans transition-colors cursor-pointer border ${
+                    isSelected
+                      ? "bg-accent-primary text-white border-accent-primary font-medium"
+                      : "bg-bg-elevated text-text-secondary border-border-subtle hover:text-text-primary hover:border-border-subtle/80"
+                  }`}
+                >
+                  {tab.label} <span className="opacity-75">({count})</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-text-muted text-[11px]">Disponibilidad:</span>
+            {[
+              { id: "all", label: `Todos (${allMethods.length})` },
+              { id: "ready", label: `Interactivos (${allMethods.filter(m => m.implemented).length})` },
+              { id: "preview", label: `Próximamente (${allMethods.filter(m => !m.implemented).length})` },
+            ].map((statusTab) => (
+              <button
+                key={statusTab.id}
+                type="button"
+                onClick={() => setSelectedStatus(statusTab.id as any)}
+                className={`px-2 py-0.5 rounded text-xs transition-colors cursor-pointer ${
+                  selectedStatus === statusTab.id
+                    ? "font-semibold text-accent-primary border-b border-accent-primary"
+                    : "text-text-muted hover:text-text-primary"
+                }`}
+              >
+                {statusTab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Lista Indexada Tipo Catálogo */}
+        {filteredMethods.length === 0 ? (
+          <div className="rounded border border-dashed border-border-subtle p-10 text-center">
+            <p className="text-sm text-text-muted">No se encontraron métodos con los filtros actuales.</p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSelectedCategory("all");
+                setSelectedStatus("all");
+                setSearchQuery("");
+              }}
+              className="mt-3 text-xs"
+            >
+              Restablecer Filtros
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {filteredMethods.map((m) => (
+              <div
+                key={m.id}
+                onClick={() => setPreviewMethod(m)}
+                className="group p-4 rounded-lg border border-border-subtle bg-bg-elevated hover:border-accent-primary/50 transition-colors cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4"
+              >
+                <div className="space-y-1 flex-1 min-w-0">
+                  <div className="flex items-center gap-2.5">
+                    <span className="font-serif text-base font-semibold text-text-primary group-hover:text-accent-primary transition-colors">
+                      {m.name}
+                    </span>
+                    {m.nameEn && (
+                      <span className="text-xs text-text-muted truncate max-w-[200px]">
+                        {m.nameEn}
+                      </span>
+                    )}
+                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-bg-secondary text-text-secondary border border-border-subtle">
+                      {CATEGORY_NAMES[m.category] || m.category}
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-text-secondary line-clamp-2 leading-relaxed">
+                    {m.description}
+                  </p>
+
+                  {m.scientificBasis && (
+                    <p className="text-[11px] text-text-muted line-clamp-1 italic">
+                      Base empírica: {m.scientificBasis}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0 self-end md:self-auto" onClick={(e) => e.stopPropagation()}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs text-text-secondary hover:text-text-primary"
+                    onClick={() => setPreviewMethod(m)}
+                  >
+                    <Eye className="h-3.5 w-3.5 mr-1" />
+                    <span>Ver Ficha</span>
+                  </Button>
+
+                  {m.implemented ? (
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="text-xs flex items-center gap-1.5 cursor-pointer"
+                      onClick={() => handleStartMethod(m.id)}
+                    >
+                      <Play className="h-3 w-3 fill-current" />
+                      <span>Iniciar Protocolo</span>
+                    </Button>
+                  ) : (
+                    m.integratesWith?.includes("fsrs") ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs cursor-pointer"
+                        onClick={() => handleContextualNav("fsrs", m.id)}
+                      >
+                        <Cpu className="h-3 w-3 mr-1 text-accent-primary" />
+                        <span>Abrir en FSRS</span>
+                      </Button>
+                    ) : null
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+
       {/* 1. FOCUS HERO: Spotlight Prioritario de Hoy */}
       <section aria-labelledby="focus-hero-title">
         <div className="rounded-lg border border-accent-primary/30 bg-bg-elevated p-6 shadow-xs relative overflow-hidden">
@@ -650,172 +818,6 @@ export const MethodsPage: React.FC = () => {
             <span>Tutor IA Local & Ollama</span>
           </Button>
         </div>
-      </section>
-
-      {/* 3. REPERTORIO METODOLÓGICO COMPLETO */}
-      <section className="space-y-4" aria-labelledby="catalog-section-title">
-        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between border-b border-border-subtle pb-3">
-          <div>
-            <h2 id="catalog-section-title" className="font-serif text-lg font-semibold text-text-primary">
-              Repertorio Metodológico
-            </h2>
-            <span className="text-xs text-text-muted">
-              {filteredMethods.length} de {allMethods.length} técnicas catalogadas
-            </span>
-          </div>
-
-          <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-muted" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Buscar por nombre, objetivo o materia..."
-              className="w-full rounded border border-border-subtle bg-bg-secondary/60 pl-9 pr-3 py-1.5 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-colors"
-            />
-          </div>
-        </div>
-
-        {/* Filtros de Categoría y Estado */}
-        <div className="flex flex-col gap-3">
-          <div className="flex flex-wrap items-center gap-1.5">
-            {CATEGORIES.map((tab) => {
-              const count = tab.id === "all"
-                ? allMethods.length
-                : allMethods.filter((m) => m.category === tab.id).length;
-
-              const isSelected = selectedCategory === tab.id;
-
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setSelectedCategory(tab.id)}
-                  className={`rounded px-2.5 py-1 text-xs font-sans transition-colors cursor-pointer border ${
-                    isSelected
-                      ? "bg-accent-primary text-white border-accent-primary font-medium"
-                      : "bg-bg-elevated text-text-secondary border-border-subtle hover:text-text-primary hover:border-border-subtle/80"
-                  }`}
-                >
-                  {tab.label} <span className="opacity-75">({count})</span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="flex items-center gap-2 text-xs">
-            <span className="text-text-muted text-[11px]">Disponibilidad:</span>
-            {[
-              { id: "all", label: `Todos (${allMethods.length})` },
-              { id: "ready", label: `Interactivos (${allMethods.filter(m => m.implemented).length})` },
-              { id: "preview", label: `Próximamente (${allMethods.filter(m => !m.implemented).length})` },
-            ].map((statusTab) => (
-              <button
-                key={statusTab.id}
-                type="button"
-                onClick={() => setSelectedStatus(statusTab.id as any)}
-                className={`px-2 py-0.5 rounded text-xs transition-colors cursor-pointer ${
-                  selectedStatus === statusTab.id
-                    ? "font-semibold text-accent-primary border-b border-accent-primary"
-                    : "text-text-muted hover:text-text-primary"
-                }`}
-              >
-                {statusTab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Lista Indexada Tipo Catálogo */}
-        {filteredMethods.length === 0 ? (
-          <div className="rounded border border-dashed border-border-subtle p-10 text-center">
-            <p className="text-sm text-text-muted">No se encontraron métodos con los filtros actuales.</p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setSelectedCategory("all");
-                setSelectedStatus("all");
-                setSearchQuery("");
-              }}
-              className="mt-3 text-xs"
-            >
-              Restablecer Filtros
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {filteredMethods.map((m) => (
-              <div
-                key={m.id}
-                onClick={() => setPreviewMethod(m)}
-                className="group p-4 rounded-lg border border-border-subtle bg-bg-elevated hover:border-accent-primary/50 transition-colors cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4"
-              >
-                <div className="space-y-1 flex-1 min-w-0">
-                  <div className="flex items-center gap-2.5">
-                    <span className="font-serif text-base font-semibold text-text-primary group-hover:text-accent-primary transition-colors">
-                      {m.name}
-                    </span>
-                    {m.nameEn && (
-                      <span className="text-xs text-text-muted truncate max-w-[200px]">
-                        {m.nameEn}
-                      </span>
-                    )}
-                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-bg-secondary text-text-secondary border border-border-subtle">
-                      {CATEGORY_NAMES[m.category] || m.category}
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-text-secondary line-clamp-2 leading-relaxed">
-                    {m.description}
-                  </p>
-
-                  {m.scientificBasis && (
-                    <p className="text-[11px] text-text-muted line-clamp-1 italic">
-                      Base empírica: {m.scientificBasis}
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0 self-end md:self-auto" onClick={(e) => e.stopPropagation()}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs text-text-secondary hover:text-text-primary"
-                    onClick={() => setPreviewMethod(m)}
-                  >
-                    <Eye className="h-3.5 w-3.5 mr-1" />
-                    <span>Ver Ficha</span>
-                  </Button>
-
-                  {m.implemented ? (
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      className="text-xs flex items-center gap-1.5 cursor-pointer"
-                      onClick={() => handleStartMethod(m.id)}
-                    >
-                      <Play className="h-3 w-3 fill-current" />
-                      <span>Iniciar Protocolo</span>
-                    </Button>
-                  ) : (
-                    m.integratesWith?.includes("fsrs") ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-xs cursor-pointer"
-                        onClick={() => handleContextualNav("fsrs", m.id)}
-                      >
-                        <Cpu className="h-3 w-3 mr-1 text-accent-primary" />
-                        <span>Abrir en FSRS</span>
-                      </Button>
-                    ) : null
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </section>
 
       {/* Preview Modal */}

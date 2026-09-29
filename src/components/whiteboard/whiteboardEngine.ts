@@ -214,6 +214,8 @@ export function renderBackgroundGrid(
   height: number,
   surface: SurfaceTheme,
   gridType: "none" | "lines" | "grid" = "grid",
+  offsetX = 0,
+  offsetY = 0,
 ) {
   ctx.save();
 
@@ -228,7 +230,8 @@ export function renderBackgroundGrid(
       const step = 32;
 
       ctx.beginPath();
-      for (let y = step; y < height; y += step) {
+      for (let worldY = Math.ceil(offsetY / step) * step; worldY < offsetY + height; worldY += step) {
+        const y = worldY - offsetY;
         ctx.moveTo(0, y);
         ctx.lineTo(width, y);
       }
@@ -241,14 +244,16 @@ export function renderBackgroundGrid(
       ctx.strokeStyle = "rgba(244, 244, 240, 0.04)";
       ctx.lineWidth = 1;
       ctx.beginPath();
-      for (let x = step; x < width; x += step) {
-        if (x % majorStep !== 0) {
+      for (let worldX = Math.ceil(offsetX / step) * step; worldX < offsetX + width; worldX += step) {
+        const x = worldX - offsetX;
+        if (worldX % majorStep !== 0) {
           ctx.moveTo(x, 0);
           ctx.lineTo(x, height);
         }
       }
-      for (let y = step; y < height; y += step) {
-        if (y % majorStep !== 0) {
+      for (let worldY = Math.ceil(offsetY / step) * step; worldY < offsetY + height; worldY += step) {
+        const y = worldY - offsetY;
+        if (worldY % majorStep !== 0) {
           ctx.moveTo(0, y);
           ctx.lineTo(width, y);
         }
@@ -259,11 +264,13 @@ export function renderBackgroundGrid(
       ctx.strokeStyle = "rgba(244, 244, 240, 0.09)";
       ctx.lineWidth = 1;
       ctx.beginPath();
-      for (let x = majorStep; x < width; x += majorStep) {
+      for (let worldX = Math.ceil(offsetX / majorStep) * majorStep; worldX < offsetX + width; worldX += majorStep) {
+        const x = worldX - offsetX;
         ctx.moveTo(x, 0);
         ctx.lineTo(x, height);
       }
-      for (let y = majorStep; y < height; y += majorStep) {
+      for (let worldY = Math.ceil(offsetY / majorStep) * majorStep; worldY < offsetY + height; worldY += majorStep) {
+        const y = worldY - offsetY;
         ctx.moveTo(0, y);
         ctx.lineTo(width, y);
       }
@@ -280,7 +287,8 @@ export function renderBackgroundGrid(
       const step = 32;
 
       ctx.beginPath();
-      for (let y = step; y < height; y += step) {
+      for (let worldY = Math.ceil(offsetY / step) * step; worldY < offsetY + height; worldY += step) {
+        const y = worldY - offsetY;
         ctx.moveTo(0, y);
         ctx.lineTo(width, y);
       }
@@ -293,14 +301,16 @@ export function renderBackgroundGrid(
       ctx.strokeStyle = "rgba(44, 74, 111, 0.06)";
       ctx.lineWidth = 1;
       ctx.beginPath();
-      for (let x = step; x < width; x += step) {
-        if (x % majorStep !== 0) {
+      for (let worldX = Math.ceil(offsetX / step) * step; worldX < offsetX + width; worldX += step) {
+        const x = worldX - offsetX;
+        if (worldX % majorStep !== 0) {
           ctx.moveTo(x, 0);
           ctx.lineTo(x, height);
         }
       }
-      for (let y = step; y < height; y += step) {
-        if (y % majorStep !== 0) {
+      for (let worldY = Math.ceil(offsetY / step) * step; worldY < offsetY + height; worldY += step) {
+        const y = worldY - offsetY;
+        if (worldY % majorStep !== 0) {
           ctx.moveTo(0, y);
           ctx.lineTo(width, y);
         }
@@ -311,11 +321,13 @@ export function renderBackgroundGrid(
       ctx.strokeStyle = "rgba(44, 74, 111, 0.14)";
       ctx.lineWidth = 1;
       ctx.beginPath();
-      for (let x = majorStep; x < width; x += majorStep) {
+      for (let worldX = Math.ceil(offsetX / majorStep) * majorStep; worldX < offsetX + width; worldX += majorStep) {
+        const x = worldX - offsetX;
         ctx.moveTo(x, 0);
         ctx.lineTo(x, height);
       }
-      for (let y = majorStep; y < height; y += majorStep) {
+      for (let worldY = Math.ceil(offsetY / majorStep) * majorStep; worldY < offsetY + height; worldY += majorStep) {
+        const y = worldY - offsetY;
         ctx.moveTo(0, y);
         ctx.lineTo(width, y);
       }

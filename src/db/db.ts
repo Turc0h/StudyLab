@@ -323,6 +323,7 @@ export interface SavedBlackboardRecord {
   strokeCount: number;
   pointCount: number;
   surfaceTheme: "chalkboard" | "notebook";
+  viewOffset?: { x: number; y: number };
   previewDataUrl?: string;
   createdAt: number;
   updatedAt: number;
